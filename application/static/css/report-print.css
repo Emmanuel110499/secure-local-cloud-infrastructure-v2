@@ -1,0 +1,131 @@
+
+/* ======================================================
+   PREMIUM PRINT
+====================================================== */
+
+@media print {
+
+*{
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+}
+
+body{
+
+    background:#ffffff !important;
+
+}
+
+.report-card,
+.metric-card,
+.chart-card{
+
+    border:2px solid #d5dce7 !important;
+
+    box-shadow:none !important;
+
+}
+
+.metric-card{
+
+    background:#ffffff !important;
+
+}
+
+.metric-value{
+
+    color:#0f172a !important;
+
+    font-weight:800 !important;
+
+}
+
+.metric-title{
+
+    color:#334155 !important;
+
+    font-weight:700 !important;
+
+}
+
+.report-title{
+
+    color:#0f172a !important;
+
+    font-weight:900 !important;
+
+}
+
+.chart-title{
+
+    color:#111827 !important;
+
+    font-weight:800 !important;
+
+}
+
+small{
+
+    color:#475569 !important;
+
+}
+
+canvas{
+
+    filter:contrast(1.18) saturate(1.28);
+
+}
+
+svg{
+
+    filter:contrast(1.18) saturate(1.28);
+
+}
+
+}
+
+
+/* ======================================================
+   GRAPHIQUES — CONTRASTE IMPRESSION
+====================================================== */
+
+@media print {
+
+    canvas {
+        opacity: 1 !important;
+
+        filter:
+            contrast(1.20)
+            saturate(1.32) !important;
+    }
+
+    .cm-chart-card,
+    .monitoring-chart-card,
+    .report-chart-card,
+    .chart-card {
+        background: #ffffff !important;
+
+        border:
+            2px solid
+            #cbd5e1 !important;
+
+        box-shadow:
+            none !important;
+    }
+
+    .cm-chart-card h2,
+    .monitoring-chart-card h2,
+    .report-chart-card h2,
+    .chart-card h2 {
+        color: #0f172a !important;
+        font-weight: 800 !important;
+    }
+
+    .cm-chart-card small,
+    .monitoring-chart-card small,
+    .report-chart-card small,
+    .chart-card small {
+        color: #334155 !important;
+        font-weight: 600 !important;
+    }
+}

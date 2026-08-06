@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sécurité — Secure Local Cloud</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-pages.css', v='security-v5-20260803') }}"
+    >
+
+    <style>
+        .security-overview {
+            display: grid;
+            grid-template-columns:
+                190px minmax(0, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .security-score-card,
+        .security-summary-card {
+            padding: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .security-score-card {
+            display: grid;
+            place-items: center;
+            text-align: center;
+        }
+
+        .security-score-ring {
+            display: grid;
+            place-items: center;
+            align-content: center;
+            width: 105px;
+            height: 105px;
+            color: #047857;
+            background:
+                conic-gradient(
+                    #10b981 var(--score-angle, 360deg),
+                    #e8edf4 0
+                );
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .security-score-ring::before {
+            position: absolute;
+            inset: 9px;
+            content: "";
+            background: #ffffff;
+            border-radius: 50%;
+        }
+
+        .security-score-ring strong,
+        .security-score-ring small {
+            position: relative;
+            z-index: 1;
+            display: block;
+            line-height: 1;
+        }
+
+        .security-score-ring strong {
+            font-size: 1.35rem;
+            font-weight: 900;
+        }
+
+        .security-score-ring small {
+            margin-top: 5px;
+            color: #7b8797;
+            font-size: 0.55rem;
+        }
+
+        .security-score-card h2 {
+            margin: 13px 0 0;
+            font-size: 0.82rem;
+        }
+
+        .security-score-card p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 0.61rem;
+            line-height: 1.5;
+        }
+
+        .security-summary-card {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .security-summary-item {
+            min-width: 0;
+            padding: 14px;
+            background: #f8fafc;
+            border: 1px solid #edf1f5;
+            border-radius: 13px;
+        }
+
+        .security-summary-item span,
+        .security-summary-item strong,
+        .security-summary-item small {
+            display: block;
+        }
+
+        .security-summary-item span {
+            color: var(--muted);
+            font-size: 0.55rem;
+            font-weight: 700;
+        }
+
+        .security-summary-item strong {
+            margin-top: 6px;
+            overflow: hidden;
+            color: #334155;
+            font-size: 0.72rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .security-summary-item small {
+            margin-top: 4px;
+            color: #8793a5;
+            font-size: 0.5rem;
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 13px;
+            margin-bottom: 16px;
+        }
+
+        .security-control {
+            min-width: 0;
+            padding: 17px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: var(--shadow);
+        }
+
+        .security-control-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 11px;
+            margin-bottom: 13px;
+        }
+
+        .security-control-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .security-control-icon {
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 39px;
+            height: 39px;
+            color: #315fd8;
+            background: #eaf1ff;
+            border: 1px solid #d9e4f7;
+            border-radius: 12px;
+        }
+
+        .security-control-icon.green {
+            color: #047857;
+            background: #ecfdf5;
+            border-color: #d1fae5;
+        }
+
+        .security-control-icon.orange {
+            color: #b45309;
+            background: #fffbeb;
+            border-color: #fef3c7;
+        }
+
+        .security-control-icon.purple {
+            color: #7c3aed;
+            background: #f5f3ff;
+            border-color: #ede9fe;
+        }
+
+        .security-control-icon svg {
+            width: 21px;
+            height: 21px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .security-control-title strong,
+        .security-control-title span {
+            display: block;
+        }
+
+        .security-control-title strong {
+            font-size: 0.74rem;
+        }
+
+        .security-control-title span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.53rem;
+        }
+
+        .security-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex: 0 0 auto;
+            min-height: 27px;
+            padding: 0 9px;
+            color: #047857;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            font-size: 0.54rem;
+            font-weight: 900;
+        }
+
+        .security-status::before {
+            width: 7px;
+            height: 7px;
+            content: "";
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .security-status.down {
+            color: #b91c1c;
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        .security-status.down::before {
+            background: #ef4444;
+        }
+
+        .security-control p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.62rem;
+            line-height: 1.6;
+        }
+
+        .security-detail-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .security-detail {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 10px;
+            background: #f8fafc;
+            border: 1px solid #edf1f5;
+            border-radius: 10px;
+        }
+
+        .security-detail span {
+            color: var(--muted);
+            font-size: 0.54rem;
+        }
+
+        .security-detail strong {
+            color: #334155;
+            font-size: 0.58rem;
+            text-align: right;
+        }
+
+        .protection-flow {
+            display: grid;
+            grid-template-columns:
+                repeat(7, minmax(0, 1fr));
+            align-items: center;
+            gap: 7px;
+        }
+
+        .protection-node {
+            min-width: 0;
+            padding: 13px 8px;
+            text-align: center;
+            background: #f8fafc;
+            border: 1px solid #e7ecf3;
+            border-radius: 12px;
+        }
+
+        .protection-node strong,
+        .protection-node span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .protection-node strong {
+            color: #334155;
+            font-size: 0.61rem;
+        }
+
+        .protection-node span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.49rem;
+        }
+
+        .protection-arrow {
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .recommendations {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .recommendation {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 13px;
+            background: #f8fafc;
+            border: 1px solid #edf1f5;
+            border-radius: 12px;
+        }
+
+        .recommendation-number {
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 28px;
+            height: 28px;
+            color: #315fd8;
+            background: #eaf1ff;
+            border-radius: 9px;
+            font-size: 0.6rem;
+            font-weight: 900;
+        }
+
+        .recommendation strong,
+        .recommendation span {
+            display: block;
+        }
+
+        .recommendation strong {
+            color: #334155;
+            font-size: 0.63rem;
+        }
+
+        .recommendation span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.55rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1000px) {
+            .security-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .protection-flow {
+                grid-template-columns:
+                    repeat(4, minmax(0, 1fr));
+            }
+
+            .protection-arrow {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .security-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .security-score-card {
+                grid-template-columns: auto minmax(0, 1fr);
+                gap: 15px;
+                text-align: left;
+            }
+
+            .security-score-ring {
+                width: 82px;
+                height: 82px;
+            }
+
+            .security-summary-card {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .security-summary-card::-webkit-scrollbar {
+                display: none;
+            }
+
+            .security-summary-item {
+                flex: 0 0 145px;
+            }
+
+            .security-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .protection-flow {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .protection-flow::-webkit-scrollbar {
+                display: none;
+            }
+
+            .protection-node {
+                flex: 0 0 120px;
+            }
+
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-theme-v2.css', v='dashboard-unified-3') }}"
+    >
+
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/portal-security-v5.css', v='security-realism-3') }}"
+>
+<style id="security-opera-critical-v5">
+    .security-maintenance-icon {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 74px !important;
+        width: 74px !important;
+        height: 74px !important;
+        min-width: 74px !important;
+        min-height: 74px !important;
+        max-width: 74px !important;
+        max-height: 74px !important;
+        padding: 15px !important;
+        overflow: hidden !important;
+    }
+
+    .security-maintenance-icon img,
+    .security-maintenance-icon svg {
+        position: static !important;
+        display: block !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+        max-width: 38px !important;
+        max-height: 38px !important;
+        margin: auto !important;
+        padding: 0 !important;
+        object-fit: contain !important;
+        transform: none !important;
+    }
+
+    .real-security-node .brand-logo {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 68px !important;
+        height: 68px !important;
+        min-width: 68px !important;
+        min-height: 68px !important;
+        max-width: 68px !important;
+        max-height: 68px !important;
+        margin: 0 auto 13px !important;
+        padding: 14px !important;
+        overflow: hidden !important;
+    }
+
+    .real-security-node .brand-logo img,
+    .real-security-node .brand-logo svg {
+        display: block !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        margin: auto !important;
+        object-fit: contain !important;
+        transform: none !important;
+    }
+</style>
+<meta
+    http-equiv="Cache-Control"
+    content="no-cache, no-store, must-revalidate"
+>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4 portal-body">
+    <main class="portal-page">
+        <header class="portal-header">
+            <div class="portal-title">
+                <div class="portal-title-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3 5 6v5c0 4.8 2.8 8.3 7 10 4.2-1.7 7-5.2 7-10V6Z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>Sécurité de l’infrastructure</h1>
+
+                    <p>
+                        État des mécanismes de protection,
+                        authentification et chiffrement.
+                    </p>
+                </div>
+            </div>
+
+            <a class="portal-back" href="/">
+                ← Tableau de bord
+            </a>
+        </header>
+
+        {% set active_controls = [
+            security.https.enabled,
+            security.authentication,
+            security.ufw,
+            security.fail2ban,
+            security.nginx,
+            security.alertmanager
+        ] | select | list | length %}
+
+        {% set security_score = ((active_controls / 6) * 100) | round | int %}
+
+        <section class="security-overview">
+            <article class="security-score-card">
+                <div
+                    class="security-score-ring"
+                    style="--score-angle: {{ security_score * 3.6 }}deg"
+                >
+                    <strong>{{ security_score }}</strong>
+                    <small>/100</small>
+                </div>
+
+                <div>
+                    <h2>
+                        {% if security_score >= 90 %}
+                            Protection élevée
+                        {% elif security_score >= 70 %}
+                            Protection correcte
+                        {% else %}
+                            Vigilance requise
+                        {% endif %}
+                    </h2>
+
+                    <p>
+                        {{ active_controls }}/6 contrôles
+                        principaux sont actifs.
+                    </p>
+                </div>
+            </article>
+
+            <article class="security-summary-card">
+                <div class="security-summary-item">
+                    <span>Certificat TLS</span>
+
+                    <strong>
+                        {% if security.https.enabled %}
+                            Valide
+                        {% else %}
+                            Indisponible
+                        {% endif %}
+                    </strong>
+
+                    <small>
+                        Expire le {{ security.https.expires_at }}
+                    </small>
+                </div>
+
+                <div class="security-summary-item">
+                    <span>Durée restante</span>
+
+                    <strong>
+                        {{ security.https.days_remaining }} jours
+                    </strong>
+
+                    <small>
+                        Renouvellement à anticiper
+                    </small>
+                </div>
+
+                <div class="security-summary-item">
+                    <span>Contrôle d’accès</span>
+
+                    <strong>Cloudflare Zero Trust</strong>
+
+                    <small>
+                        Accès externe protégé
+                    </small>
+                </div>
+
+                <div class="security-summary-item">
+                    <span>Sessions</span>
+
+                    <strong>Flask sécurisé</strong>
+
+                    <small>
+                        Authentification obligatoire
+                    </small>
+                </div>
+
+                <div class="security-summary-item">
+                    <span>Pare-feu</span>
+
+                    <strong>
+                        {% if security.ufw %}
+                            UFW actif
+                        {% else %}
+                            UFW inactif
+                        {% endif %}
+                    </strong>
+
+                    <small>
+                        Filtrage entrant
+                    </small>
+                </div>
+
+                <div class="security-summary-item">
+                    <span>Protection SSH</span>
+
+                    <strong>
+                        {% if security.fail2ban %}
+                            Fail2ban actif
+                        {% else %}
+                            Fail2ban inactif
+                        {% endif %}
+                    </strong>
+
+                    <small>
+                        Blocage des tentatives répétées
+                    </small>
+                </div>
+            </article>
+        </section>
+
+        <section class="security-grid">
+            <article class="security-control">
+                <header class="security-control-header">
+                    <div class="security-control-title">
+                        <span class="security-control-icon green">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 11V8a5 5 0 0 1 10 0v3"/>
+                                <rect x="5" y="11" width="14" height="10" rx="2"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>HTTPS et TLS</strong>
+                            <span>Chiffrement des échanges</span>
+                        </div>
+                    </div>
+
+                    <span class="security-status {% if not security.https.enabled %}down{% endif %}">
+                        {% if security.https.enabled %}
+                            Actif
+                        {% else %}
+                            Indisponible
+                        {% endif %}
+                    </span>
+                </header>
+
+                <p>
+                    Les communications entre le navigateur et
+                    la plateforme sont protégées par un certificat TLS.
+                </p>
+
+                <div class="security-detail-list">
+                    <div class="security-detail">
+                        <span>Expiration</span>
+                        <strong>{{ security.https.expires_at }}</strong>
+                    </div>
+
+                    <div class="security-detail">
+                        <span>Jours restants</span>
+                        <strong>{{ security.https.days_remaining }}</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="security-control">
+                <header class="security-control-header">
+                    <div class="security-control-title">
+                        <span class="security-control-icon">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="8" r="3.5"/>
+                                <path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>Authentification</strong>
+                            <span>Sessions administrateur</span>
+                        </div>
+                    </div>
+
+                    <span class="security-status">
+                        Active
+                    </span>
+                </header>
+
+                <p>
+                    Les routes sensibles nécessitent une session
+                    authentifiée et un compte administrateur valide.
+                </p>
+
+                <div class="security-detail-list">
+                    <div class="security-detail">
+                        <span>Stockage du mot de passe</span>
+                        <strong>Hash sécurisé</strong>
+                    </div>
+
+                    <div class="security-detail">
+                        <span>Déconnexion</span>
+                        <strong>Session supprimée</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="security-control">
+                <header class="security-control-header">
+                    <div class="security-control-title">
+                        <span class="security-control-icon orange">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 5h16v14H4Z"/>
+                                <path d="M4 9h16M8 5v4M16 5v4"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>Pare-feu UFW</strong>
+                            <span>Filtrage réseau</span>
+                        </div>
+                    </div>
+
+                    <span class="security-status {% if not security.ufw %}down{% endif %}">
+                        {% if security.ufw %}
+                            Actif
+                        {% else %}
+                            Inactif
+                        {% endif %}
+                    </span>
+                </header>
+
+                <p>
+                    Les connexions entrantes non autorisées sont
+                    bloquées et seuls les ports nécessaires sont ouverts.
+                </p>
+
+                <div class="security-detail-list">
+                    <div class="security-detail">
+                        <span>Politique entrante</span>
+                        <strong>Refus par défaut</strong>
+                    </div>
+
+                    <div class="security-detail">
+                        <span>SSH</span>
+                        <strong>Accès contrôlé</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="security-control">
+                <header class="security-control-header">
+                    <div class="security-control-title">
+                        <span class="security-control-icon purple">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M6 18 18 6"/>
+                                <path d="M8 6h10v10"/>
+                                <path d="M4 12v8h8"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>Fail2ban</strong>
+                            <span>Protection des accès SSH</span>
+                        </div>
+                    </div>
+
+                    <span class="security-status {% if not security.fail2ban %}down{% endif %}">
+                        {% if security.fail2ban %}
+                            Actif
+                        {% else %}
+                            Inactif
+                        {% endif %}
+                    </span>
+                </header>
+
+                <p>
+                    Les tentatives de connexion répétées sont
+                    surveillées et les adresses suspectes sont bloquées.
+                </p>
+
+                <div class="security-detail-list">
+                    <div class="security-detail">
+                        <span>Jail</span>
+                        <strong>sshd</strong>
+                    </div>
+
+                    <div class="security-detail">
+                        <span>Réponse</span>
+                        <strong>Bannissement automatique</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="security-control">
+                <header class="security-control-header">
+                    <div class="security-control-title">
+                        <span class="security-control-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 4h14v16H5Z"/>
+                                <path d="M8 8h8M8 12h8M8 16h5"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>Nginx</strong>
+                            <span>Reverse proxy applicatif</span>
+                        </div>
+                    </div>
+
+                    <span class="security-status {% if not security.nginx %}down{% endif %}">
+                        {% if security.nginx %}
+                            Disponible
+                        {% else %}
+                            Indisponible
+                        {% endif %}
+                    </span>
+                </header>
+
+                <p>
+                    Nginx centralise les accès HTTP et HTTPS avant
+                    de transmettre les requêtes à l’application Flask.
+                </p>
+
+                <div class="security-detail-list">
+                    <div class="security-detail">
+                        <span>Exposition</span>
+                        <strong>Ports 80 / 443</strong>
+                    </div>
+
+                    <div class="security-detail">
+                        <span>Backend</span>
+                        <strong>Flask / Gunicorn</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="security-control">
+                <header class="security-control-header">
+                    <div class="security-control-title">
+                        <span class="security-control-icon green">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 4v4M12 16v4M4 12h4M16 12h4"/>
+                                <circle cx="12" cy="12" r="4"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>Alertmanager</strong>
+                            <span>Gestion des alertes</span>
+                        </div>
+                    </div>
+
+                    <span class="security-status {% if not security.alertmanager %}down{% endif %}">
+                        {% if security.alertmanager %}
+                            Disponible
+                        {% else %}
+                            Indisponible
+                        {% endif %}
+                    </span>
+                </header>
+
+                <p>
+                    Alertmanager reçoit les alertes Prometheus
+                    et permet leur regroupement et leur traitement.
+                </p>
+
+                <div class="security-detail-list">
+                    <div class="security-detail">
+                        <span>Adresse</span>
+                        <strong>192.168.50.20:9093</strong>
+                    </div>
+
+                    <div class="security-detail">
+                        <span>Contrôle</span>
+                        <strong>Endpoint /-/healthy</strong>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="portal-section">
+            <div class="portal-section-header">
+                <h2>Chaîne de protection</h2>
+
+                <span>Accès externe vers l’application</span>
+            </div>
+
+            <div class="protection-flow">
+                <article class="protection-node">
+                    <strong>Utilisateur</strong>
+                    <span>Navigateur</span>
+                </article>
+
+                <span class="protection-arrow">→</span>
+
+                <article class="protection-node">
+                    <strong>Cloudflare</strong>
+                    <span>Zero Trust</span>
+                </article>
+
+                <span class="protection-arrow">→</span>
+
+                <article class="protection-node">
+                    <strong>HTTPS</strong>
+                    <span>Chiffrement TLS</span>
+                </article>
+
+                <span class="protection-arrow">→</span>
+
+                <article class="protection-node">
+                    <strong>Nginx</strong>
+                    <span>Reverse proxy</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="security-maintenance-section">
+    <header class="security-maintenance-header">
+        <div>
+            <h2>Recommandations de maintien en sécurité</h2>
+            <p>
+                Actions régulières permettant de maintenir le niveau
+                de protection de l’infrastructure.
+            </p>
+        </div>
+
+        <span class="security-maintenance-label">
+            Bonnes pratiques opérationnelles
+        </span>
+    </header>
+
+    <div class="security-maintenance-grid">
+
+        <article class="security-maintenance-card">
+            <div class="security-maintenance-icon">
+                <span class="security-maintenance-number">1</span>
+
+                <img
+                    src="{{ url_for('static', filename='brand/cloudflare.svg') }}"
+                    alt="Certificat TLS"
+                >
+            </div>
+
+            <div class="security-maintenance-content">
+                <h3>Renouveler le certificat à temps</h3>
+
+                <p>
+                    Prévoir une alerte avant les 30 derniers jours
+                    de validité du certificat TLS.
+                </p>
+
+                <span class="security-maintenance-tag">
+                    TLS / HTTPS
+                </span>
+            </div>
+        </article>
+
+        <article class="security-maintenance-card">
+            <div class="security-maintenance-icon">
+                <span class="security-maintenance-number">2</span>
+
+                <img
+                    src="{{ url_for('static', filename='brand/linux.svg') }}"
+                    alt="Journaux SSH"
+                >
+            </div>
+
+            <div class="security-maintenance-content">
+                <h3>Contrôler les journaux SSH</h3>
+
+                <p>
+                    Examiner régulièrement les événements Fail2ban
+                    et les connexions inhabituelles.
+                </p>
+
+                <span class="security-maintenance-tag">
+                    SSH / Fail2ban
+                </span>
+            </div>
+        </article>
+
+        <article class="security-maintenance-card">
+            <div class="security-maintenance-icon">
+                <span class="security-maintenance-number">3</span>
+
+                <img
+                    src="{{ url_for('static', filename='brand/nginx.svg') }}"
+                    alt="Ports exposés"
+                >
+            </div>
+
+            <div class="security-maintenance-content">
+                <h3>Limiter les ports exposés</h3>
+
+                <p>
+                    Conserver uniquement les ports nécessaires
+                    et contrôler régulièrement les règles UFW.
+                </p>
+
+                <span class="security-maintenance-tag">
+                    UFW / Réseau
+                </span>
+            </div>
+        </article>
+
+        <article class="security-maintenance-card">
+            <div class="security-maintenance-icon">
+                <span class="security-maintenance-number">4</span>
+
+                <img
+                    src="{{ url_for('static', filename='brand/alertmanager.svg') }}"
+                    alt="Alertmanager"
+                >
+            </div>
+
+            <div class="security-maintenance-content">
+                <h3>Vérifier Alertmanager</h3>
+
+                <p>
+                    Tester périodiquement l’émission et la réception
+                    d’une alerte de supervision.
+                </p>
+
+                <span class="security-maintenance-tag">
+                    Prometheus / Alertes
+                </span>
+            </div>
+        </article>
+
+    </div>
+</section>
+    <section
+    id="real-security-map"
+    class="real-security-section"
+>
+    <header class="real-section-head">
+        <div>
+            <h2>Chaîne de protection de l’infrastructure</h2>
+
+            <p>
+                Vue des contrôles appliqués depuis l’accès externe
+                jusqu’à l’application Flask et aux services internes.
+            </p>
+        </div>
+
+        <span class="live-pill">
+            Protection active
+        </span>
+    </header>
+
+    <div class="real-security-flow">
+        <article class="real-security-node">
+            <span class="brand-logo large cloudflare">
+                <img
+                    src="{{ url_for('static', filename='brand/cloudflare.svg') }}"
+                    alt="Cloudflare"
+                >
+            </span>
+
+            <div>
+                <h3>Cloudflare Zero Trust</h3>
+
+                <p>
+                    Contrôle d’identité, filtrage et tunnel sécurisé.
+                </p>
+
+                <span class="real-security-status">
+                    Accès externe protégé
+                </span>
+            </div>
+        </article>
+
+        <div class="real-security-arrow">
+            <span></span>
+        </div>
+
+        <article class="real-security-node">
+            <span class="real-security-symbol https">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 11V8a5 5 0 0 1 10 0v3"/>
+                    <rect
+                        x="5"
+                        y="11"
+                        width="14"
+                        height="10"
+                        rx="2"
+                    />
+                    <path d="m9 16 2 2 4-4"/>
+                </svg>
+            </span>
+
+            <div>
+                <h3>HTTPS / TLS</h3>
+
+                <p>
+                    Chiffrement des échanges entre l’administrateur
+                    et le portail.
+                </p>
+
+                <span class="real-security-status">
+                    Certificat actif
+                </span>
+            </div>
+        </article>
+
+        <div class="real-security-arrow">
+            <span></span>
+        </div>
+
+        <article class="real-security-node">
+            <span class="brand-logo large nginx">
+                <img
+                    src="{{ url_for('static', filename='brand/nginx.svg') }}"
+                    alt="Nginx"
+                >
+            </span>
+
+            <div>
+                <h3>Nginx</h3>
+
+                <p>
+                    Reverse proxy et point d’entrée applicatif.
+                </p>
+
+                <span class="real-security-status">
+                    Proxy disponible
+                </span>
+            </div>
+        </article>
+
+        <div class="real-security-arrow">
+            <span></span>
+        </div>
+
+        <article class="real-security-node">
+            <span class="brand-logo large flask">
+                <img
+                    src="{{ url_for('static', filename='brand/flask.svg') }}"
+                    alt="Flask"
+                >
+            </span>
+
+            <div>
+                <h3>Authentification Flask</h3>
+
+                <p>
+                    Sessions protégées et accès aux pages sensibles.
+                </p>
+
+                <span class="real-security-status">
+                    Session obligatoire
+                </span>
+            </div>
+        </article>
+    </div>
+
+    <div class="real-security-grid">
+        <article class="real-security-control">
+            <span class="real-security-symbol firewall">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h6v5H4Z"/>
+                    <path d="M14 6h6v5h-6Z"/>
+                    <path d="M7 11h10v5H7Z"/>
+                    <path d="M4 16h6v4H4Z"/>
+                    <path d="M14 16h6v4h-6Z"/>
+                </svg>
+            </span>
+
+            <div>
+                <h3>UFW</h3>
+
+                <p>
+                    Limite les ports et bloque les connexions
+                    entrantes non autorisées.
+                </p>
+
+                <strong>
+                    {% if security.ufw %}
+                        Actif
+                    {% else %}
+                        Indisponible
+                    {% endif %}
+                </strong>
+            </div>
+        </article>
+
+        <article class="real-security-control">
+            <span class="real-security-symbol fail2ban">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3 5 6v5c0 4.8 2.8 8.3 7 10 4.2-1.7 7-5.2 7-10V6Z"/>
+                    <path d="M9 9l6 6M15 9l-6 6"/>
+                </svg>
+            </span>
+
+            <div>
+                <h3>Fail2ban</h3>
+
+                <p>
+                    Bloque les adresses responsables de tentatives
+                    répétées de connexion.
+                </p>
+
+                <strong>
+                    {% if security.fail2ban %}
+                        Actif
+                    {% else %}
+                        Indisponible
+                    {% endif %}
+                </strong>
+            </div>
+        </article>
+
+        <article class="real-security-control">
+            <span class="brand-logo small alertmanager">
+                <img
+                    src="{{ url_for('static', filename='brand/prometheus.svg') }}"
+                    alt="Alertmanager"
+                >
+            </span>
+
+            <div>
+                <h3>Alertmanager</h3>
+
+                <p>
+                    Centralise et route les alertes issues de Prometheus.
+                </p>
+
+                <strong>
+                    {% if security.alertmanager %}
+                        Disponible
+                    {% else %}
+                        Indisponible
+                    {% endif %}
+                </strong>
+            </div>
+        </article>
+
+        <article class="real-security-control">
+            <span class="real-security-symbol certificate">
+                <svg viewBox="0 0 24 24">
+                    <path d="M6 3h12v18H6Z"/>
+                    <path d="M9 8h6M9 12h6"/>
+                    <circle cx="12" cy="17" r="2"/>
+                </svg>
+            </span>
+
+            <div>
+                <h3>Certificat TLS</h3>
+
+                <p>
+                    Expiration :
+                    {{ security.https.expires_at }}
+                </p>
+
+                <strong>
+                    {{ security.https.days_remaining }}
+                    jour(s) restant(s)
+                </strong>
+            </div>
+        </article>
+    </div>
+
+    <div class="real-security-summary">
+        <article>
+            <span>HTTPS</span>
+
+            <strong>
+                {% if security.https.enabled %}
+                    Actif
+                {% else %}
+                    Inactif
+                {% endif %}
+            </strong>
+        </article>
+
+        <article>
+            <span>Nginx</span>
+
+            <strong>
+                {% if security.nginx %}
+                    Disponible
+                {% else %}
+                    Indisponible
+                {% endif %}
+            </strong>
+        </article>
+
+        <article>
+            <span>Authentification</span>
+
+            <strong>
+                {% if security.authentication %}
+                    Active
+                {% else %}
+                    Inactive
+                {% endif %}
+            </strong>
+        </article>
+
+        <article>
+            <span>Alertes</span>
+
+            <strong>
+                {% if security.alertmanager %}
+                    Opérationnelles
+                {% else %}
+                    Indisponibles
+                {% endif %}
+            </strong>
+        </article>
+    </div>
+</section>
+
+</main>
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

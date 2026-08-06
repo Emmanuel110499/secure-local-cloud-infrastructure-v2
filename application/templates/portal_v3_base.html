@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}Secure Local Cloud{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v3.css', v='remaining-v3-4') }}"
+    >
+
+    {% block head %}{% endblock %}
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4 v3-body">
+    <div class="v3-background-orb v3-background-orb-one"></div>
+    <div class="v3-background-orb v3-background-orb-two"></div>
+
+    <main class="v3-page">
+        <header class="v3-topbar">
+            <a
+                class="v3-brand"
+                href="/"
+                aria-label="Retour au tableau de bord"
+            >
+                <span class="v3-brand-mark">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3 5 6v5c0 4.8 2.8 8.3 7 10 4.2-1.7 7-5.2 7-10V6Z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </span>
+
+                <span>
+                    <strong>Secure Local</strong>
+                    <small>Cloud Infrastructure</small>
+                </span>
+            </a>
+
+            <nav class="v3-top-actions">
+                {% block top_actions %}{% endblock %}
+
+                <a
+                    class="v3-dashboard-link"
+                    href="/"
+                >
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 11 12 3l9 8"/>
+                        <path d="M5 10v10h14V10"/>
+                        <path d="M9 20v-6h6v6"/>
+                    </svg>
+
+                    <span>Tableau de bord</span>
+                </a>
+            </nav>
+        </header>
+
+        <section class="v3-page-heading">
+            <div class="v3-heading-identity">
+                <span class="v3-page-icon">
+                    {% block page_icon %}
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 5h16v14H4Z"/>
+                        </svg>
+                    {% endblock %}
+                </span>
+
+                <div>
+                    <div class="v3-breadcrumb">
+                        Secure Local Cloud
+                        <span>/</span>
+                        {% block breadcrumb %}Portail{% endblock %}
+                    </div>
+
+                    <h1>{% block page_title %}Portail{% endblock %}</h1>
+
+                    <p>
+                        {% block page_description %}
+                            Gestion de l’infrastructure locale sécurisée.
+                        {% endblock %}
+                    </p>
+                </div>
+            </div>
+
+            {% block heading_actions %}{% endblock %}
+        </section>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <div
+        id="v3-toast-container"
+        class="v3-toast-container"
+        aria-live="polite"
+    ></div>
+
+    <script
+        src="{{ url_for('static', filename='js/portal-v3.js', v='remaining-v3-4') }}"
+    ></script>
+
+    {% block scripts %}{% endblock %}
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

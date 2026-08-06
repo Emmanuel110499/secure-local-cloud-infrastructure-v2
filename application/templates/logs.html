@@ -1,0 +1,279 @@
+{% extends "portal_v3_base.html" %}
+
+{% block title %}Journaux — Secure Local Cloud{% endblock %}
+{% block breadcrumb %}Observabilité / Journaux{% endblock %}
+{% block page_title %}Journaux système{% endblock %}
+
+{% block page_description %}
+Consultation des journaux applicatifs et techniques
+exportés par la plateforme.
+{% endblock %}
+
+{% block page_icon %}
+<svg viewBox="0 0 24 24">
+    <path d="M6 3h12v18H6Z"/>
+    <path d="M9 8h6M9 12h6M9 16h4"/>
+</svg>
+{% endblock %}
+
+{% block content %}
+<section class="v3-toolbar">
+    <label class="v3-search">
+        <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-4-4"/>
+        </svg>
+
+        <input
+            id="log-search"
+            type="search"
+            placeholder="Rechercher dans le journal affiché…"
+        >
+    </label>
+
+    <div class="v3-tabs">
+        <a class="v3-tab" href="/audit">Audit</a>
+        <a class="v3-tab active" href="/logs">Journaux</a>
+        <a class="v3-tab" href="/monitoring">Monitoring</a>
+    </div>
+</section>
+
+<section class="v3-stat-grid">
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Journal sélectionné</span>
+
+            <span class="v3-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M6 3h12v18H6Z"/>
+                    <path d="M9 8h6M9 12h6"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong
+            id="selected-log-name"
+            style="font-size:.83rem"
+        >
+            {{ selected_log or "application" }}
+        </strong>
+
+        <small>Source actuellement affichée</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Lignes chargées</span>
+
+            <span class="v3-icon cyan">
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 7h14M5 12h14M5 17h9"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="log-lines-count">{{ log_lines | length }}</strong>
+        <small>Entrées affichées</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Filtrage</span>
+
+            <span class="v3-icon purple">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 5h16l-6 7v6l-4 2v-8Z"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong
+            id="log-filter-state"
+            style="font-size:.83rem"
+        >
+            Aucun
+        </strong>
+
+        <small>Recherche locale instantanée</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Mode d’accès</span>
+
+            <span class="v3-icon green">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 11V8a5 5 0 0 1 10 0v3"/>
+                    <rect x="5" y="11" width="14" height="10" rx="2"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong style="font-size:.83rem">
+            Lecture seule
+        </strong>
+
+        <small>Aucune modification des fichiers</small>
+    </article>
+</section>
+
+<section class="v3-panel">
+    <header class="v3-panel-header">
+        <div>
+            <h2>Contenu du journal</h2>
+            <p>
+                Les lignes sont affichées dans l’ordre fourni
+                par le service de journaux.
+            </p>
+        </div>
+
+        <div style="display:flex;gap:7px">
+            <button
+                id="copy-logs"
+                class="v3-button"
+                type="button"
+            >
+                Copier
+            </button>
+
+            <button
+                id="refresh-logs"
+                class="v3-button primary"
+                type="button"
+            >
+                Actualiser
+            </button>
+        </div>
+    </header>
+
+    <pre
+        id="log-content"
+        class="v3-code-panel"
+    >{% for line in log_lines %}{{ line }}
+{% endfor %}</pre>
+
+    <div
+        id="logs-updated"
+        class="v3-updated"
+    >
+        Journal chargé depuis le serveur.
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const content = document.getElementById("log-content");
+    const search = document.getElementById("log-search");
+    const selectedLog =
+        {{ (selected_log or "application") | tojson }};
+
+    let originalText = content.textContent;
+
+    function applySearch() {
+        const query = search.value.trim().toLowerCase();
+
+        document.getElementById(
+            "log-filter-state"
+        ).textContent = query || "Aucun";
+
+        if (!query) {
+            content.textContent = originalText;
+            return;
+        }
+
+        content.textContent = originalText
+            .split("\n")
+            .filter((line) =>
+                line.toLowerCase().includes(query)
+            )
+            .join("\n");
+    }
+
+    async function refresh() {
+        try {
+            const response = await fetch(
+                `/api/logs/${
+                    encodeURIComponent(selectedLog)
+                }?t=${Date.now()}`,
+                { cache: "no-store" }
+            );
+
+            if (!response.ok) {
+                throw new Error("Journal indisponible");
+            }
+
+            const payload = await response.json();
+
+            if (Array.isArray(payload.lines)) {
+                originalText = payload.lines.join("\n");
+            } else if (typeof payload.content === "string") {
+                originalText = payload.content;
+            } else if (typeof payload.logs === "string") {
+                originalText = payload.logs;
+            } else if (Array.isArray(payload)) {
+                originalText = payload.join("\n");
+            } else {
+                originalText = JSON.stringify(
+                    payload,
+                    null,
+                    2
+                );
+            }
+
+            document.getElementById(
+                "log-lines-count"
+            ).textContent =
+                originalText.split("\n").filter(Boolean).length;
+
+            applySearch();
+
+            document.getElementById(
+                "logs-updated"
+            ).textContent =
+                `Actualisé à ${
+                    new Date().toLocaleTimeString("fr-FR")
+                }`;
+        } catch (error) {
+            console.error(error);
+
+            PortalV3.showToast(
+                "Impossible d’actualiser le journal.",
+                "error"
+            );
+        }
+    }
+
+    search.addEventListener("input", applySearch);
+
+    document.getElementById(
+        "refresh-logs"
+    ).addEventListener("click", refresh);
+
+    document.getElementById(
+        "copy-logs"
+    ).addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(
+                content.textContent
+            );
+
+            PortalV3.showToast(
+                "Journal copié dans le presse-papiers."
+            );
+        } catch (error) {
+            PortalV3.showToast(
+                "Impossible de copier le journal.",
+                "error"
+            );
+        }
+    });
+});
+</script>
+{% endblock %}
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>

@@ -1,0 +1,302 @@
+{% extends "portal_v3_base.html" %}
+
+{% set active_docker_page = "networks" %}
+
+{% block title %}Réseaux Docker — Secure Local Cloud{% endblock %}
+{% block breadcrumb %}Docker / Réseaux{% endblock %}
+{% block page_title %}Réseaux Docker{% endblock %}
+
+{% block page_description %}
+Topologie des réseaux Docker locaux et nombre de conteneurs
+connectés à chaque segment.
+{% endblock %}
+
+{% block page_icon %}
+<svg viewBox="0 0 24 24">
+    <circle cx="6" cy="12" r="2.5"/>
+    <circle cx="18" cy="6" r="2.5"/>
+    <circle cx="18" cy="18" r="2.5"/>
+    <path d="m8.2 10.9 7.5-3.8M8.2 13.1l7.5 3.8"/>
+</svg>
+{% endblock %}
+
+{% block content %}
+<section class="v3-toolbar">
+    <label class="v3-search">
+        <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-4-4"/>
+        </svg>
+
+        <input
+            id="network-search"
+            type="search"
+            placeholder="Rechercher un réseau, un driver ou un scope…"
+        >
+    </label>
+
+    {% include "_docker_tabs.html" %}
+</section>
+
+<section class="v3-stat-grid">
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Réseaux détectés</span>
+
+            <span class="v3-icon cyan">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="6" cy="12" r="2.5"/>
+                    <circle cx="18" cy="6" r="2.5"/>
+                    <circle cx="18" cy="18" r="2.5"/>
+                    <path d="m8.2 10.9 7.5-3.8M8.2 13.1l7.5 3.8"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="networks-total">{{ networks | length }}</strong>
+        <small>Réseaux Docker disponibles</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Conteneurs connectés</span>
+
+            <span class="v3-icon green">
+                <svg viewBox="0 0 24 24">
+                    <rect x="4" y="6" width="16" height="12" rx="2"/>
+                    <path d="M8 10h8M8 14h5"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="networks-containers">
+            {{ networks | sum(attribute="containers") }}
+        </strong>
+
+        <small>Connexions réseau recensées</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Réseaux bridge</span>
+
+            <span class="v3-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 18h16M6 18V9M18 18V9M6 9c3-4 9-4 12 0"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="networks-bridge">
+            {{ networks | selectattr("driver", "equalto", "bridge") | list | length }}
+        </strong>
+
+        <small>Segments utilisant le driver bridge</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Scope principal</span>
+
+            <span class="v3-icon purple">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M3 12h18M12 3a15 15 0 0 1 0 18"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="networks-scope" style="font-size:.88rem">
+            {% if networks %}
+                {{ networks[0].scope }}
+            {% else %}
+                Aucun
+            {% endif %}
+        </strong>
+
+        <small>Portée réseau dominante</small>
+    </article>
+</section>
+
+<section class="v3-panel">
+    <header class="v3-panel-header">
+        <div>
+            <h2>Segments réseau Docker</h2>
+            <p>Actualisation automatique toutes les 10 secondes.</p>
+        </div>
+
+        <span id="networks-updated">Chargement…</span>
+    </header>
+
+    <div
+        id="networks-grid"
+        class="v3-card-grid"
+    ></div>
+
+    <div
+        id="networks-empty"
+        class="v3-empty"
+        {% if networks %}hidden{% endif %}
+    >
+        <span class="v3-empty-icon">
+            <svg viewBox="0 0 24 24">
+                <circle cx="6" cy="12" r="2.5"/>
+                <circle cx="18" cy="6" r="2.5"/>
+                <circle cx="18" cy="18" r="2.5"/>
+                <path d="m8.2 10.9 7.5-3.8M8.2 13.1l7.5 3.8"/>
+            </svg>
+        </span>
+
+        <h3>Aucun réseau Docker détecté</h3>
+        <p>Les réseaux créés par Docker apparaîtront ici.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("networks-grid");
+    const empty = document.getElementById("networks-empty");
+    let networks = {{ networks | tojson }};
+
+    function render(items) {
+        const escape = PortalV3.escapeHtml;
+
+        grid.innerHTML = items.map((network) => `
+            <article class="v3-resource-card network-card">
+                <header class="v3-resource-header">
+                    <div class="v3-resource-identity">
+                        <span class="v3-icon cyan">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="6" cy="12" r="2.5"/>
+                                <circle cx="18" cy="6" r="2.5"/>
+                                <circle cx="18" cy="18" r="2.5"/>
+                                <path d="m8.2 10.9 7.5-3.8M8.2 13.1l7.5 3.8"/>
+                            </svg>
+                        </span>
+
+                        <div style="min-width:0">
+                            <strong>${escape(network.name)}</strong>
+                            <span>${escape(network.id || "Réseau Docker")}</span>
+                        </div>
+                    </div>
+
+                    <span class="v3-badge ${
+                        Number(network.containers || 0) > 0
+                            ? "success"
+                            : ""
+                    }">
+                        ${Number(network.containers || 0)} conteneur(s)
+                    </span>
+                </header>
+
+                <div class="v3-detail-grid">
+                    <div class="v3-detail">
+                        <span>Driver</span>
+                        <strong>${escape(network.driver)}</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Scope</span>
+                        <strong>${escape(network.scope)}</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Conteneurs</span>
+                        <strong>${Number(network.containers || 0)}</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Type</span>
+                        <strong>
+                            ${
+                                network.name === "application_default"
+                                    ? "Applicatif"
+                                    : "Système"
+                            }
+                        </strong>
+                    </div>
+                </div>
+            </article>
+        `).join("");
+
+        empty.hidden = items.length !== 0;
+
+        document.getElementById(
+            "networks-total"
+        ).textContent = items.length;
+
+        document.getElementById(
+            "networks-containers"
+        ).textContent = items.reduce(
+            (total, network) =>
+                total + Number(network.containers || 0),
+            0
+        );
+
+        document.getElementById(
+            "networks-bridge"
+        ).textContent = items.filter(
+            (network) => network.driver === "bridge"
+        ).length;
+
+        document.getElementById(
+            "networks-scope"
+        ).textContent =
+            items[0]?.scope || "Aucun";
+    }
+
+    async function refresh() {
+        try {
+            const response = await fetch(
+                `/api/docker/networks?t=${Date.now()}`,
+                { cache: "no-store" }
+            );
+
+            if (!response.ok) {
+                throw new Error("API Docker indisponible");
+            }
+
+            const payload = await response.json();
+
+            networks = Array.isArray(payload.networks)
+                ? payload.networks
+                : [];
+
+            render(networks);
+
+            document.getElementById(
+                "networks-updated"
+            ).textContent =
+                `Actualisé à ${
+                    new Date(
+                        payload.updated_at
+                    ).toLocaleTimeString("fr-FR")
+                }`;
+        } catch (error) {
+            console.error(error);
+
+            PortalV3.showToast(
+                "Impossible d’actualiser les réseaux.",
+                "error"
+            );
+        }
+    }
+
+    PortalV3.bindSearch({
+        input: "#network-search",
+        selector: ".network-card",
+        empty: "#networks-empty",
+    });
+
+    render(networks);
+    window.setInterval(refresh, 10000);
+});
+</script>
+{% endblock %}
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>

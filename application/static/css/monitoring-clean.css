@@ -1,0 +1,573 @@
+body.clean-monitoring-page {
+    --cm-ink: #17243c;
+    --cm-muted: #697b96;
+    --cm-border: #dce5f1;
+    --cm-blue: #3567e8;
+    --cm-green: #10a87f;
+    --cm-orange: #e9810b;
+    --cm-red: #dc2626;
+}
+
+.clean-monitoring-old-hidden {
+    display: none !important;
+}
+
+#clean-monitoring-dashboard {
+    width: min(calc(100% - 40px), 1500px);
+    margin: 22px auto 50px;
+}
+
+.cm-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 64px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid var(--cm-border);
+    border-radius: 18px;
+    box-shadow: 0 10px 28px rgba(15,23,42,.055);
+}
+
+.cm-periods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.cm-periods button {
+    min-height: 39px;
+    padding: 0 14px;
+    border: 1px solid #dce5f1;
+    border-radius: 11px;
+    color: #586a85;
+    background: #f7f9fc;
+    font: inherit;
+    font-size: .75rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.cm-periods button:hover {
+    color: #2455d6;
+    background: #eef4ff;
+}
+
+.cm-periods button.is-active {
+    color: #fff;
+    background: linear-gradient(135deg,#275bdd,#5279ec);
+    border-color: transparent;
+    box-shadow: 0 7px 17px rgba(39,91,221,.22);
+}
+
+.cm-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+#cm-status {
+    color: #71829d;
+    font-size: .72rem;
+    white-space: nowrap;
+}
+
+.cm-export {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 39px;
+    padding: 0 13px;
+    color: #fff;
+    background: linear-gradient(135deg,#e7444a,#f05f57);
+    border: 0;
+    border-radius: 11px;
+    box-shadow: 0 8px 19px rgba(231,68,74,.2);
+    font: inherit;
+    font-size: .72rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.cm-export svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.cm-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cm-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    min-height: 104px;
+    padding: 15px;
+    background:
+        radial-gradient(
+            circle at 100% 0,
+            rgba(53,103,232,.075),
+            transparent 45%
+        ),
+        rgba(255,255,255,.96);
+    border: 1px solid var(--cm-border);
+    border-radius: 18px;
+    box-shadow: 0 11px 29px rgba(15,23,42,.055);
+}
+
+.cm-summary-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    font-size: .66rem;
+    font-weight: 900;
+}
+
+.cm-blue {
+    color: #1375bb;
+    background: #e6f6ff;
+}
+
+.cm-indigo {
+    color: #315fdf;
+    background: #eaf0ff;
+}
+
+.cm-green {
+    color: #078f6c;
+    background: #e5f8f1;
+}
+
+.cm-orange {
+    color: #c66b00;
+    background: #fff2df;
+}
+
+.cm-summary-card > div {
+    min-width: 0;
+}
+
+.cm-summary-card small {
+    display: block;
+    margin-bottom: 4px;
+    color: #71829d;
+    font-size: .67rem;
+    font-weight: 780;
+}
+
+.cm-summary-card strong {
+    display: block;
+    color: var(--cm-ink);
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.cm-summary-card span:last-child {
+    display: block;
+    margin-top: 5px;
+    overflow: hidden;
+    color: #8a9ab1;
+    font-size: .63rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cm-summary-card [data-level="normal"] {
+    color: #07976f;
+}
+
+.cm-summary-card [data-level="warning"] {
+    color: #d97706;
+}
+
+.cm-summary-card [data-level="critical"] {
+    color: #dc2626;
+}
+
+.cm-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 13px;
+}
+
+.cm-chart-card {
+    min-width: 0;
+    padding: 17px;
+    background:
+        linear-gradient(
+            155deg,
+            rgba(255,255,255,.99),
+            rgba(248,250,253,.97)
+        );
+    border: 1px solid var(--cm-border);
+    border-radius: 19px;
+    box-shadow: 0 13px 33px rgba(15,23,42,.06);
+}
+
+.cm-cpu-card {
+    border-top: 3px solid var(--cm-blue);
+}
+
+.cm-memory-card {
+    border-top: 3px solid var(--cm-green);
+}
+
+.cm-disk-card {
+    border-top: 3px solid var(--cm-orange);
+}
+
+.cm-chart-card > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 9px;
+}
+
+.cm-kicker {
+    display: inline-flex;
+    min-height: 22px;
+    align-items: center;
+    padding: 0 8px;
+    color: #57708f;
+    background: #f0f4fa;
+    border-radius: 999px;
+    font-size: .56rem;
+    font-weight: 850;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.cm-chart-card h2 {
+    margin: 7px 0 2px;
+    color: var(--cm-ink);
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: -.025em;
+}
+
+.cm-chart-card p {
+    margin: 0;
+    color: var(--cm-muted);
+    font-size: .68rem;
+}
+
+.cm-value-badge {
+    flex: 0 0 auto;
+    padding: 7px 9px;
+    color: #315fdf;
+    background: #eef4ff;
+    border: 1px solid #d8e3fa;
+    border-radius: 10px;
+    font-size: .75rem;
+    font-weight: 900;
+}
+
+.cm-value-badge[data-level="normal"] {
+    color: #078f6c;
+    background: #e9f9f3;
+    border-color: #ccefe2;
+}
+
+.cm-value-badge[data-level="warning"] {
+    color: #c66b00;
+    background: #fff5e5;
+    border-color: #f8ddb4;
+}
+
+.cm-value-badge[data-level="critical"] {
+    color: #cf252d;
+    background: #fff0f1;
+    border-color: #f8ced1;
+}
+
+.cm-chart-wrapper {
+    position: relative;
+    height: 205px;
+    padding: 5px 2px;
+}
+
+.cm-chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.cm-stats {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.cm-stats > div {
+    min-width: 0;
+    padding: 8px 4px;
+    text-align: center;
+    background: #f5f8fc;
+    border: 1px solid #e1e8f2;
+    border-radius: 10px;
+}
+
+.cm-stats small {
+    display: block;
+    margin-bottom: 3px;
+    color: #8292aa;
+    font-size: .56rem;
+}
+
+.cm-stats strong {
+    color: var(--cm-ink);
+    font-size: .71rem;
+    font-weight: 850;
+}
+
+.cm-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 12px;
+    padding: 0 3px;
+    color: #8292a9;
+    font-size: .63rem;
+}
+
+.cm-footer span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.cm-status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(16,185,129,.1);
+}
+
+@media (max-width: 1100px) {
+    .cm-chart-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    .cm-disk-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 760px) {
+    #clean-monitoring-dashboard {
+        width: calc(100% - 16px);
+        margin-top: 14px;
+        margin-bottom: 100px;
+    }
+
+    .cm-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 9px;
+        border-radius: 15px;
+    }
+
+    .cm-periods {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    .cm-periods button {
+        width: 100%;
+    }
+
+    .cm-toolbar-right {
+        justify-content: space-between;
+    }
+
+    #cm-status {
+        white-space: normal;
+    }
+
+    .cm-summary-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 8px;
+    }
+
+    .cm-summary-card {
+        min-height: 92px;
+        padding: 11px;
+        gap: 9px;
+        border-radius: 15px;
+    }
+
+    .cm-summary-icon {
+        flex-basis: 37px;
+        width: 37px;
+        height: 37px;
+        border-radius: 11px;
+        font-size: .56rem;
+    }
+
+    .cm-summary-card strong {
+        font-size: 1.05rem;
+    }
+
+    .cm-chart-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .cm-disk-card {
+        grid-column: auto;
+    }
+
+    .cm-chart-card {
+        padding: 13px;
+        border-radius: 16px;
+    }
+
+    .cm-chart-wrapper {
+        height: 180px;
+    }
+
+    .cm-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 390px) {
+    .cm-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cm-chart-wrapper {
+        height: 165px;
+    }
+}
+
+@media print {
+    body.clean-monitoring-page
+    .sidebar,
+    body.clean-monitoring-page
+    .mobile-header,
+    body.clean-monitoring-page
+    .floating-assistant,
+    body.clean-monitoring-page
+    .pdf-export-button,
+    body.clean-monitoring-page
+    .cm-export {
+        display: none !important;
+    }
+
+    #clean-monitoring-dashboard {
+        width: 100%;
+        margin: 0;
+    }
+
+    .cm-toolbar,
+    .cm-summary-card,
+    .cm-chart-card {
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    .cm-chart-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    .cm-disk-card {
+        grid-column: 1 / -1;
+    }
+}
+
+
+/* =========================================================
+   SUPPRESSION VISUELLE DE L’ANCIEN MONITORING
+========================================================= */
+
+body.clean-monitoring-page
+.legacy-monitoring-block {
+    display: none !important;
+}
+
+body.clean-monitoring-page
+.clean-monitoring-old-hidden {
+    display: none !important;
+}
+
+/*
+ * Aucun ancien canvas ne doit rester visible.
+ */
+body.clean-monitoring-page
+canvas:not([id^="cm-"]) {
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+}
+
+/*
+ * Le bouton d’export reste discret.
+ */
+body.clean-monitoring-page
+.cm-export {
+    min-height: 37px !important;
+    padding-inline: 12px !important;
+    border-radius: 10px !important;
+    font-size: 0.69rem !important;
+}
+
+body.clean-monitoring-page
+.cm-export svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+
+
+/* =========================================================
+   SÉCURITÉ ANTI-ANCIEN MONITORING
+========================================================= */
+
+body.clean-monitoring-page
+.clean-monitoring-old-hidden,
+body.clean-monitoring-page
+.legacy-monitoring-block {
+    display: none !important;
+}
+
+/*
+ * Les seuls graphiques autorisés dans la nouvelle interface
+ * sont cm-cpu-chart, cm-memory-chart et cm-disk-chart.
+ */
+body.clean-monitoring-page
+canvas[id="cpuChart"],
+body.clean-monitoring-page
+canvas[id="memoryChart"],
+body.clean-monitoring-page
+canvas[id="diskChart"],
+body.clean-monitoring-page
+canvas[id="cpu-chart"],
+body.clean-monitoring-page
+canvas[id="memory-chart"],
+body.clean-monitoring-page
+canvas[id="disk-chart"] {
+    display: none !important;
+}
+

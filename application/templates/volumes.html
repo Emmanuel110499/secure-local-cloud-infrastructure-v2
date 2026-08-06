@@ -1,0 +1,271 @@
+{% extends "portal_v3_base.html" %}
+
+{% set active_docker_page = "volumes" %}
+
+{% block title %}Volumes Docker — Secure Local Cloud{% endblock %}
+{% block breadcrumb %}Docker / Volumes{% endblock %}
+{% block page_title %}Volumes Docker{% endblock %}
+
+{% block page_description %}
+Inventaire des espaces de stockage persistants utilisés
+par les conteneurs Docker.
+{% endblock %}
+
+{% block page_icon %}
+<svg viewBox="0 0 24 24">
+    <ellipse cx="12" cy="6" rx="8" ry="3"/>
+    <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
+    <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>
+</svg>
+{% endblock %}
+
+{% block content %}
+<section class="v3-toolbar">
+    <label class="v3-search">
+        <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-4-4"/>
+        </svg>
+
+        <input
+            id="volume-search"
+            type="search"
+            placeholder="Rechercher un volume, un driver ou un point de montage…"
+        >
+    </label>
+
+    {% include "_docker_tabs.html" %}
+</section>
+
+<section class="v3-stat-grid">
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Volumes détectés</span>
+
+            <span class="v3-icon purple">
+                <svg viewBox="0 0 24 24">
+                    <ellipse cx="12" cy="6" rx="8" ry="3"/>
+                    <path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="volumes-total">{{ volumes | length }}</strong>
+        <small>Stockages Docker persistants</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Driver principal</span>
+
+            <span class="v3-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 4h14v16H5Z"/>
+                    <path d="M8 8h8M8 12h8"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="volumes-driver" style="font-size:.88rem">
+            {% if volumes %}
+                {{ volumes[0].driver }}
+            {% else %}
+                Aucun
+            {% endif %}
+        </strong>
+
+        <small>Premier driver détecté</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Points de montage</span>
+
+            <span class="v3-icon cyan">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h6l2 2h8v10H4Z"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="volumes-mounts">{{ volumes | length }}</strong>
+        <small>Emplacements disponibles</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>État du stockage</span>
+
+            <span class="v3-icon green">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong style="font-size:.88rem">
+            {% if volumes %}Disponible{% else %}Aucun volume{% endif %}
+        </strong>
+
+        <small>Inventaire Docker local</small>
+    </article>
+</section>
+
+<section class="v3-panel">
+    <header class="v3-panel-header">
+        <div>
+            <h2>Espaces persistants</h2>
+            <p>Actualisation automatique toutes les 10 secondes.</p>
+        </div>
+
+        <span id="volumes-updated">Chargement…</span>
+    </header>
+
+    <div
+        id="volumes-grid"
+        class="v3-card-grid"
+    ></div>
+
+    <div
+        id="volumes-empty"
+        class="v3-empty"
+        {% if volumes %}hidden{% endif %}
+    >
+        <span class="v3-empty-icon">
+            <svg viewBox="0 0 24 24">
+                <ellipse cx="12" cy="6" rx="8" ry="3"/>
+                <path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
+            </svg>
+        </span>
+
+        <h3>Aucun volume Docker présent</h3>
+
+        <p>
+            La plateforme fonctionne actuellement sans volume Docker
+            nommé. Les futurs volumes apparaîtront automatiquement ici.
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("volumes-grid");
+    const empty = document.getElementById("volumes-empty");
+    let volumes = {{ volumes | tojson }};
+
+    function render(items) {
+        const escape = PortalV3.escapeHtml;
+
+        grid.innerHTML = items.map((volume) => `
+            <article class="v3-resource-card volume-card">
+                <header class="v3-resource-header">
+                    <div class="v3-resource-identity">
+                        <span class="v3-icon purple">
+                            <svg viewBox="0 0 24 24">
+                                <ellipse cx="12" cy="6" rx="8" ry="3"/>
+                                <path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
+                            </svg>
+                        </span>
+
+                        <div style="min-width:0">
+                            <strong>${escape(volume.name)}</strong>
+                            <span>${escape(volume.driver)}</span>
+                        </div>
+                    </div>
+
+                    <span class="v3-badge success">
+                        Disponible
+                    </span>
+                </header>
+
+                <div class="v3-detail-grid">
+                    <div class="v3-detail">
+                        <span>Driver</span>
+                        <strong>${escape(volume.driver)}</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Créé le</span>
+                        <strong>${escape(volume.created || "--")}</strong>
+                    </div>
+
+                    <div class="v3-detail" style="grid-column:1/-1">
+                        <span>Point de montage</span>
+                        <strong>${escape(volume.mountpoint || "--")}</strong>
+                    </div>
+                </div>
+            </article>
+        `).join("");
+
+        empty.hidden = items.length !== 0;
+
+        document.getElementById(
+            "volumes-total"
+        ).textContent = items.length;
+
+        document.getElementById(
+            "volumes-mounts"
+        ).textContent = items.length;
+
+        document.getElementById(
+            "volumes-driver"
+        ).textContent =
+            items[0]?.driver || "Aucun";
+    }
+
+    async function refresh() {
+        try {
+            const response = await fetch(
+                `/api/docker/volumes?t=${Date.now()}`,
+                { cache: "no-store" }
+            );
+
+            if (!response.ok) {
+                throw new Error("API Docker indisponible");
+            }
+
+            const payload = await response.json();
+
+            volumes = Array.isArray(payload.volumes)
+                ? payload.volumes
+                : [];
+
+            render(volumes);
+
+            document.getElementById(
+                "volumes-updated"
+            ).textContent =
+                `Actualisé à ${
+                    new Date(
+                        payload.updated_at
+                    ).toLocaleTimeString("fr-FR")
+                }`;
+        } catch (error) {
+            console.error(error);
+
+            PortalV3.showToast(
+                "Impossible d’actualiser les volumes.",
+                "error"
+            );
+        }
+    }
+
+    PortalV3.bindSearch({
+        input: "#volume-search",
+        selector: ".volume-card",
+        empty: "#volumes-empty",
+    });
+
+    render(volumes);
+    window.setInterval(refresh, 10000);
+});
+</script>
+{% endblock %}
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>

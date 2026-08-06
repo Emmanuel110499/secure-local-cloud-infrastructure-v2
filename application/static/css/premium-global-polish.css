@@ -1,0 +1,1243 @@
+/* ======================================================
+   PREMIUM GLOBAL POLISH
+   Conserve toutes les couleurs existantes
+====================================================== */
+
+:root {
+    --premium-radius-sm: 10px;
+    --premium-radius-md: 15px;
+    --premium-radius-lg: 21px;
+
+    --premium-shadow-soft:
+        0 8px 24px rgba(15, 23, 42, 0.05),
+        0 2px 7px rgba(15, 23, 42, 0.035);
+
+    --premium-shadow-hover:
+        0 16px 38px rgba(15, 23, 42, 0.09),
+        0 5px 14px rgba(15, 23, 42, 0.055);
+
+    --premium-transition:
+        180ms cubic-bezier(.2, .7, .3, 1);
+}
+
+/* ======================================================
+   BASE GLOBALE
+====================================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+main,
+.main-content,
+.page-content,
+.content-wrapper,
+.portal-content {
+    min-width: 0;
+}
+
+/* ======================================================
+   CARTES ET PANNEAUX
+====================================================== */
+
+.panel,
+.card,
+.kpi-card,
+.metric-card,
+.stat-card,
+.info-card,
+.service-card,
+.server-card,
+.quick-card,
+.platform-goal-card,
+.world-presence-card,
+.infrastructure-card,
+.container-card,
+.monitoring-card,
+.security-card,
+.audit-card,
+.documentation-card {
+    border-radius:
+        var(--premium-radius-lg) !important;
+
+    box-shadow:
+        var(--premium-shadow-soft);
+
+    transition:
+        transform var(--premium-transition),
+        box-shadow var(--premium-transition),
+        border-color var(--premium-transition);
+}
+
+@media screen and (min-width: 821px) {
+    .panel:hover,
+    .card:hover,
+    .kpi-card:hover,
+    .metric-card:hover,
+    .stat-card:hover,
+    .info-card:hover,
+    .service-card:hover,
+    .server-card:hover,
+    .quick-card:hover,
+    .platform-goal-card:hover,
+    .world-presence-card:hover,
+    .infrastructure-card:hover,
+    .container-card:hover,
+    .monitoring-card:hover,
+    .security-card:hover,
+    .audit-card:hover,
+    .documentation-card:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            var(--premium-shadow-hover);
+    }
+}
+
+/* ======================================================
+   EN-TÊTES ET TYPOGRAPHIE
+====================================================== */
+
+.panel-header,
+.card-header,
+.section-header,
+.page-header,
+.widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    min-width: 0;
+}
+
+.panel-header strong,
+.card-header strong,
+.section-header h2,
+.section-header h3,
+.page-header h1,
+.page-header h2,
+.widget-header strong {
+    letter-spacing: -0.022em;
+    line-height: 1.2;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    text-wrap: balance;
+}
+
+p,
+small,
+.description,
+.subtitle {
+    text-wrap: pretty;
+}
+
+/* ======================================================
+   ESPACEMENTS DES SECTIONS
+====================================================== */
+
+section + section {
+    margin-top: 24px;
+}
+
+.content-grid,
+.dashboard-grid,
+.kpi-grid,
+.cards-grid,
+.metrics-grid,
+.monitoring-grid,
+.infrastructure-grid {
+    gap: 16px;
+}
+
+/* ======================================================
+   BOUTONS ET LIENS D’ACTION
+====================================================== */
+
+button,
+.button,
+.btn,
+.action-button,
+.icon-button,
+.panel-header a,
+.card-header a {
+    border-radius:
+        var(--premium-radius-sm);
+
+    transition:
+        transform var(--premium-transition),
+        box-shadow var(--premium-transition),
+        opacity var(--premium-transition),
+        background-color var(--premium-transition),
+        border-color var(--premium-transition);
+}
+
+@media screen and (min-width: 821px) {
+    button:hover,
+    .button:hover,
+    .btn:hover,
+    .action-button:hover,
+    .icon-button:hover,
+    .panel-header a:hover,
+    .card-header a:hover {
+        transform: translateY(-1px);
+    }
+}
+
+button:active,
+.button:active,
+.btn:active,
+.action-button:active,
+.icon-button:active {
+    transform: translateY(0) scale(.98);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, .22);
+    outline-offset: 3px;
+}
+
+/* ======================================================
+   FORMULAIRES
+====================================================== */
+
+input,
+textarea,
+select {
+    border-radius:
+        var(--premium-radius-sm);
+
+    transition:
+        border-color var(--premium-transition),
+        box-shadow var(--premium-transition);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, .08);
+}
+
+/* ======================================================
+   TABLEAUX
+====================================================== */
+
+.table-wrapper,
+.table-container,
+.docker-table-wrapper,
+.monitoring-table-wrapper {
+    overflow: auto;
+
+    border-radius:
+        var(--premium-radius-md);
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    font-weight: 750;
+    letter-spacing: .01em;
+}
+
+th,
+td {
+    vertical-align: middle;
+}
+
+tbody tr {
+    transition:
+        background-color var(--premium-transition);
+}
+
+/* ======================================================
+   BADGES ET STATUTS
+====================================================== */
+
+.badge,
+.status-badge,
+.service-status,
+.health-badge,
+.state-badge,
+.tag,
+.pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    border-radius: 999px;
+    line-height: 1;
+}
+
+/* ======================================================
+   ICÔNES
+====================================================== */
+
+.kpi-icon,
+.card-icon,
+.metric-icon,
+.service-icon,
+.sidebar-colored-icon,
+.platform-activity-row-icon {
+    flex: 0 0 auto;
+
+    transition:
+        transform var(--premium-transition);
+}
+
+@media screen and (min-width: 821px) {
+    .kpi-card:hover .kpi-icon,
+    .card:hover .card-icon,
+    .metric-card:hover .metric-icon,
+    .service-card:hover .service-icon {
+        transform: scale(1.045);
+    }
+}
+
+/* ======================================================
+   SIDEBAR
+====================================================== */
+
+.sidebar .nav-item {
+    transition:
+        transform var(--premium-transition),
+        background-color var(--premium-transition),
+        border-color var(--premium-transition),
+        color var(--premium-transition);
+}
+
+.sidebar .sidebar-colored-icon {
+    display: grid;
+    place-items: center;
+}
+
+.sidebar-status,
+.user-box,
+.user-menu {
+    border-radius:
+        var(--premium-radius-md);
+}
+
+/* ======================================================
+   DIALOGUES ET MENUS
+====================================================== */
+
+dialog,
+.modal,
+.popup,
+.dropdown-menu,
+.user-menu,
+.mobile-user-menu,
+.daily-alerts-details-card,
+.emma-chat-panel {
+    border-radius:
+        var(--premium-radius-lg);
+
+    box-shadow:
+        0 24px 70px rgba(15, 23, 42, .18);
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media screen and (max-width: 820px) {
+    section + section {
+        margin-top: 18px;
+    }
+
+    .content-grid,
+    .dashboard-grid,
+    .kpi-grid,
+    .cards-grid,
+    .metrics-grid,
+    .monitoring-grid,
+    .infrastructure-grid {
+        gap: 11px;
+    }
+
+    .panel,
+    .card,
+    .kpi-card,
+    .metric-card,
+    .stat-card,
+    .info-card,
+    .platform-goal-card {
+        transform: none !important;
+    }
+
+    button,
+    .button,
+    .btn,
+    .action-button,
+    .icon-button {
+        min-height: 42px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+    }
+
+    .table-wrapper,
+    .table-container,
+    .docker-table-wrapper,
+    .monitoring-table-wrapper {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ======================================================
+   ACCESSIBILITÉ
+====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =====================================================
+   PREMIUM ACTION BUTTONS
+===================================================== */
+
+.panel-header a,
+.quick-action,
+.action-link{
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:6px;
+
+    padding:7px 12px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    font-size:.78rem;
+
+    text-decoration:none;
+
+    transition:
+        all .22s ease;
+
+}
+
+.panel-header a:hover,
+.quick-action:hover,
+.action-link:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.panel-header a::after{
+
+    content:"→";
+
+    transition:transform .25s ease;
+
+}
+
+.panel-header a:hover::after{
+
+    transform:translateX(3px);
+
+}
+
+
+/* =====================================================
+   PREMIUM CARD SPACING
+===================================================== */
+
+.panel{
+
+    padding:22px !important;
+
+}
+
+.kpi-card{
+
+    padding:18px !important;
+
+}
+
+.platform-goal-card{
+
+    padding:22px !important;
+
+}
+
+.world-presence-card{
+
+    padding:22px !important;
+
+}
+
+
+/* =====================================================
+   SIDEBAR PREMIUM
+===================================================== */
+
+.sidebar .nav-item{
+
+    min-height:46px;
+
+    padding:0 14px;
+
+    border-radius:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.sidebar .nav-item+.nav-item{
+
+    margin-top:5px;
+
+}
+
+.sidebar-colored-icon{
+
+    width:22px;
+
+    text-align:center;
+
+    font-size:18px;
+
+}
+
+.sidebar-nav-label{
+
+    font-weight:600;
+
+}
+
+
+/* ======================================================
+   PREMIUM SECTIONS + TABLEAUX
+   Conserve les couleurs existantes
+====================================================== */
+
+/* Titres des grandes sections */
+
+.platform-goals-heading,
+.section-heading,
+.table-section-header,
+.monitoring-section-header,
+.infrastructure-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+
+    margin-bottom: 20px;
+}
+
+.platform-goals-heading h2,
+.section-heading h2,
+.table-section-header h2,
+.monitoring-section-header h2,
+.infrastructure-section-header h2 {
+    margin: 4px 0 0;
+
+    font-size: clamp(1.25rem, 1.8vw, 1.65rem);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    line-height: 1.15;
+}
+
+.platform-goals-heading p,
+.section-heading p,
+.table-section-header p,
+.monitoring-section-header p,
+.infrastructure-section-header p {
+    max-width: 680px;
+    margin: 8px 0 0;
+
+    font-size: .78rem;
+    line-height: 1.6;
+}
+
+/* Petits labels au-dessus des titres */
+
+.platform-goals-eyebrow,
+.platform-activity-eyebrow,
+.section-eyebrow,
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: .59rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+/* Conteneurs de tableaux */
+
+.table-wrapper,
+.table-container,
+.docker-table-wrapper,
+.monitoring-table-wrapper,
+.container-table-wrapper {
+    position: relative;
+
+    border-radius: 17px !important;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, .045);
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Tableau */
+
+table {
+    font-size: .73rem;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    padding: 13px 15px;
+
+    font-size: .61rem;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+tbody td {
+    padding: 14px 15px;
+
+    line-height: 1.4;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+tbody tr {
+    transition:
+        background-color 160ms ease,
+        transform 160ms ease;
+}
+
+/* Statuts plus réguliers */
+
+.service-status,
+.status-badge,
+.state-badge,
+.health-badge {
+    min-height: 26px;
+    padding: 6px 10px;
+
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+
+/* Alignement des lignes de services */
+
+.service-row {
+    min-height: 48px;
+
+    padding: 10px 12px;
+
+    border-radius: 13px;
+
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.service-row > div {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    min-width: 0;
+}
+
+.service-dot {
+    flex: 0 0 auto;
+}
+
+/* Cartes internes */
+
+.infra-summary-item,
+.platform-activity-row,
+.recent-item,
+.quick-card {
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        border-color 180ms ease;
+}
+
+@media screen and (min-width: 821px) {
+    tbody tr:hover {
+        background-color: rgba(148, 163, 184, .045);
+    }
+
+    .service-row:hover,
+    .infra-summary-item:hover,
+    .platform-activity-row:hover,
+    .recent-item:hover,
+    .quick-card:hover {
+        transform: translateY(-2px);
+    }
+}
+
+/* Mobile */
+
+@media screen and (max-width: 820px) {
+    .platform-goals-heading,
+    .section-heading,
+    .table-section-header,
+    .monitoring-section-header,
+    .infrastructure-section-header {
+        flex-direction: column;
+        gap: 10px;
+
+        margin-bottom: 15px;
+    }
+
+    .platform-goals-heading h2,
+    .section-heading h2,
+    .table-section-header h2,
+    .monitoring-section-header h2,
+    .infrastructure-section-header h2 {
+        font-size: 1.18rem;
+    }
+
+    thead th {
+        padding: 11px 12px;
+    }
+
+    tbody td {
+        padding: 12px;
+    }
+
+    .service-row,
+    .infra-summary-item,
+    .platform-activity-row,
+    .recent-item,
+    .quick-card {
+        transform: none !important;
+    }
+}
+
+
+/* ======================================================
+   TABLEAUX PREMIUM
+====================================================== */
+
+.table-wrapper,
+.table-container,
+.docker-table-wrapper,
+.monitoring-table-wrapper {
+    border-radius: 18px !important;
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.045) !important;
+}
+
+table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+
+    font-size: 0.66rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.055em !important;
+    text-transform: uppercase !important;
+}
+
+table tbody td {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+
+    font-size: 0.72rem !important;
+}
+
+table tbody tr {
+    transition:
+        transform 170ms ease,
+        box-shadow 170ms ease,
+        background-color 170ms ease !important;
+}
+
+@media screen and (min-width: 821px) {
+    table tbody tr:hover {
+        position: relative;
+        z-index: 1;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 8px 18px rgba(15, 23, 42, 0.045);
+    }
+}
+
+/* ======================================================
+   BADGES D’ÉTAT
+====================================================== */
+
+.service-status,
+.status-badge,
+.state-badge,
+.health-badge,
+.badge,
+.pill {
+    min-height: 27px !important;
+    padding: 6px 10px !important;
+
+    border-radius: 999px !important;
+
+    font-size: 0.59rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.015em !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.48);
+}
+
+.service-dot,
+.status-dot,
+.health-dot,
+.platform-activity-live > span {
+    animation:
+        premiumStatusPulse 2.2s ease-out infinite;
+}
+
+@keyframes premiumStatusPulse {
+    0% {
+        box-shadow:
+            0 0 0 0 rgba(34, 197, 94, 0.30);
+    }
+
+    70% {
+        box-shadow:
+            0 0 0 8px rgba(34, 197, 94, 0);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* ======================================================
+   TITRES DES GRANDES SECTIONS
+====================================================== */
+
+.platform-goals-heading,
+.section-heading,
+.table-section-header,
+.documentation-heading,
+.monitoring-heading,
+.infrastructure-heading {
+    margin-bottom: 18px !important;
+}
+
+.platform-goals-eyebrow,
+.platform-activity-eyebrow,
+.section-eyebrow,
+.page-eyebrow {
+    font-size: 0.56rem !important;
+    font-weight: 850 !important;
+    letter-spacing: 0.11em !important;
+    text-transform: uppercase !important;
+}
+
+.platform-goals-heading h2,
+.section-heading h2,
+.table-section-header h2 {
+    margin-top: 5px !important;
+    margin-bottom: 7px !important;
+
+    font-weight: 850 !important;
+    letter-spacing: -0.035em !important;
+    line-height: 1.12 !important;
+}
+
+.platform-goals-heading p,
+.section-heading p,
+.table-section-header p {
+    max-width: 720px;
+
+    line-height: 1.62 !important;
+}
+
+/* ======================================================
+   CHARGEMENTS
+====================================================== */
+
+.loading,
+.loading-text,
+.skeleton,
+[class*="loading"] {
+    position: relative;
+}
+
+.loading-text,
+td:has(> .loading),
+.recent-empty {
+    animation:
+        premiumLoadingFade 1.35s ease-in-out infinite alternate;
+}
+
+@keyframes premiumLoadingFade {
+    from {
+        opacity: 0.48;
+    }
+
+    to {
+        opacity: 0.88;
+    }
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media screen and (max-width: 820px) {
+    table thead th,
+    table tbody td {
+        white-space: nowrap;
+    }
+
+    table thead th {
+        padding: 12px 11px !important;
+        font-size: 0.58rem !important;
+    }
+
+    table tbody td {
+        padding: 13px 11px !important;
+        font-size: 0.66rem !important;
+    }
+
+    .service-status,
+    .status-badge,
+    .state-badge,
+    .health-badge,
+    .badge,
+    .pill {
+        min-height: 25px !important;
+        padding: 5px 8px !important;
+    }
+}
+
+
+/* ======================================================
+   TITRES ET SÉPARATION DES SECTIONS
+====================================================== */
+
+.section-header,
+.platform-goals-heading,
+.table-section-header,
+.dashboard-section-header {
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+
+    margin-bottom: 18px;
+}
+
+.section-header > div,
+.platform-goals-heading > div,
+.table-section-header > div {
+    min-width: 0;
+}
+
+.section-header h2,
+.platform-goals-heading h2,
+.table-section-header h2,
+.dashboard-section-header h2 {
+    margin: 0;
+
+    font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.15;
+}
+
+.section-header p,
+.platform-goals-heading p,
+.table-section-header p,
+.dashboard-section-header p {
+    max-width: 720px;
+    margin: 7px 0 0;
+
+    font-size: .72rem;
+    line-height: 1.55;
+    opacity: .72;
+}
+
+.platform-goals-eyebrow,
+.platform-activity-eyebrow,
+.section-eyebrow,
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 6px;
+
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+/* ======================================================
+   TABLEAUX PLUS PROPRES
+====================================================== */
+
+.table-wrapper,
+.table-container,
+.docker-table-wrapper,
+.monitoring-table-wrapper {
+    border-radius: var(--premium-radius-lg);
+    box-shadow: var(--premium-shadow-soft);
+}
+
+table {
+    table-layout: auto;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    padding: 13px 15px;
+
+    font-size: .64rem;
+    font-weight: 800;
+    letter-spacing: .045em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+tbody td {
+    padding: 14px 15px;
+
+    font-size: .7rem;
+    line-height: 1.4;
+}
+
+tbody tr:last-child td:first-child {
+    border-bottom-left-radius: var(--premium-radius-md);
+}
+
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: var(--premium-radius-md);
+}
+
+@media screen and (min-width: 821px) {
+    tbody tr:hover {
+        transform: translateZ(0);
+    }
+}
+
+/* ======================================================
+   CONTENU DES CARTES
+====================================================== */
+
+.panel > :last-child,
+.card > :last-child,
+.platform-goal-card > :last-child {
+    margin-bottom: 0 !important;
+}
+
+.panel p,
+.card p,
+.platform-goal-card p {
+    line-height: 1.55;
+}
+
+.service-row,
+.platform-activity-row,
+.infra-summary-item,
+.recent-item {
+    transition:
+        transform var(--premium-transition),
+        box-shadow var(--premium-transition),
+        border-color var(--premium-transition);
+}
+
+@media screen and (min-width: 821px) {
+    .service-row:hover,
+    .platform-activity-row:hover,
+    .infra-summary-item:hover,
+    .recent-item:hover {
+        transform: translateY(-1px);
+    }
+}
+
+/* ======================================================
+   ÉTATS DE CHARGEMENT ET CONTENU VIDE
+====================================================== */
+
+.loading-state,
+.empty-state,
+.error-state,
+.recent-empty,
+.table-empty,
+.no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 130px;
+    padding: 22px;
+
+    text-align: center;
+
+    border-radius: var(--premium-radius-md);
+}
+
+.loading-state strong,
+.empty-state strong,
+.error-state strong,
+.recent-empty strong,
+.no-data strong {
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.loading-state small,
+.empty-state small,
+.error-state small,
+.recent-empty small,
+.no-data small {
+    max-width: 360px;
+
+    font-size: .62rem;
+    line-height: 1.5;
+    opacity: .68;
+}
+
+/* ======================================================
+   BADGES ET PASTILLES
+====================================================== */
+
+.service-status,
+.status-badge,
+.badge,
+.pill,
+.tag,
+.platform-goals-live,
+.platform-activity-live,
+.world-online-badge {
+    min-height: 25px;
+    padding: 5px 9px;
+
+    font-size: .57rem;
+    font-weight: 800;
+    letter-spacing: .015em;
+    white-space: nowrap;
+}
+
+.service-dot,
+.world-online-dot,
+.platform-goals-live > span,
+.platform-activity-live > span {
+    flex: 0 0 auto;
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media screen and (max-width: 820px) {
+    .section-header,
+    .platform-goals-heading,
+    .table-section-header,
+    .dashboard-section-header {
+        gap: 11px;
+        margin-bottom: 14px;
+    }
+
+    .section-header h2,
+    .platform-goals-heading h2,
+    .table-section-header h2,
+    .dashboard-section-header h2 {
+        font-size: 1.08rem;
+    }
+
+    .section-header p,
+    .platform-goals-heading p,
+    .table-section-header p,
+    .dashboard-section-header p {
+        font-size: .65rem;
+    }
+
+    thead th {
+        padding: 11px 12px;
+        font-size: .58rem;
+    }
+
+    tbody td {
+        padding: 12px;
+        font-size: .65rem;
+    }
+
+    .loading-state,
+    .empty-state,
+    .error-state,
+    .recent-empty,
+    .table-empty,
+    .no-data {
+        min-height: 110px;
+        padding: 16px;
+    }
+}
+

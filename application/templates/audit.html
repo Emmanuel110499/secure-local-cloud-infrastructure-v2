@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Audit — Secure Local Cloud</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-pages.css', v='audit-v3') }}"
+    >
+
+    <style>
+        .audit-summary {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .audit-summary-card {
+            min-width: 0;
+            padding: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .audit-summary-card span,
+        .audit-summary-card strong,
+        .audit-summary-card small {
+            display: block;
+        }
+
+        .audit-summary-card span {
+            color: var(--muted);
+            font-size: 0.59rem;
+            font-weight: 750;
+        }
+
+        .audit-summary-card strong {
+            margin-top: 7px;
+            color: #263449;
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+
+        .audit-summary-card small {
+            margin-top: 4px;
+            color: #8a96a7;
+            font-size: 0.52rem;
+        }
+
+        .audit-toolbar {
+            display: grid;
+            grid-template-columns:
+                minmax(220px, 1fr)
+                auto;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .audit-filters {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .audit-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .audit-filter {
+            flex: 0 0 auto;
+            min-height: 36px;
+            padding: 0 11px;
+            color: #607087;
+            background: #f7f9fc;
+            border: 1px solid #e3e9f1;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.59rem;
+            font-weight: 850;
+        }
+
+        .audit-filter.active {
+            color: #ffffff;
+            background: #315fd8;
+            border-color: #315fd8;
+        }
+
+        .audit-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .audit-entry {
+            display: grid;
+            grid-template-columns:
+                auto minmax(150px, 0.8fr)
+                minmax(150px, 1fr)
+                minmax(110px, 0.6fr)
+                minmax(220px, 1.5fr)
+                auto;
+            align-items: center;
+            gap: 13px;
+            min-width: 0;
+            padding: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .audit-icon {
+            display: grid;
+            place-items: center;
+            width: 39px;
+            height: 39px;
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            border-radius: 12px;
+        }
+
+        .audit-entry.failed .audit-icon {
+            color: #b91c1c;
+            background: #fff1f2;
+            border-color: #fee2e2;
+        }
+
+        .audit-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .audit-field {
+            min-width: 0;
+        }
+
+        .audit-field span,
+        .audit-field strong {
+            display: block;
+        }
+
+        .audit-field span {
+            color: var(--muted);
+            font-size: 0.5rem;
+            font-weight: 700;
+        }
+
+        .audit-field strong {
+            margin-top: 4px;
+            overflow: hidden;
+            color: #334155;
+            font-size: 0.62rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .audit-details strong {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            line-height: 1.45;
+        }
+
+        .audit-result {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 27px;
+            padding: 0 9px;
+            color: #047857;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            font-size: 0.53rem;
+            font-weight: 900;
+        }
+
+        .audit-result::before {
+            width: 7px;
+            height: 7px;
+            content: "";
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .audit-result.failed {
+            color: #b91c1c;
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        .audit-result.failed::before {
+            background: #ef4444;
+        }
+
+        .audit-empty {
+            display: none;
+            padding: 35px 15px;
+            color: var(--muted);
+            text-align: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            font-size: 0.7rem;
+        }
+
+        .audit-updated {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.57rem;
+        }
+
+        @media (max-width: 1000px) {
+            .audit-entry {
+                grid-template-columns:
+                    auto minmax(140px, 1fr)
+                    minmax(140px, 1fr)
+                    auto;
+            }
+
+            .audit-field.optional {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .audit-summary {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .audit-summary::-webkit-scrollbar {
+                display: none;
+            }
+
+            .audit-summary-card {
+                flex: 0 0 140px;
+                padding: 12px;
+            }
+
+            .audit-toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .audit-entry {
+                grid-template-columns:
+                    auto minmax(0, 1fr)
+                    auto;
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .audit-field.resource {
+                grid-column: 2 / -1;
+            }
+
+            .audit-field.details {
+                grid-column: 1 / -1;
+                padding-top: 9px;
+                border-top: 1px solid #edf1f5;
+            }
+
+            .audit-field.user,
+            .audit-field.optional {
+                display: none;
+            }
+        }
+    </style>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-theme-v2.css', v='dashboard-unified-3') }}"
+    >
+
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4 portal-body">
+    <main class="portal-page">
+        <header class="portal-header">
+            <div class="portal-title">
+                <div class="portal-title-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M7 3h10v4H7Z"/>
+                        <path d="M5 5h14v16H5Z"/>
+                        <path d="M8 11h8M8 15h8M8 18h5"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>Journal d’audit</h1>
+
+                    <p>
+                        Traçabilité des opérations administratives
+                        et des actions exécutées sur Docker.
+                    </p>
+                </div>
+            </div>
+
+            <a class="portal-back" href="/">
+                ← Tableau de bord
+            </a>
+        </header>
+
+        <section class="audit-summary">
+            <article class="audit-summary-card">
+                <span>Événements enregistrés</span>
+                <strong id="audit-total">--</strong>
+                <small>Dans le journal actuel</small>
+            </article>
+
+            <article class="audit-summary-card">
+                <span>Actions réussies</span>
+                <strong id="audit-success">--</strong>
+                <small>Opérations terminées</small>
+            </article>
+
+            <article class="audit-summary-card">
+                <span>Actions en échec</span>
+                <strong id="audit-failed">--</strong>
+                <small>Opérations à vérifier</small>
+            </article>
+
+            <article class="audit-summary-card">
+                <span>Utilisateurs distincts</span>
+                <strong id="audit-users">--</strong>
+                <small>Identités enregistrées</small>
+            </article>
+        </section>
+
+        <section class="audit-toolbar">
+            <label class="portal-search">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="m20 20-4-4"/>
+                </svg>
+
+                <input
+                    id="audit-search"
+                    type="search"
+                    placeholder="Rechercher une action, une ressource ou un utilisateur…"
+                    autocomplete="off"
+                >
+            </label>
+
+            <div class="audit-filters">
+                <button
+                    class="audit-filter active"
+                    type="button"
+                    data-filter="all"
+                >
+                    Toutes
+                </button>
+
+                <button
+                    class="audit-filter"
+                    type="button"
+                    data-filter="success"
+                >
+                    Succès
+                </button>
+
+                <button
+                    class="audit-filter"
+                    type="button"
+                    data-filter="failed"
+                >
+                    Échecs
+                </button>
+
+                <button
+                    class="audit-filter"
+                    type="button"
+                    data-filter="start"
+                >
+                    Start
+                </button>
+
+                <button
+                    class="audit-filter"
+                    type="button"
+                    data-filter="stop"
+                >
+                    Stop
+                </button>
+
+                <button
+                    class="audit-filter"
+                    type="button"
+                    data-filter="restart"
+                >
+                    Restart
+                </button>
+            </div>
+        </section>
+
+        <section>
+            <div
+                id="audit-list"
+                class="audit-list"
+            ></div>
+
+            <div
+                id="audit-empty"
+                class="audit-empty"
+            >
+                Aucun événement ne correspond aux filtres sélectionnés.
+            </div>
+
+            <div
+                id="audit-updated"
+                class="audit-updated"
+            >
+                Chargement du journal d’audit…
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const list = document.getElementById(
+                "audit-list"
+            );
+
+            const empty = document.getElementById(
+                "audit-empty"
+            );
+
+            const updated = document.getElementById(
+                "audit-updated"
+            );
+
+            const search = document.getElementById(
+                "audit-search"
+            );
+
+            let actions = [];
+            let activeFilter = "all";
+
+            function escapeHtml(value) {
+                const element =
+                    document.createElement("div");
+
+                element.textContent =
+                    String(value ?? "");
+
+                return element.innerHTML;
+            }
+
+            function formatDate(timestamp) {
+                const date = new Date(timestamp);
+
+                if (Number.isNaN(date.getTime())) {
+                    return String(timestamp || "--");
+                }
+
+                return date.toLocaleString(
+                    "fr-FR",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                    }
+                );
+            }
+
+            function updateSummary() {
+                const successful = actions.filter(
+                    (action) =>
+                        Boolean(action.success)
+                );
+
+                const failed = actions.filter(
+                    (action) =>
+                        !Boolean(action.success)
+                );
+
+                const users = new Set(
+                    actions.map(
+                        (action) =>
+                            String(
+                                action.user || "inconnu"
+                            )
+                    )
+                );
+
+                document.getElementById(
+                    "audit-total"
+                ).textContent = actions.length;
+
+                document.getElementById(
+                    "audit-success"
+                ).textContent = successful.length;
+
+                document.getElementById(
+                    "audit-failed"
+                ).textContent = failed.length;
+
+                document.getElementById(
+                    "audit-users"
+                ).textContent = users.size;
+            }
+
+            function matchesFilter(action) {
+                if (activeFilter === "all") {
+                    return true;
+                }
+
+                if (activeFilter === "success") {
+                    return Boolean(action.success);
+                }
+
+                if (activeFilter === "failed") {
+                    return !Boolean(action.success);
+                }
+
+                return String(
+                    action.action || ""
+                ).toLowerCase() === activeFilter;
+            }
+
+            function renderActions() {
+                const query =
+                    search.value
+                        .trim()
+                        .toLowerCase();
+
+                const filtered = actions.filter(
+                    (action) => {
+                        const searchable = [
+                            action.user,
+                            action.resource,
+                            action.action,
+                            action.details,
+                            action.timestamp,
+                        ]
+                            .join(" ")
+                            .toLowerCase();
+
+                        return (
+                            matchesFilter(action)
+                            && (
+                                !query
+                                || searchable.includes(query)
+                            )
+                        );
+                    }
+                );
+
+                if (!filtered.length) {
+                    list.innerHTML = "";
+                    empty.style.display = "block";
+                    return;
+                }
+
+                empty.style.display = "none";
+
+                list.innerHTML = filtered.map(
+                    (action) => {
+                        const success =
+                            Boolean(action.success);
+
+                        return `
+                            <article
+                                class="audit-entry ${
+                                    success
+                                        ? ""
+                                        : "failed"
+                                }"
+                            >
+                                <span class="audit-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        ${
+                                            success
+                                                ? `
+                                                    <circle cx="12" cy="12" r="9"/>
+                                                    <path d="m8 12 2.5 2.5L16 9"/>
+                                                `
+                                                : `
+                                                    <circle cx="12" cy="12" r="9"/>
+                                                    <path d="m9 9 6 6M15 9l-6 6"/>
+                                                `
+                                        }
+                                    </svg>
+                                </span>
+
+                                <div class="audit-field resource">
+                                    <span>Ressource</span>
+                                    <strong>
+                                        ${
+                                            escapeHtml(
+                                                action.resource
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div class="audit-field user">
+                                    <span>Utilisateur</span>
+                                    <strong>
+                                        ${
+                                            escapeHtml(
+                                                action.user
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div class="audit-field">
+                                    <span>Action</span>
+                                    <strong>
+                                        ${
+                                            escapeHtml(
+                                                action.action
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div class="audit-field details">
+                                    <span>Détails</span>
+                                    <strong>
+                                        ${
+                                            escapeHtml(
+                                                action.details
+                                                || "Aucun détail"
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div class="audit-field optional">
+                                    <span>Date</span>
+                                    <strong>
+                                        ${
+                                            escapeHtml(
+                                                formatDate(
+                                                    action.timestamp
+                                                )
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <span
+                                    class="audit-result ${
+                                        success
+                                            ? ""
+                                            : "failed"
+                                    }"
+                                >
+                                    ${
+                                        success
+                                            ? "Succès"
+                                            : "Échec"
+                                    }
+                                </span>
+                            </article>
+                        `;
+                    }
+                ).join("");
+            }
+
+            async function refreshAudit() {
+                try {
+                    const response = await fetch(
+                        `/api/audit?t=${Date.now()}`,
+                        {
+                            cache: "no-store",
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Erreur HTTP ${response.status}`
+                        );
+                    }
+
+                    const payload =
+                        await response.json();
+
+                    actions = Array.isArray(
+                        payload.actions
+                    )
+                        ? payload.actions
+                        : [];
+
+                    updateSummary();
+                    renderActions();
+
+                    updated.textContent =
+                        `Actualisé à ${
+                            new Date(
+                                payload.updated_at
+                            ).toLocaleTimeString(
+                                "fr-FR"
+                            )
+                        } · ${actions.length} événement(s)`;
+                } catch (error) {
+                    console.error(error);
+
+                    updated.textContent =
+                        "Impossible d’actualiser le journal d’audit.";
+                }
+            }
+
+            search.addEventListener(
+                "input",
+                renderActions
+            );
+
+            document
+                .querySelectorAll(".audit-filter")
+                .forEach((button) => {
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            activeFilter =
+                                button.dataset.filter;
+
+                            document
+                                .querySelectorAll(
+                                    ".audit-filter"
+                                )
+                                .forEach((item) => {
+                                    item.classList.remove(
+                                        "active"
+                                    );
+                                });
+
+                            button.classList.add(
+                                "active"
+                            );
+
+                            renderActions();
+                        }
+                    );
+                });
+
+            refreshAudit();
+
+            window.setInterval(
+                refreshAudit,
+                10000
+            );
+        });
+    </script>
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

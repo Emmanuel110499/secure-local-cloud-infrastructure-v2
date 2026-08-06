@@ -1,0 +1,717 @@
+/* =====================================================
+   THÈME GLOBAL — IDENTITÉ VISUELLE DU TABLEAU DE BORD
+===================================================== */
+
+:root {
+    --portal-bg: #f5f7fb;
+    --portal-surface: #ffffff;
+    --portal-surface-soft: #f8faff;
+    --portal-border: #e4eaf3;
+    --portal-text: #182238;
+    --portal-muted: #68778e;
+
+    --portal-primary: #315fd8;
+    --portal-primary-light: #eaf1ff;
+    --portal-purple: #7c5ce7;
+    --portal-cyan: #0891b2;
+    --portal-green: #059669;
+    --portal-orange: #d97706;
+    --portal-red: #dc2626;
+
+    --portal-radius-sm: 12px;
+    --portal-radius: 18px;
+    --portal-radius-lg: 24px;
+
+    --portal-shadow:
+        0 10px 30px rgba(31, 49, 84, 0.07);
+
+    --portal-shadow-hover:
+        0 18px 44px rgba(31, 49, 84, 0.12);
+}
+
+html {
+    background: var(--portal-bg);
+}
+
+body,
+body.portal-body {
+    min-height:100%;
+    color: var(--portal-text);
+    background:
+        radial-gradient(
+            circle at 0 0,
+            rgba(49, 95, 216, 0.09),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 100% 0,
+            rgba(124, 92, 231, 0.06),
+            transparent 24%
+        ),
+        var(--portal-bg) !important;
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+.portal-page,
+.page {
+    width: min(1400px, 100%) !important;
+    margin: 0 auto !important;
+    padding: 27px !important;
+}
+
+/* =====================================================
+   EN-TÊTES
+===================================================== */
+
+.portal-header,
+.topbar {
+    min-height: 72px;
+    margin-bottom: 22px !important;
+}
+
+.portal-title,
+.title-block {
+    gap: 15px !important;
+}
+
+.portal-title-icon,
+.page-icon {
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 auto !important;
+    width: 54px !important;
+    height: 54px !important;
+    color: #ffffff !important;
+    background:
+        linear-gradient(
+            145deg,
+            #234fc4,
+            #4f78eb 60%,
+            #765ce0
+        ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    border-radius: 17px !important;
+    box-shadow:
+        0 13px 28px rgba(49, 95, 216, 0.25) !important;
+}
+
+.portal-title-icon svg,
+.page-icon svg {
+    width: 27px !important;
+    height: 27px !important;
+    stroke-width: 1.85 !important;
+}
+
+.portal-title h1,
+.title-block h1,
+.page h1 {
+    color: var(--portal-text) !important;
+    font-size: clamp(1.35rem, 2vw, 1.72rem) !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.025em !important;
+}
+
+.portal-title p,
+.title-block p {
+    max-width: 720px;
+    margin-top: 6px !important;
+    color: var(--portal-muted) !important;
+    font-size: 0.83rem !important;
+    line-height: 1.55 !important;
+}
+
+.portal-back,
+.back-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 43px !important;
+    padding: 0 15px !important;
+    color: var(--portal-primary) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid var(--portal-border) !important;
+    border-radius: 13px !important;
+    box-shadow: var(--portal-shadow) !important;
+    text-decoration: none !important;
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease !important;
+}
+
+.portal-back:hover,
+.back-link:hover {
+    transform: translateY(-2px);
+    border-color: #cbd9f4 !important;
+    box-shadow: var(--portal-shadow-hover) !important;
+}
+
+/* =====================================================
+   CARTES ET SECTIONS
+===================================================== */
+
+.portal-card,
+.portal-section,
+.chart-card,
+.summary-card,
+.server-card,
+.security-score-card,
+.security-summary-card,
+.security-control,
+.assistant-panel,
+.assistant-side-card,
+.audit-summary-card,
+.audit-entry,
+.docker-summary-card,
+.container-card,
+.topology-section {
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #fdfefe
+        ) !important;
+    border: 1px solid var(--portal-border) !important;
+    border-radius: var(--portal-radius) !important;
+    box-shadow: var(--portal-shadow) !important;
+}
+
+.portal-card,
+.chart-card,
+.server-card,
+.security-control,
+.assistant-side-card,
+.container-card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease !important;
+}
+
+.portal-card:hover,
+.chart-card:hover,
+.server-card:hover,
+.security-control:hover,
+.assistant-side-card:hover,
+.container-card:hover {
+    transform: translateY(-3px) !important;
+    border-color: #d4def0 !important;
+    box-shadow: var(--portal-shadow-hover) !important;
+}
+
+.portal-section,
+.topology-section {
+    padding: 22px !important;
+}
+
+.portal-section-header {
+    margin-bottom: 18px !important;
+}
+
+.portal-section-header h2,
+.portal-card h2,
+.portal-card h3,
+.chart-title strong,
+.server-name,
+.security-control-title strong,
+.assistant-side-title h2 {
+    color: var(--portal-text) !important;
+    font-size: 0.84rem !important;
+    font-weight: 850 !important;
+}
+
+.portal-card p,
+.security-control p,
+.server-description,
+.chart-title span,
+.portal-section-header span {
+    color: var(--portal-muted) !important;
+    font-size: 0.68rem !important;
+    line-height: 1.6 !important;
+}
+
+/* =====================================================
+   LOGOS ET ICÔNES
+===================================================== */
+
+.portal-icon,
+.server-icon,
+.security-control-icon,
+.assistant-side-icon,
+.suggestion-symbol,
+.container-symbol,
+.service-symbol,
+.access-node-icon,
+.topology-node-icon,
+.topology-network-icon,
+.audit-icon {
+    display: grid !important;
+    place-items: center !important;
+    text-align: center !important;
+    border-radius: 13px !important;
+}
+
+.portal-icon {
+    width: 43px !important;
+    height: 43px !important;
+}
+
+.portal-card:nth-child(6n + 1) .portal-icon,
+.portal-card:nth-child(6n + 1) .suggestion-symbol {
+    color: #315fd8 !important;
+    background: #eaf1ff !important;
+    border-color: #d5e2fb !important;
+}
+
+.portal-card:nth-child(6n + 2) .portal-icon,
+.portal-card:nth-child(6n + 2) .suggestion-symbol {
+    color: #7c3aed !important;
+    background: #f3e8ff !important;
+    border-color: #e9d5ff !important;
+}
+
+.portal-card:nth-child(6n + 3) .portal-icon,
+.portal-card:nth-child(6n + 3) .suggestion-symbol {
+    color: #047857 !important;
+    background: #ecfdf5 !important;
+    border-color: #d1fae5 !important;
+}
+
+.portal-card:nth-child(6n + 4) .portal-icon {
+    color: #b45309 !important;
+    background: #fffbeb !important;
+    border-color: #fdecc8 !important;
+}
+
+.portal-card:nth-child(6n + 5) .portal-icon {
+    color: #0e7490 !important;
+    background: #ecfeff !important;
+    border-color: #cffafe !important;
+}
+
+.portal-card:nth-child(6n + 6) .portal-icon {
+    color: #be185d !important;
+    background: #fdf2f8 !important;
+    border-color: #fce7f3 !important;
+}
+
+.portal-icon svg,
+.server-icon svg,
+.security-control-icon svg,
+.assistant-side-icon svg,
+.suggestion-symbol svg,
+.container-symbol svg,
+.service-symbol svg,
+.access-node-icon svg,
+.topology-node-icon svg,
+.topology-network-icon svg,
+.audit-icon svg {
+    display: block !important;
+    margin: auto !important;
+}
+
+/* =====================================================
+   BARRES D’OUTILS ET RECHERCHES
+===================================================== */
+
+.portal-toolbar,
+.toolbar,
+.audit-toolbar {
+    padding: 14px !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid var(--portal-border) !important;
+    border-radius: 17px !important;
+    box-shadow: var(--portal-shadow) !important;
+}
+
+.portal-search {
+    min-height: 46px !important;
+    background: #f7f9fc !important;
+    border: 1px solid #e0e7f0 !important;
+    border-radius: 13px !important;
+}
+
+.portal-search:focus-within {
+    background: #ffffff !important;
+    border-color: #9bb3ee !important;
+    box-shadow:
+        0 0 0 4px rgba(49, 95, 216, 0.09) !important;
+}
+
+.portal-search input {
+    color: var(--portal-text) !important;
+    font-size: 0.76rem !important;
+}
+
+/* =====================================================
+   BOUTONS ET BADGES
+===================================================== */
+
+.portal-badge,
+.latest-badge,
+.network-badge,
+.docker-tool-link,
+.period-button,
+.audit-filter {
+    font-size: 0.6rem !important;
+    font-weight: 850 !important;
+}
+
+.portal-badge {
+    min-height: 27px !important;
+    padding: 0 10px !important;
+    color: var(--portal-primary) !important;
+    background: var(--portal-primary-light) !important;
+    border: 1px solid #d6e2f8 !important;
+}
+
+.period-button,
+.audit-filter,
+.docker-tool-link {
+    min-height: 38px !important;
+    padding: 0 13px !important;
+    background: #f6f8fc !important;
+    border: 1px solid var(--portal-border) !important;
+    border-radius: 11px !important;
+}
+
+.period-button.active,
+.audit-filter.active,
+.docker-tool-link.active {
+    color: #ffffff !important;
+    background:
+        linear-gradient(
+            145deg,
+            #315fd8,
+            #5377e6
+        ) !important;
+    border-color: transparent !important;
+    box-shadow:
+        0 8px 18px rgba(49, 95, 216, 0.2) !important;
+}
+
+/* =====================================================
+   VALEURS ET STATISTIQUES
+===================================================== */
+
+.summary-value,
+.audit-summary-card strong,
+.docker-summary-card strong {
+    color: var(--portal-text) !important;
+    font-size: 1.38rem !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.03em !important;
+}
+
+.summary-label,
+.audit-summary-card span,
+.docker-summary-card span {
+    color: var(--portal-muted) !important;
+    font-size: 0.66rem !important;
+}
+
+.stat {
+    padding: 11px !important;
+    background: #f8faff !important;
+    border: 1px solid #e8edf4 !important;
+    border-radius: 11px !important;
+}
+
+.stat strong {
+    color: var(--portal-text) !important;
+    font-size: 0.73rem !important;
+}
+
+/* =====================================================
+   EMMA IA
+===================================================== */
+
+.assistant-panel {
+    min-height: 700px !important;
+    border-radius: 22px !important;
+}
+
+.assistant-panel-header {
+    min-height: 74px !important;
+    padding: 15px 19px !important;
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #fbfcff
+        ) !important;
+}
+
+.assistant-avatar {
+    width: 47px !important;
+    height: 47px !important;
+    border-radius: 15px !important;
+}
+
+.assistant-identity strong {
+    font-size: 0.84rem !important;
+}
+
+.assistant-identity span {
+    font-size: 0.61rem !important;
+}
+
+.message-content {
+    font-size: 0.74rem !important;
+    line-height: 1.72 !important;
+}
+
+.message-bubble {
+    padding: 14px 16px !important;
+    border-radius: 7px 18px 18px 18px !important;
+}
+
+.message-row.user .message-bubble {
+    border-radius: 18px 7px 18px 18px !important;
+}
+
+.suggestion {
+    min-height: 49px !important;
+    font-size: 0.66rem !important;
+    border-radius: 12px !important;
+}
+
+.suggestion-symbol {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+/* =====================================================
+   INFRASTRUCTURE
+===================================================== */
+
+.topology-node,
+.topology-network,
+.access-node {
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #f9fbff
+        ) !important;
+}
+
+.topology-node strong {
+    font-size: 0.78rem !important;
+}
+
+.topology-services span {
+    min-height: 27px !important;
+    font-size: 0.55rem !important;
+}
+
+.service-item {
+    min-height: 48px !important;
+    padding: 10px 12px !important;
+    background: #f8faff !important;
+    border: 1px solid #e8edf4 !important;
+}
+
+.service-name {
+    font-size: 0.69rem !important;
+}
+
+.service-status,
+.server-state {
+    font-size: 0.58rem !important;
+}
+
+/* =====================================================
+   SÉCURITÉ
+===================================================== */
+
+.security-score-ring {
+    width: 112px !important;
+    height: 112px !important;
+}
+
+.security-score-ring strong {
+    font-size: 1.48rem !important;
+}
+
+.security-control {
+    padding: 19px !important;
+}
+
+.security-control-title strong {
+    font-size: 0.78rem !important;
+}
+
+.security-control-title span {
+    font-size: 0.58rem !important;
+}
+
+.security-detail {
+    min-height: 38px !important;
+    background: #f8faff !important;
+}
+
+/* =====================================================
+   DOCKER ET AUDIT
+===================================================== */
+
+.container-card,
+.audit-entry {
+    padding: 16px !important;
+}
+
+.container-name {
+    font-size: 0.82rem !important;
+}
+
+.container-image {
+    font-size: 0.62rem !important;
+}
+
+.container-metric span,
+.audit-field span {
+    font-size: 0.56rem !important;
+}
+
+.container-metric strong,
+.audit-field strong {
+    font-size: 0.67rem !important;
+}
+
+.container-action {
+    width: 37px !important;
+    height: 37px !important;
+    border-radius: 11px !important;
+}
+
+/* =====================================================
+   MONITORING
+===================================================== */
+
+.chart-area {
+    height: 270px !important;
+}
+
+.chart-card {
+    padding: 20px !important;
+}
+
+.latest-badge {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px !important;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 820px) {
+    .portal-page,
+    .page {
+        padding: 13px !important;
+    }
+
+    .portal-header,
+    .topbar {
+        min-height: 58px;
+        align-items: center !important;
+        margin-bottom: 15px !important;
+    }
+
+    .portal-title-icon,
+    .page-icon {
+        width: 45px !important;
+        height: 45px !important;
+        border-radius: 14px !important;
+    }
+
+    .portal-title-icon svg,
+    .page-icon svg {
+        width: 23px !important;
+        height: 23px !important;
+    }
+
+    .portal-title h1,
+    .title-block h1,
+    .page h1 {
+        font-size: 1.14rem !important;
+    }
+
+    .portal-title p,
+    .title-block p {
+        display: none !important;
+    }
+
+    .portal-back,
+    .back-link {
+        min-height: 37px !important;
+        padding: 0 10px !important;
+        font-size: 0.62rem !important;
+    }
+
+    .portal-card,
+    .portal-section,
+    .chart-card,
+    .server-card,
+    .security-control,
+    .assistant-side-card,
+    .container-card,
+    .audit-entry,
+    .topology-section {
+        border-radius: 16px !important;
+    }
+
+    .portal-card,
+    .portal-section,
+    .chart-card,
+    .server-card,
+    .security-control,
+    .assistant-side-card,
+    .topology-section {
+        padding: 15px !important;
+    }
+
+    .portal-card h2,
+    .portal-card h3,
+    .portal-section-header h2 {
+        font-size: 0.79rem !important;
+    }
+
+    .portal-card p {
+        font-size: 0.65rem !important;
+    }
+
+    .portal-icon {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .chart-area {
+        height: 205px !important;
+    }
+
+    .assistant-panel {
+        min-height:auto!important;
+    }
+
+    .assistant-messages {
+        padding: 12px !important;
+    }
+
+    .message-content {
+        font-size: 0.7rem !important;
+    }
+
+    .suggestion {
+        min-height: 47px !important;
+    }
+}

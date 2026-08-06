@@ -1,0 +1,40 @@
+services:
+  web:
+    build: .
+    container_name: secure-web-app-v2
+    hostname: srv-web
+    restart: unless-stopped
+    ports:
+      - "5001:5000"
+    
+    volumes:
+      - /etc/nginx/ssl/nginx.crt:/security/nginx.crt:ro
+      - /home/emmanuel/application/log_exports:/app/log_exports:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+
+    environment:
+      PROMETHEUS_URL: "http://192.168.50.20:9090"
+      GRAFANA_URL: "http://192.168.50.20:3000"
+      NODE_EXPORTER_URL: "http://192.168.50.10:9100"
+      CADVISOR_URL: "http://192.168.154.10:8080/containers/"
+      ALERTMANAGER_URL: "http://192.168.50.20:9093"
+      CERTIFICATE_PATH: "/security/nginx.crt"
+
+      SECRET_KEY: "${SECRET_KEY}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    privileged: true

@@ -1,0 +1,155 @@
+/* ======================================================
+   RAPPORT MONITORING — IMPRESSION MOBILE ET PC
+====================================================== */
+
+@page {
+    size: A4 landscape;
+    margin: 8mm;
+}
+
+@media print {
+    html,
+    body {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+
+        color: #0f172a !important;
+        background: #ffffff !important;
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        overflow: visible !important;
+    }
+
+    /* Éléments d’interface inutiles sur le rapport */
+    .sidebar,
+    .sidebar-overlay,
+    .mobile-menu-button,
+    .mobile-account-ribbon,
+    .mobile-user-menu,
+    .topbar,
+    .header-actions,
+    .user-menu,
+    .emma-floating-button,
+    .emma-chat-panel,
+    .floating-actions,
+    .report-pdf-button,
+    .export-report-button,
+    #report-pdf-button,
+    #export-report-pdf,
+    button:has(
+        svg
+    ) {
+        display: none !important;
+    }
+
+    main,
+    .main-content,
+    .page-content,
+    .content-wrapper,
+    .portal-content,
+    .monitoring-page,
+    .monitoring-content {
+        position: static !important;
+
+        width: 100% !important;
+        max-width: none !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        transform: none !important;
+    }
+
+    /* Conserver les couleurs des graphiques */
+    canvas,
+    svg {
+        opacity: 1 !important;
+        filter:
+            contrast(1.18)
+            saturate(1.25) !important;
+    }
+
+    canvas {
+        max-width: 100% !important;
+    }
+
+    /* Cartes du rapport */
+    .card,
+    .panel,
+    .metric-card,
+    .stat-card,
+    .chart-card,
+    .monitoring-card,
+    .report-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+
+        color: #0f172a !important;
+        background: #ffffff !important;
+
+        border:
+            1.5px solid #cbd5e1 !important;
+
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    .charts-grid,
+    .monitoring-grid,
+    .metrics-grid,
+    .report-grid {
+        display: grid !important;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+        gap: 8mm !important;
+
+        width: 100% !important;
+    }
+
+    .kpi-grid,
+    .summary-grid {
+        display: grid !important;
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+        gap: 5mm !important;
+
+        width: 100% !important;
+    }
+
+    h1,
+    h2,
+    h3,
+    strong {
+        color: #0f172a !important;
+    }
+
+    p,
+    span,
+    small,
+    th,
+    td {
+        color: #334155 !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    th,
+    td {
+        border:
+            1px solid #cbd5e1 !important;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+}

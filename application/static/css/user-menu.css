@@ -1,0 +1,501 @@
+.user-menu-wrapper {
+    position: relative;
+}
+
+.avatar-button {
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.avatar-button:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 10px 24px rgba(49, 95, 216, 0.22);
+}
+
+.user-menu {
+    position: absolute;
+    top: calc(100% + 11px);
+    right: 0;
+    z-index: 1300;
+    width: 255px;
+    padding: 9px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e1e7f0;
+    border-radius: 17px;
+    box-shadow:
+        0 22px 55px rgba(15, 23, 42, 0.16);
+    backdrop-filter: blur(14px);
+}
+
+.user-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px;
+    margin-bottom: 5px;
+    background:
+        linear-gradient(
+            135deg,
+            #f3f7ff,
+            #f8faff
+        );
+    border-radius: 12px;
+}
+
+.user-menu-soft-icon {
+    display: grid;
+    place-items: center;
+    width: 37px;
+    height: 37px;
+    background: #e7efff;
+    border-radius: 12px;
+}
+
+.user-menu-header strong,
+.user-menu-header small {
+    display: block;
+}
+
+.user-menu-header strong {
+    color: #172033;
+    font-size: 0.76rem;
+}
+
+.user-menu-header small {
+    margin-top: 3px;
+    color: #77869a;
+    font-size: 0.59rem;
+}
+
+.user-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 39px;
+    padding: 8px 10px;
+    color: #334155;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 0.69rem;
+    font-weight: 650;
+    transition: 0.16s ease;
+}
+
+.user-menu a:hover {
+    color: #315fd8;
+    background: #f1f5ff;
+}
+
+.user-menu a > span {
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    background: #f0f4fa;
+    border-radius: 9px;
+    font-size: 0.82rem;
+}
+
+.user-menu-separator {
+    height: 1px;
+    margin: 6px 5px;
+    background: #e8edf4;
+}
+
+.user-menu .logout-link {
+    color: #b42318;
+}
+
+.user-menu .logout-link:hover {
+    color: #991b1b;
+    background: #fff1f0;
+}
+
+@media (max-width: 820px) {
+    .user-menu {
+        position: fixed;
+        top: 57px;
+        right: 10px;
+        width: min(255px, calc(100vw - 20px));
+    }
+}
+
+/* ===== EN-TÊTE UTILISATEUR MOBILE ===== */
+
+.mobile-user-header {
+    display: none;
+}
+
+@media (max-width: 820px) {
+    .mobile-user-header {
+        position: fixed;
+        top: 9px;
+        right: 10px;
+        left: 61px;
+        z-index: 1190;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 41px;
+        padding: 4px 5px 4px 7px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid #e3e9f2;
+        border-radius: 13px;
+        box-shadow:
+            0 8px 24px rgba(15, 23, 42, 0.09);
+        backdrop-filter: blur(14px);
+    }
+
+    .mobile-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: #172033;
+        text-decoration: none;
+    }
+
+    .mobile-brand-logo {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 31px;
+        height: 31px;
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                #315fd8,
+                #5b83f7
+            );
+        border-radius: 10px;
+        box-shadow:
+            0 7px 16px rgba(49, 95, 216, 0.2);
+        font-size: 0.78rem;
+        font-weight: 900;
+    }
+
+    .mobile-brand-name {
+        max-width: 145px;
+        overflow: hidden;
+        font-size: 0.73rem;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mobile-account-button {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 31px;
+        height: 31px;
+        padding: 0;
+        color: #315fd8;
+        background: #edf3ff;
+        border: 0;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.84rem;
+    }
+
+    .mobile-user-menu {
+        position: fixed;
+        top: 58px;
+        right: 10px;
+        z-index: 1350;
+        width: min(260px, calc(100vw - 20px));
+        padding: 9px;
+        background: rgba(255, 255, 255, 0.99);
+        border: 1px solid #e1e7f0;
+        border-radius: 16px;
+        box-shadow:
+            0 22px 55px rgba(15, 23, 42, 0.18);
+        backdrop-filter: blur(14px);
+    }
+
+    .mobile-user-menu-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 5px;
+        padding: 11px;
+        background:
+            linear-gradient(
+                135deg,
+                #f3f7ff,
+                #f8faff
+            );
+        border-radius: 12px;
+    }
+
+    .mobile-user-avatar {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        color: #315fd8;
+        background: #e6efff;
+        border-radius: 11px;
+        font-size: 0.82rem;
+        font-weight: 900;
+    }
+
+    .mobile-user-menu-header strong,
+    .mobile-user-menu-header small {
+        display: block;
+    }
+
+    .mobile-user-menu-header strong {
+        color: #172033;
+        font-size: 0.75rem;
+    }
+
+    .mobile-user-menu-header small {
+        margin-top: 3px;
+        color: #77869a;
+        font-size: 0.58rem;
+    }
+
+    .mobile-user-menu a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 38px;
+        padding: 8px 10px;
+        color: #334155;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 0.68rem;
+        font-weight: 700;
+    }
+
+    .mobile-user-menu a:hover {
+        color: #315fd8;
+        background: #f1f5ff;
+    }
+
+    .mobile-user-menu a > span {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        background: #f0f4fa;
+        border-radius: 8px;
+    }
+
+    .mobile-user-menu-separator {
+        height: 1px;
+        margin: 6px 5px;
+        background: #e8edf4;
+    }
+
+    .mobile-user-menu .mobile-logout-link {
+        color: #b42318;
+    }
+
+    .mobile-user-menu .mobile-logout-link:hover {
+        color: #991b1b;
+        background: #fff1f0;
+    }
+
+    .main-content {
+        padding-top: 38px !important;
+    }
+}
+
+/* ===== MASQUER L'EN-TÊTE MOBILE QUAND LA SIDEBAR EST OUVERTE ===== */
+
+@media (max-width: 820px) {
+    body.menu-is-open .mobile-user-header {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: translateY(-14px) !important;
+    }
+
+    body.menu-is-open .mobile-user-menu {
+        display: none !important;
+    }
+
+    body.menu-is-open .sidebar {
+        z-index: 1600 !important;
+    }
+
+    body.menu-is-open .sidebar-overlay {
+        z-index: 1500 !important;
+    }
+
+    body.menu-is-open .mobile-menu-button {
+        z-index: 1700 !important;
+    }
+}
+
+/* ===== SUPPRESSION DEFINITIVE DU GRAND RUBAN MOBILE ===== */
+
+@media (max-width: 820px) {
+    .mobile-user-header {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    .mobile-brand,
+    .mobile-brand-logo,
+    .mobile-brand-name,
+    .mobile-account-button {
+        display: none !important;
+    }
+}
+
+
+/* ===== MOBILE ACCOUNT RIBBON MENU FINAL ===== */
+
+.mobile-account-ribbon {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
+}
+
+.topbar,
+.user-box,
+.user-menu-wrapper {
+    overflow: visible !important;
+}
+
+.user-menu {
+    z-index: 12000 !important;
+}
+
+@media screen and (max-width: 820px) {
+    #mobile-user-menu {
+        position: fixed !important;
+        z-index: 12050 !important;
+
+        top: 76px !important;
+        right: 14px !important;
+        left: auto !important;
+
+        width: min(300px, calc(100vw - 28px)) !important;
+        max-height: calc(100dvh - 100px) !important;
+
+        margin: 0 !important;
+        padding: 10px !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        background: rgba(255, 255, 255, 0.98) !important;
+        border: 1px solid #e1e7f0 !important;
+        border-radius: 18px !important;
+
+        box-shadow:
+            0 24px 60px rgba(15, 23, 42, 0.22) !important;
+
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
+    }
+
+    #mobile-user-menu[hidden] {
+        display: none !important;
+    }
+
+    #mobile-user-menu:not([hidden]) {
+        display: block !important;
+        animation: mobileAccountMenuIn 180ms ease both;
+    }
+
+    #mobile-user-menu a {
+        display: flex !important;
+        align-items: center !important;
+        gap: 11px !important;
+
+        min-height: 46px !important;
+        padding: 9px 10px !important;
+
+        color: #25324a !important;
+        text-decoration: none !important;
+        border-radius: 12px !important;
+    }
+
+    #mobile-user-menu a:hover,
+    #mobile-user-menu a:active {
+        background: #f1f5ff !important;
+    }
+
+    #mobile-user-menu .logout-link,
+    #mobile-user-menu .mobile-logout-link,
+    #mobile-user-menu a[href="/logout"] {
+        color: #c52b25 !important;
+    }
+}
+
+@keyframes mobileAccountMenuIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ======================================================
+   PC — MENU UTILISATEUR TOUJOURS VISIBLE
+====================================================== */
+
+@media screen and (min-width: 821px) {
+
+    .topbar,
+    .user-box,
+    .user-menu-wrapper,
+    .main-content,
+    .hero {
+        overflow: visible !important;
+    }
+
+    .user-menu-wrapper {
+        position: relative !important;
+        z-index: 20000 !important;
+    }
+
+    #user-menu,
+    .user-menu {
+        position: absolute !important;
+
+        top: calc(100% + 10px) !important;
+        right: 0 !important;
+        left: auto !important;
+        bottom: auto !important;
+
+        z-index: 30000 !important;
+
+        width: 320px !important;
+        max-width: calc(100vw - 32px) !important;
+        max-height: calc(100vh - 110px) !important;
+
+        margin: 0 !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        transform: none !important;
+    }
+
+    #user-menu[hidden] {
+        display: none !important;
+    }
+
+    #user-menu:not([hidden]) {
+        display: block !important;
+    }
+}

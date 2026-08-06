@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Secure Local Cloud Infrastructure</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/dashboard-v2.css', v='card-harmony-20260804-124051') }}"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/docker-donut-fix.css', v='2') }}"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/user-menu.css', v='user-menu-pc-fix-20260803-203842') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/account-ui.css', v='desktop-mobile-account-5') }}"
+    >
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/emma-floating-chat.css',
+        v='emma-floating-chat-v2'
+    ) }}"
+>
+
+<link
+rel="stylesheet"
+href="{{ url_for(
+'static',
+filename='css/dashboard-modern-pc.css',
+v='modern-pc-20260803-233423'
+) }}">
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/dashboard-cockpit-pc.css',
+        v='recent-complete-20260803-235515'
+    ) }}"
+>
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/recent-activity-mobile-final.css',
+        v='recent-mobile-final-20260804-012824'
+    ) }}"
+>
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/sidebar-premium.css',
+        v='compact-health-20260804-201558'
+    ) }}"
+>
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/monitoring-report-print.css',
+        v='monitoring-print-20260804-134659'
+    ) }}"
+>
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/platform-search.css',
+        v='platform-search-20260804-144713'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4">
+    <button
+        id="mobile-menu-button"
+        class="mobile-menu-button"
+        type="button"
+    >
+        ☰
+    </button>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+
+<button
+    id="mobile-user-menu-button"
+    class="mobile-account-ribbon"
+    type="button"
+    aria-label="Ouvrir le menu du compte"
+    aria-haspopup="true"
+    aria-expanded="false"
+>
+
+    <span class="mobile-account-ribbon-name">
+        {{ logged_user or "Emmanuel" }}
+    </span>
+
+    <span class="mobile-account-ribbon-avatar">
+        {{ (logged_user or "E")[0] | upper }}
+    </span>
+
+</button>
+
+<div
+    id="mobile-user-menu"
+    class="mobile-user-menu"
+    hidden
+></div>
+
+
+
+
+
+    <aside id="sidebar" class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🛡️</div>
+
+            <div>
+                <strong>Secure Local</strong>
+                <span>Cloud Infrastructure</span>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <a href="/" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    🏠
+</span>
+<span class="sidebar-nav-label">
+    Accueil
+</span>
+</a>
+            <a href="#dashboard" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    📊
+</span>
+<span class="sidebar-nav-label">
+    Tableau de bord
+</span>
+</a>
+            <a href="/monitoring" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    📈
+</span>
+<span class="sidebar-nav-label">
+    Monitoring
+</span>
+</a>
+            <a href="/containers" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    🐳
+</span>
+<span class="sidebar-nav-label">
+    Conteneurs Docker
+</span>
+</a>
+            <a href="/infrastructure" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    🖥️
+</span>
+<span class="sidebar-nav-label">
+    Infrastructure
+</span>
+</a>
+            
+            <a href="/documentation" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    📚
+</span>
+<span class="sidebar-nav-label">
+    Documentation
+</span>
+</a>
+
+            <div class="nav-heading">Outils avancés</div>
+
+            <a
+href="https://grafana.emmanuelinfra.fr"
+target="_blank"
+class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    📊
+</span>
+<span class="sidebar-nav-label">
+    Grafana
+</span>
+</a>
+
+            <a
+href="https://prometheus.emmanuelinfra.fr"
+target="_blank"
+class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    🔥
+</span>
+<span class="sidebar-nav-label">
+    Prometheus
+</span>
+</a>
+
+            <a href="/security" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    🔐
+</span>
+<span class="sidebar-nav-label">
+    Connexion sécurisée
+</span>
+</a>
+            <a href="/audit" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    📜
+</span>
+<span class="sidebar-nav-label">
+    Audit
+</span>
+</a>
+        </nav>
+</aside>
+
+    <main class="main-content">
+
+<div id="dashboard-alert" class="dashboard-alert hidden">
+    <span id="dashboard-alert-icon">⚠️</span>
+    <span id="dashboard-alert-text">
+        Tous les services sont opérationnels.
+    </span>
+</div>
+
+        <header class="topbar">
+            <strong></strong>
+
+            
+<!-- GLOBAL_PLATFORM_SEARCH -->
+<div class="platform-search-wrapper">
+    <div
+        id="platform-search"
+        class="platform-search"
+        role="search"
+    >
+        <span
+            class="platform-search-icon"
+            aria-hidden="true"
+        >
+            <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m20 20-3.5-3.5"></path>
+            </svg>
+        </span>
+
+        <input
+            id="platform-search-input"
+            class="platform-search-input"
+            type="search"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Rechercher une section…"
+            aria-label="Rechercher dans la plateforme"
+            aria-controls="platform-search-results"
+            aria-expanded="false"
+        >
+
+        <kbd class="platform-search-shortcut">
+            Ctrl K
+        </kbd>
+
+        <button
+            id="platform-search-clear"
+            class="platform-search-clear"
+            type="button"
+            aria-label="Effacer la recherche"
+            hidden
+        >
+            ✕
+        </button>
+
+        <div
+            id="platform-search-results"
+            class="platform-search-results"
+            role="listbox"
+            hidden
+        ></div>
+    </div>
+</div>
+
+<div class="user-box user-menu-wrapper">
+                <span>{{ logged_user or "Utilisateur" }}</span>
+
+                <button
+                    id="user-menu-button"
+                    class="avatar avatar-button"
+                    type="button"
+                    aria-label="Ouvrir le menu utilisateur"
+                    aria-expanded="false"
+                >
+                    {{ (logged_user or "U")[0] | upper }}
+                </button>
+
+                <div
+                    id="user-menu"
+                    class="user-menu"
+                    hidden
+                >
+                    <div class="user-menu-header">
+                        <span class="user-menu-soft-icon">
+                            👤
+                        </span>
+
+                        <div>
+                            <strong>
+                                {{ logged_user or "Utilisateur" }}
+                            </strong>
+                            <small>Compte administrateur</small>
+                        </div>
+                    </div>
+
+                    <a href="/account">
+                        
+<span class="account-symbol menu-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1A8 8 0 0 0 15 6l-.3-2.5h-4L10.4 6a8 8 0 0 0-1.7 1.1l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1A8 8 0 0 0 10.4 18l.3 2.5h4L15 18a8 8 0 0 0 1.6-1.1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1Z"/>
+    </svg>
+</span>
+                        Gérer mon compte
+                    </a>
+
+                    <a href="/account#username">
+                        
+<span class="account-symbol menu-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <path d="m4 20 4.2-1 10-10-3.2-3.2-10 10L4 20Z"/>
+        <path d="m13.8 7 3.2 3.2M4 20l4.2-1"/>
+    </svg>
+</span>
+                        Modifier l’identifiant
+                    </a>
+
+                    <a href="/account#password">
+                        
+<span class="account-symbol menu-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <circle cx="8" cy="12" r="3.5"/>
+        <path d="M11.5 12H21M17 12v3M20 12v2"/>
+    </svg>
+</span>
+                        Modifier le mot de passe
+                    </a>
+
+                    <div class="user-menu-separator"></div>
+
+                    <a
+                        href="/logout"
+                        class="logout-link"
+                    >
+                        
+<span class="account-symbol menu-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <path d="M10 5H5v14h5"/>
+        <path d="m14 8 4 4-4 4M18 12H9"/>
+    </svg>
+</span>
+                        Se déconnecter
+                    </a>
+                </div>
+            </div>
+        </header>
+<section class="hero">
+            <div class="hero-content">
+                <span class="hero-badge">
+                    Infrastructure Cloud & Connexion sécurisée
+                </span>
+
+                <h1>
+                    Bienvenue sur Secure Local Cloud Infrastructure
+                </h1>
+
+                <p>
+                    Une plateforme de supervision et d’observabilité
+                    permettant de suivre l’état des services, des
+                    ressources système et des conteneurs Docker depuis
+                    une interface centralisée et sécurisée.
+                </p>
+
+                <div class="world-presence-card">
+    <div class="world-presence-visual" aria-hidden="true">
+        <div class="world-orbit world-orbit-one"></div>
+        <div class="world-orbit world-orbit-two"></div>
+
+        <div class="world-globe">
+            <div class="world-globe-surface"></div>
+            <div class="world-globe-grid"></div>
+            <div class="world-globe-light"></div>
+
+            <span class="world-location-marker">
+                <span></span>
+            </span>
+        </div>
+
+        <div class="world-satellite">✦</div>
+    </div>
+
+    <div class="world-presence-content">
+        <div class="world-presence-heading">
+            <div>
+                <span class="world-presence-eyebrow">
+                    Global Infrastructure
+                </span>
+
+                <h2>Présence réseau détectée</h2>
+            </div>
+
+            <span class="world-online-badge">
+                <span class="world-online-dot"></span>
+                Online
+            </span>
+        </div>
+
+        <div class="world-detected-location">
+            <span class="world-location-symbol" aria-hidden="true">⌖</span>
+
+            <div>
+                <strong id="visitor-country">
+                    Détection de votre région…
+                </strong>
+
+                <span id="visitor-location">
+                    Analyse du point d’accès réseau
+                </span>
+            </div>
+        </div>
+
+        <div class="world-presence-message">
+            <span class="world-message-line"></span>
+
+            <p>
+                Cette interface adapte automatiquement son point de présence
+                au pays depuis lequel elle est consultée.
+            </p>
+        </div>
+    </div>
+</div>
+            </div>
+
+            <div
+                class="hero-visual"
+                aria-label="Illustration d'une infrastructure cloud sécurisée"
+            >
+                <svg
+                    class="hero-svg"
+                    viewBox="0 0 520 360"
+                    role="img"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <defs>
+                        <linearGradient
+                            id="serverGradient"
+                            x1="0"
+                            y1="0"
+                            x2="1"
+                            y2="1"
+                        >
+                            <stop offset="0%" stop-color="#60a5fa"/>
+                            <stop offset="100%" stop-color="#1d4ed8"/>
+                        </linearGradient>
+
+                        <linearGradient
+                            id="screenGradient"
+                            x1="0"
+                            y1="0"
+                            x2="1"
+                            y2="1"
+                        >
+                            <stop offset="0%" stop-color="#eff6ff"/>
+                            <stop offset="100%" stop-color="#dbeafe"/>
+                        </linearGradient>
+
+                        <filter
+                            id="softShadow"
+                            x="-30%"
+                            y="-30%"
+                            width="160%"
+                            height="160%"
+                        >
+                            <feDropShadow
+                                dx="0"
+                                dy="14"
+                                stdDeviation="12"
+                                flood-color="#2563eb"
+                                flood-opacity=".18"
+                            />
+                        </filter>
+                    </defs>
+
+                    <ellipse
+                        cx="260"
+                        cy="325"
+                        rx="185"
+                        ry="18"
+                        fill="#dbeafe"
+                        opacity=".55"
+                    />
+
+                    <g
+                        filter="url(#softShadow)"
+                        transform="translate(155 70)"
+                    >
+                        <path
+                            d="M55 60c5-28 29-48 58-48
+                               25 0 46 14 55 35
+                               6-3 13-5 21-5
+                               24 0 43 19 43 43
+                               0 23-18 42-41 43
+                               H58C26 128 0 103 0 72
+                               0-29 24-53 55-55z"
+                            fill="#dbeafe"
+                        />
+
+                        <path
+                            d="M77 68c4-20 21-34 42-34
+                               18 0 33 10 40 25
+                               5-2 10-3 15-3
+                               17 0 31 14 31 31
+                               0 17-14 30-30 31
+                               H78c-22 0-40-18-40-40
+                               0-20 17-37 39-37z"
+                            fill="#93c5fd"
+                            opacity=".85"
+                        />
+                    </g>
+
+                    <g
+                        filter="url(#softShadow)"
+                        transform="translate(165 150)"
+                    >
+                        <rect
+                            x="0"
+                            y="0"
+                            width="175"
+                            height="54"
+                            rx="13"
+                            fill="url(#serverGradient)"
+                        />
+                        <circle cx="24" cy="27" r="6" fill="#86efac"/>
+                        <rect x="43" y="20" width="88" height="6" rx="3" fill="#bfdbfe"/>
+                        <rect x="43" y="31" width="64" height="5" rx="2.5" fill="#93c5fd"/>
+
+                        <rect
+                            x="12"
+                            y="64"
+                            width="175"
+                            height="54"
+                            rx="13"
+                            fill="url(#serverGradient)"
+                        />
+                        <circle cx="36" cy="91" r="6" fill="#86efac"/>
+                        <rect x="55" y="84" width="88" height="6" rx="3" fill="#bfdbfe"/>
+                        <rect x="55" y="95" width="64" height="5" rx="2.5" fill="#93c5fd"/>
+
+                        <rect
+                            x="24"
+                            y="128"
+                            width="175"
+                            height="54"
+                            rx="13"
+                            fill="url(#serverGradient)"
+                        />
+                        <circle cx="48" cy="155" r="6" fill="#86efac"/>
+                        <rect x="67" y="148" width="88" height="6" rx="3" fill="#bfdbfe"/>
+                        <rect x="67" y="159" width="64" height="5" rx="2.5" fill="#93c5fd"/>
+                    </g>
+
+                    <g
+                        filter="url(#softShadow)"
+                        transform="translate(355 172)"
+                    >
+                        <rect
+                            x="0"
+                            y="0"
+                            width="130"
+                            height="96"
+                            rx="13"
+                            fill="#1e3a8a"
+                        />
+
+                        <rect
+                            x="10"
+                            y="10"
+                            width="110"
+                            height="70"
+                            rx="8"
+                            fill="url(#screenGradient)"
+                        />
+
+                        <path
+                            d="M25 63 L45 47 L62 55 L83 31 L105 42"
+                            fill="none"
+                            stroke="#2563eb"
+                            stroke-width="6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+
+                        <rect
+                            x="53"
+                            y="96"
+                            width="25"
+                            height="20"
+                            rx="3"
+                            fill="#1e3a8a"
+                        />
+
+                        <rect
+                            x="34"
+                            y="113"
+                            width="63"
+                            height="9"
+                            rx="4"
+                            fill="#1e3a8a"
+                        />
+                    </g>
+
+                    <g
+                        filter="url(#softShadow)"
+                        transform="translate(77 217)"
+                    >
+                        <path
+                            d="M50 0
+                               L94 17
+                               V58
+                               C94 86 75 106 50 119
+                               C25 106 6 86 6 58
+                               V17Z"
+                            fill="#2563eb"
+                        />
+
+                        <rect
+                            x="35"
+                            y="46"
+                            width="31"
+                            height="31"
+                            rx="7"
+                            fill="#dbeafe"
+                        />
+
+                        <path
+                            d="M40 47V37
+                               C40 24 60 24 60 37V47"
+                            fill="none"
+                            stroke="#dbeafe"
+                            stroke-width="7"
+                            stroke-linecap="round"
+                        />
+                    </g>
+
+                    <path
+                        d="M170 280 C230 320 315 320 370 265"
+                        fill="none"
+                        stroke="#60a5fa"
+                        stroke-width="4"
+                        stroke-dasharray="9 10"
+                        opacity=".65"
+                    />
+                </svg>
+            </div>
+        </section>
+
+        <section id="dashboard" class="kpi-grid">
+            <article class="kpi-card">
+                <div class="kpi-icon green">▦</div>
+
+                <div>
+                    <strong>
+                        {{ services.values() | select("equalto", true) | list | length }}
+                        / {{ services | length }}
+                    </strong>
+                    <span>Services</span>
+                    <small>En ligne</small>
+                </div>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-icon blue">🐳</div>
+
+                <div>
+                    <strong id="containers-value">
+                        {{ metrics.containers or 0 }}
+                    </strong>
+                    <span>Conteneurs</span>
+                    <small>Détectés</small>
+                </div>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-icon orange">◉</div>
+
+                <div>
+                    <strong id="cpu-value">
+                        {{ metrics.cpu if metrics.cpu is not none else "N/A" }}{% if metrics.cpu is not none %}%{% endif %}
+                    </strong>
+                    <span>CPU</span>
+                    <small>Utilisation</small>
+                </div>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-icon purple">▤</div>
+
+                <div>
+                    <strong id="memory-value">
+                        {{ metrics.memory if metrics.memory is not none else "N/A" }}{% if metrics.memory is not none %}%{% endif %}
+                    </strong>
+                    <span>RAM</span>
+                    <small>Utilisation</small>
+                </div>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-icon red">⚠</div>
+
+                <div>
+                    <strong>
+                        {% if infrastructure_healthy %}0{% else %}1{% endif %}
+                    </strong>
+                    <span>Alertes</span>
+                    <small>En cours</small>
+                </div>
+            </article>
+        </section>
+
+        <section
+    id="platform-goals"
+    class="platform-goals-section"
+    aria-labelledby="platform-goals-title"
+>
+    <header class="platform-goals-heading">
+        <div>
+            <span class="platform-goals-eyebrow">
+                Qualité de service
+            </span>
+
+            <h2 id="platform-goals-title">
+                Objectifs de la plateforme
+            </h2>
+
+            <p>
+                Une lecture claire des engagements de disponibilité,
+                de performance et de qualité de l’infrastructure.
+            </p>
+        </div>
+
+        <span class="platform-goals-live">
+            <span></span>
+            Objectifs actifs
+        </span>
+    </header>
+
+    <div
+        id="platform-goals-carousel"
+        class="platform-goals-carousel"
+        tabindex="0"
+        aria-label="Objectifs de performance et d’infrastructure"
+    >
+        <article
+            class="platform-goal-card performance-goal-card"
+            data-platform-goal
+        >
+            <div class="platform-goal-card-header">
+                <span class="platform-goal-main-icon" aria-hidden="true">
+                    🎯
+                </span>
+
+                <div>
+                    <small>Fonctionnement général</small>
+                    <h3>État de la plateforme</h3>
+                </div>
+
+                <span class="platform-goal-score">
+                    98
+                    <small>/100</small>
+                </span>
+            </div>
+
+            <div class="platform-goal-list">
+                <div
+                    class="platform-goal-item"
+                    style="--goal-progress: 99.9%"
+                >
+                    <div class="platform-goal-item-top">
+                        <span>Plateforme accessible</span>
+                        <strong>99,9 %</strong>
+                    </div>
+
+                    <div class="platform-goal-track">
+                        <span></span>
+                    </div>
+
+                    <small>
+                        Accessible à tout moment
+                    </small>
+                </div>
+
+                <div
+                    class="platform-goal-item"
+                    style="--goal-progress: 92%"
+                >
+                    <div class="platform-goal-item-top">
+                        <span>Rapidité</span>
+                        <strong>Excellent</strong>
+                    </div>
+
+                    <div class="platform-goal-track">
+                        <span></span>
+                    </div>
+
+                    <small>
+                        Navigation rapide sur tous les appareils
+                    </small>
+                </div>
+
+                <div
+                    class="platform-goal-item"
+                    style="--goal-progress: 95%"
+                >
+                    <div class="platform-goal-item-top">
+                        <span>Fonctionnement</span>
+                        <strong>Élevée</strong>
+                    </div>
+
+                    <div class="platform-goal-track">
+                        <span></span>
+                    </div>
+
+                    <small>
+                        Tous les services fonctionnent correctement
+                    </small>
+                </div>
+            </div>
+
+            <footer class="platform-goal-card-footer">
+                <span class="goal-footer-dot"></span>
+                Plateforme prête à être utilisée
+            </footer>
+        </article>
+
+        <article
+    class="platform-goal-card infrastructure-goal-card"
+    data-platform-goal
+>
+    <div class="platform-goal-card-header">
+        <span
+            class="platform-goal-main-icon"
+            aria-hidden="true"
+        >
+            🛡️
+        </span>
+
+        <div>
+            <small>Configuration</small>
+            <h3>Infrastructure</h3>
+        </div>
+
+        <span class="platform-goal-grade">
+            A+
+        </span>
+    </div>
+
+    <div class="infrastructure-goal-grid">
+        <div class="infrastructure-goal">
+            <span
+                class="infrastructure-goal-icon"
+                aria-hidden="true"
+            >
+                🔐
+            </span>
+
+            <div>
+                <small>Connexion sécurisée</small>
+                <strong>Activée</strong>
+            </div>
+
+            <span
+                class="infrastructure-goal-check"
+                aria-label="Actif"
+            >
+                ✓
+            </span>
+        </div>
+
+        <div class="infrastructure-goal">
+            <span
+                class="infrastructure-goal-icon"
+                aria-hidden="true"
+            >
+                ↗️
+            </span>
+
+            <div>
+                <small>Peut évoluer</small>
+                <strong>Oui</strong>
+            </div>
+
+            <span
+                class="infrastructure-goal-check"
+                aria-label="Actif"
+            >
+                ✓
+            </span>
+        </div>
+
+        <div class="infrastructure-goal">
+            <span
+                class="infrastructure-goal-icon"
+                aria-hidden="true"
+            >
+                🧩
+            </span>
+
+            <div>
+                <small>Facile à gérer</small>
+                <strong>Organisée</strong>
+            </div>
+
+            <span
+                class="infrastructure-goal-check"
+                aria-label="Actif"
+            >
+                ✓
+            </span>
+        </div>
+
+        <div class="infrastructure-goal">
+            <span
+                class="infrastructure-goal-icon"
+                aria-hidden="true"
+            >
+                🧱
+            </span>
+
+            <div>
+                <small>Protection</small>
+                <strong>Active</strong>
+            </div>
+
+            <span
+                class="infrastructure-goal-check"
+                aria-label="Actif"
+            >
+                ✓
+            </span>
+        </div>
+    </div>
+
+    <footer class="platform-goal-card-footer">
+        <span class="goal-footer-dot"></span>
+        Infrastructure moderne, sécurisée et facile à faire évoluer
+    </footer>
+</article>
+    </div>
+
+    <div
+        class="platform-goals-pagination"
+        aria-label="Navigation du carrousel"
+    >
+        <button
+            type="button"
+            class="platform-goal-dot active"
+            data-platform-goal-index="0"
+            aria-label="Afficher État de la plateforme"
+        ></button>
+
+        <button
+            type="button"
+            class="platform-goal-dot"
+            data-platform-goal-index="1"
+            aria-label="Afficher Infrastructure"
+        ></button>
+    </div>
+
+    <small class="platform-goals-mobile-hint">
+        Faites glisser pour découvrir l’objectif suivant
+        <span aria-hidden="true">→</span>
+    </small>
+</section>
+
+        <section class="panel docker-table-panel">
+            <div class="panel-header">
+                <strong>Conteneurs Docker</strong>
+
+                <a href="/containers">
+                    Voir tout →
+                </a>
+            </div>
+
+            <div class="docker-table-wrapper">
+                <table class="docker-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Image</th>
+                            <th>CPU</th>
+                            <th>Mémoire</th>
+                            <th>Uptime</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="docker-table-body">
+                        <tr>
+                            <td colspan="6">
+                                Chargement des conteneurs...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="content-grid mobile-panels-carousel dashboard-cockpit-grid">
+            <article class="panel cockpit-services-panel">
+                <div class="panel-header">
+                    <strong>Services supervisés</strong>
+                    <a href="/monitoring">Voir tout →</a>
+                </div>
+
+                <div class="services-list">
+                    {% for name, status in services.items() %}
+                        <div class="service-row">
+                            <div>
+                                <span
+                                    class="service-dot {% if status %}up{% else %}down{% endif %}"
+                                ></span>
+
+                                {{ name.replace("_", " ") | title }}
+                            </div>
+
+                            <span
+                                class="service-status {% if status %}running{% else %}stopped{% endif %}"
+                            >
+                                {% if status %}Running{% else %}Down{% endif %}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            
+<article class="panel recent-activity-panel cockpit-recent-panel">
+
+<div class="panel-header">
+
+<strong>Activité récente</strong>
+
+<button
+id="clear-recent-pages"
+class="clear-recent-pages"
+type="button">
+
+🗑
+
+</button>
+
+</div>
+
+<div id="recent-pages-list">
+    {% if recent_pages %}
+        {% for item in recent_pages %}
+            <a
+                href="{{ item.path }}"
+                class="recent-item"
+            >
+                <div class="recent-left">
+                    <span class="recent-icon">
+                        {{ item.icon }}
+                    </span>
+
+                    <div class="recent-item-content">
+                        <div class="recent-item-top">
+                            <span class="recent-title">
+                                {{ item.title }}
+                            </span>
+
+                            {% if loop.first %}
+                                <span class="recent-current-badge">
+                                    Plus récent
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <span class="recent-time">
+                            {{ item.relative_time }}
+                        </span>
+                    </div>
+                </div>
+
+                <span class="recent-position">
+                    {{ loop.index }}
+                </span>
+            </a>
+        {% endfor %}
+    {% else %}
+        <div class="recent-empty">
+            <strong>Aucune activité récente</strong>
+
+            <small>
+                Ouvrez une section pour commencer l’historique.
+            </small>
+        </div>
+    {% endif %}
+</div>
+</article>
+
+
+            <article class="panel infrastructure-panel cockpit-infrastructure-panel">
+                <div class="panel-header">
+                    <strong>Infrastructure</strong>
+
+                    <a href="/infrastructure">
+                        Voir →
+                    </a>
+                </div>
+
+                
+<div class="server-card server-card-clean">
+
+    <div class="server-icon">
+        🖥️
+    </div>
+
+    <div class="server-main-info">
+        <small>Serveur principal</small>
+        <strong>{{ hostname }}</strong>
+    </div>
+
+</div>
+
+<div class="infra-summary">
+
+    <div class="infra-summary-item">
+        <span>⏱️</span>
+        <div>
+            <small>Temps actif</small>
+            <strong>{{ metrics.uptime }}</strong>
+        </div>
+    </div>
+
+    <div class="infra-summary-item">
+        <span>🟢</span>
+        <div>
+            <small>État</small>
+            <strong>Opérationnel</strong>
+        </div>
+    </div>
+
+    <div class="infra-summary-item">
+        <span>🔒</span>
+        <div>
+            <small>Sécurité</small>
+            <strong>Active</strong>
+        </div>
+    </div>
+
+</div>
+
+</article>
+
+
+            <article class="panel platform-activity-panel cockpit-visitors-panel">
+    <div class="panel-header">
+        <div>
+            <span class="platform-activity-eyebrow">
+                Activité
+            </span>
+
+            <strong>Activité de la plateforme</strong>
+        </div>
+
+        <span class="platform-activity-live">
+            <span></span>
+            En direct
+        </span>
+    </div>
+
+    <div class="platform-activity-summary">
+        <div class="platform-activity-main">
+            <span class="platform-activity-main-icon">
+                🌍
+            </span>
+
+            <div>
+                <small>Visiteurs aujourd’hui</small>
+                <strong id="platform-visitors-today">
+                    --
+                </strong>
+            </div>
+        </div>
+
+        
+        </div>
+    </div>
+
+    
+<div class="platform-activity-list">
+    <div class="platform-activity-row">
+        <span class="platform-activity-row-icon" aria-hidden="true">
+            📍
+        </span>
+
+        <div>
+            <small>Dernier visiteur</small>
+
+            <strong id="platform-last-country">
+                Localisation en cours…
+            </strong>
+
+            <small id="platform-last-city">
+                Recherche de la ville…
+            </small>
+        </div>
+
+        <span id="platform-last-time">
+            Maintenant
+        </span>
+    </div>
+
+    <div class="platform-activity-row">
+        <span class="platform-activity-row-icon" aria-hidden="true">
+            🌎
+        </span>
+
+        <div>
+            <small>Pays ayant consulté la plateforme</small>
+
+            <strong id="platform-country-list">
+                Détection en cours…
+            </strong>
+        </div>
+
+        <span id="platform-country-count">
+            --
+        </span>
+    </div>
+
+    <div class="platform-activity-row">
+        <span class="platform-activity-row-icon" aria-hidden="true">
+            🕒
+        </span>
+
+        <div>
+            <small>Dernière activité</small>
+
+            <strong id="platform-last-activity">
+                À l’instant
+            </strong>
+        </div>
+
+        <span>Aujourd’hui</span>
+    </div>
+</div>
+
+<div class="platform-activity-footer">
+
+        <span class="platform-activity-footer-dot"></span>
+
+        <span>
+            Aucune adresse IP n’est affichée
+        </span>
+    </div>
+</article>
+        </section>
+
+        <footer class="footer">
+            <div>
+                <span
+                    class="status-dot {% if infrastructure_healthy %}online{% else %}offline{% endif %}"
+                ></span>
+
+                {% if infrastructure_healthy %}
+                    Système sain
+                {% else %}
+                    Incident détecté
+                {% endif %}
+            </div>
+
+            <div>
+                {{ hostname }} · {{ server_ip }} · {{ metrics.uptime }}
+            </div>
+
+            <div id="last-update">
+                {{ current_time }}
+            </div>
+        </footer>
+    </main>
+
+    
+
+    <script>
+        window.dashboardInitialData = {
+            cpu: {{ metrics.cpu or 0 }},
+            memory: {{ metrics.memory or 0 }},
+            containers: {{ metrics.containers or 0 }}
+        };
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/dashboard-v2.js', v='visitor-backend-20260803-223530') }}"
+    ></script>
+
+    <script
+        src="{{ url_for('static', filename='js/user-menu.js', v='mobile-account-menu-20260803-203437') }}"
+    ></script>
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+<a
+    class="pdf-export-button mobile-export-above-emma"
+    href="{{ url_for('reports.export_pdf') }}"
+    title="Télécharger le rapport PDF"
+>
+    <span class="pdf-export-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+            <path d="M6 2h9l5 5v15H6z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M9 13h6"/>
+            <path d="M9 17h6"/>
+        </svg>
+    </span>
+
+    <span class="pdf-export-text">
+        Exporter le rapport PDF
+    </span>
+</a>
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/dashboard-floating-ui.js',
+        v='mobile-account-ribbon-20260803-190646'
+    ) }}"
+></script>
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/dashboard-responsive-shell.js',
+        v='responsive-shell-v3'
+    ) }}"
+></script>
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/sidebar-active-navigation.js', v='sidebar-active-20260803-204450'
+    ) }}"
+></script>
+<!-- EMMA_FLOATING_CHAT_START -->
+
+<button
+    id="emma-chat-launcher"
+    class="emma-chat-launcher"
+    type="button"
+    aria-label="Ouvrir Emma_IA"
+    aria-controls="emma-chat-panel"
+    aria-expanded="false"
+>
+    <span
+        class="emma-chat-launcher-icon"
+        aria-hidden="true"
+    >
+        🤖
+    </span>
+
+    <span class="emma-chat-launcher-label">
+        Demandez à Emma_IA
+    </span>
+</button>
+
+<section
+    id="emma-chat-panel"
+    class="emma-chat-panel"
+    aria-label="Discussion avec Emma_IA"
+    aria-hidden="true"
+>
+    <header class="emma-chat-header">
+        <div class="emma-chat-identity">
+            <span
+                class="emma-chat-avatar"
+                aria-hidden="true"
+            >
+                🤖
+            </span>
+
+            <div>
+                <strong>Emma_IA</strong>
+                <small>
+                    En ligne · accès en lecture seule
+                </small>
+            </div>
+        </div>
+
+        <div class="emma-chat-header-actions">
+            <button
+                id="emma-chat-clear"
+                class="emma-chat-header-button"
+                type="button"
+                title="Effacer la conversation"
+                aria-label="Effacer la conversation"
+            >
+                ↻
+            </button>
+
+            <button
+                id="emma-chat-close"
+                class="emma-chat-header-button"
+                type="button"
+                title="Fermer"
+                aria-label="Fermer Emma_IA"
+            >
+                ×
+            </button>
+        </div>
+    </header>
+
+    <div
+        id="emma-chat-messages"
+        class="emma-chat-messages"
+        aria-live="polite"
+    ></div>
+
+    <div class="emma-chat-suggestions">
+        <span class="emma-chat-suggestions-label">
+            Questions suggérées
+        </span>
+
+        <div class="emma-chat-chips">
+            <button
+                class="emma-chat-chip"
+                type="button"
+                data-question="Quel est l’état actuel de mon infrastructure ?"
+            >
+                État global
+            </button>
+
+            <button
+                class="emma-chat-chip"
+                type="button"
+                data-question="Analyse l’utilisation actuelle du CPU, de la RAM et du disque."
+            >
+                Ressources
+            </button>
+
+            <button
+                class="emma-chat-chip"
+                type="button"
+                data-question="Quels services sont actuellement disponibles ?"
+            >
+                Services
+            </button>
+
+            <button
+                class="emma-chat-chip"
+                type="button"
+                data-question="Quels sont les risques de sécurité actuels ?"
+            >
+                Connexion sécurisée
+            </button>
+
+            <button
+                class="emma-chat-chip"
+                type="button"
+                data-question="Explique-moi simplement l’architecture de la plateforme."
+            >
+                Organisation
+            </button>
+        </div>
+    </div>
+
+    <footer class="emma-chat-composer">
+        <form
+            id="emma-chat-form"
+            class="emma-chat-form"
+        >
+            <textarea
+                id="emma-chat-input"
+                class="emma-chat-input"
+                rows="1"
+                maxlength="1000"
+                placeholder="Posez votre question…"
+                aria-label="Question pour Emma_IA"
+            ></textarea>
+
+            <button
+                id="emma-chat-send"
+                class="emma-chat-send"
+                type="submit"
+                title="Envoyer"
+                aria-label="Envoyer la question"
+            >
+                ➜
+            </button>
+        </form>
+
+        <p class="emma-chat-footnote">
+            Emma_IA analyse les données sans modifier la plateforme.
+        </p>
+    </footer>
+</section>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/emma-floating-chat.js',
+        v='emma-floating-chat-v2'
+    ) }}"
+></script>
+
+<!-- EMMA_FLOATING_CHAT_END -->
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/world-presence.js',
+        v='world-presence-20260803-210915'
+    ) }}"
+></script>
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/platform-goals.js',
+        v='platform-goals-20260803-212939'
+    ) }}"
+></script>
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/visitor-activity.js',
+        v='visitor-activity-20260803-223530'
+    ) }}"
+></script>
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/daily-alerts.js',
+        v='alert-details-20260804-011424'
+    ) }}"
+></script>
+
+
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/monitoring-report-print.js',
+        v='monitoring-print-20260804-134659'
+    ) }}"
+></script>
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/platform-search.js',
+        v='platform-search-20260804-144713'
+    ) }}"
+></script>
+
+</body>
+</html>

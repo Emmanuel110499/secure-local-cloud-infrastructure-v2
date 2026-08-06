@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Monitoring — Secure Local Cloud</title>
+
+    <section class="monitoring-disk-chart-card">
+    <div class="monitoring-disk-chart-header">
+        <div>
+            <span class="monitoring-disk-chart-kicker">
+                Stockage
+            </span>
+
+            <h2>
+                Utilisation du disque
+            </h2>
+
+            <p>
+                Évolution de l’espace utilisé sur la partition racine.
+            </p>
+        </div>
+
+        <div class="monitoring-disk-current">
+            <span>Valeur actuelle</span>
+            <strong id="disk-chart-current">-- %</strong>
+        </div>
+    </div>
+
+    <div class="monitoring-disk-chart-wrapper">
+        <canvas id="diskChart"></canvas>
+    </div>
+
+    <div class="monitoring-disk-thresholds">
+        <span class="disk-threshold disk-threshold-normal">
+            Normal : moins de 70 %
+        </span>
+
+        <span class="disk-threshold disk-threshold-warning">
+            Surveillance : 70 à 80 %
+        </span>
+
+        <span class="disk-threshold disk-threshold-critical">
+            Alerte : plus de 80 %
+        </span>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">
+    const diskValues = [];
+</script>
+
+    <style>
+        :root {
+            --background: #f4f7fb;
+            --surface: #ffffff;
+            --border: #e4eaf2;
+            --text: #172033;
+            --muted: #708096;
+            --primary: #315fd8;
+            --cpu: #315fd8;
+            --memory: #10b981;
+            --disk: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text);
+            background: var(--background);
+            font-family:
+                Inter,
+                Arial,
+                sans-serif;
+        }
+
+        .page {
+            width: min(1380px, 100%);
+            margin: auto;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .title-block {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .page-icon {
+            display: grid;
+            place-items: center;
+            width: 47px;
+            height: 47px;
+            color: #ffffff;
+            background:
+                linear-gradient(
+                    145deg,
+                    #234fc4,
+                    #5b83f7
+                );
+            border-radius: 15px;
+            box-shadow:
+                0 12px 24px rgba(49, 95, 216, 0.2);
+        }
+
+        .page-icon svg {
+            width: 25px;
+            height: 25px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.35rem;
+        }
+
+        .title-block p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 39px;
+            padding: 0 13px;
+            color: #315fd8;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            box-shadow:
+                0 6px 18px rgba(15, 23, 42, 0.05);
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow:
+                0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .periods {
+            display: flex;
+            gap: 6px;
+        }
+
+        .period-button {
+            min-height: 34px;
+            padding: 0 12px;
+            color: #607087;
+            background: #f5f7fb;
+            border: 1px solid #e4eaf2;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.68rem;
+            font-weight: 800;
+        }
+
+        .period-button.active {
+            color: #ffffff;
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .refresh-info {
+            color: var(--muted);
+            font-size: 0.67rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .summary-card {
+            min-width: 0;
+            padding: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow:
+                0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 0.66rem;
+            font-weight: 700;
+        }
+
+        .summary-value {
+            display: block;
+            margin-top: 8px;
+            font-size: 1.3rem;
+            font-weight: 900;
+        }
+
+        .summary-detail {
+            display: block;
+            margin-top: 5px;
+            overflow: hidden;
+            color: #8793a5;
+            font-size: 0.58rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .chart-card {
+            min-width: 0;
+            padding: 17px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow:
+                0 10px 28px rgba(15, 23, 42, 0.06);
+        }
+
+        .chart-card.disk-card {
+            grid-column: 1 / -1;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 13px;
+        }
+
+        .chart-title strong,
+        .chart-title span {
+            display: block;
+        }
+
+        .chart-title strong {
+            font-size: 0.79rem;
+        }
+
+        .chart-title span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.58rem;
+        }
+
+        .latest-badge {
+            padding: 6px 9px;
+            color: #334155;
+            background: #f5f7fb;
+            border: 1px solid #e5eaf1;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 900;
+        }
+
+        .chart-area {
+            position: relative;
+            width: 100%;
+            height: 245px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .stat {
+            padding: 9px;
+            background: #f8fafc;
+            border: 1px solid #edf1f5;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat span,
+        .stat strong {
+            display: block;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 0.54rem;
+        }
+
+        .stat strong {
+            margin-top: 4px;
+            font-size: 0.69rem;
+        }
+
+        .empty-state {
+            display: none;
+            padding: 22px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 850px) {
+            .page {
+                padding: 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .page-icon {
+                width: 41px;
+                height: 41px;
+            }
+
+            h1 {
+                font-size: 1.05rem;
+            }
+
+            .title-block p {
+                display: none;
+            }
+
+            .back-link {
+                min-height: 35px;
+                padding: 0 10px;
+                font-size: 0.62rem;
+            }
+
+            .toolbar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .periods {
+                width: 100%;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .periods::-webkit-scrollbar {
+                display: none;
+            }
+
+            .period-button {
+                flex: 0 0 auto;
+            }
+
+            .summary-grid {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .summary-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .summary-card {
+                flex: 0 0 145px;
+                padding: 12px;
+            }
+
+            .summary-value {
+                font-size: 1rem;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card.disk-card {
+                grid-column: auto;
+            }
+
+            .chart-card {
+                padding: 12px;
+            }
+
+            .chart-area {
+                height: 185px;
+            }
+        }
+    </style>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-theme-v2.css', v='monitoring-clean-final-20260803-2') }}"
+    >
+
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='monitoring-clean-final-20260803-2') }}"
+    >
+
+
+<style id="modern-monitoring-layout">
+
+.monitoring-grid{
+display:grid!important;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:22px!important;
+}
+
+.chart-card,
+.monitor-card,
+.monitor-panel{
+min-height:420px!important;
+padding:22px!important;
+border-radius:24px!important;
+}
+
+.chart-card canvas,
+.monitor-card canvas,
+.monitor-panel canvas{
+height:260px!important;
+max-height:260px!important;
+}
+
+.disk-card canvas{
+height:260px!important;
+}
+
+.summary-cards{
+display:grid!important;
+grid-template-columns:repeat(4,minmax(180px,1fr));
+gap:18px!important;
+margin-bottom:22px!important;
+}
+
+.summary-card{
+padding:18px!important;
+border-radius:20px!important;
+}
+
+.period-selector{
+margin-bottom:22px!important;
+}
+
+@media(max-width:992px){
+
+.summary-cards{
+grid-template-columns:1fr 1fr!important;
+}
+
+.monitoring-grid{
+grid-template-columns:1fr!important;
+}
+
+.chart-card,
+.monitor-card,
+.monitor-panel{
+min-height:auto!important;
+}
+
+.chart-card canvas,
+.monitor-card canvas,
+.monitor-panel canvas{
+height:220px!important;
+}
+
+}
+
+@media(max-width:640px){
+
+.summary-cards{
+grid-template-columns:1fr!important;
+}
+
+.chart-card canvas,
+.monitor-card canvas,
+.monitor-panel canvas{
+height:190px!important;
+}
+
+}
+
+</style>
+
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/monitoring-clean.css',
+        v='clean-monitoring-20260803-1'
+    ) }}"
+>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4 portal-body">
+    <main class="page">
+        <header class="topbar">
+            <div class="title-block">
+                <div class="page-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19V9"/>
+                        <path d="M10 19V5"/>
+                        <path d="M16 19v-7"/>
+                        <path d="M22 19V3"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>Monitoring historique</h1>
+
+                    <p>
+                        Évolution réelle des ressources
+                        de l’infrastructure.
+                    </p>
+                </div>
+            </div>
+
+            <a class="back-link" href="/">
+                ← Tableau de bord
+            </a>
+        </header>
+
+        <section class="toolbar">
+            <div
+                class="periods"
+                aria-label="Sélectionner la période"
+            >
+                <button
+                    class="period-button"
+                    data-hours="1"
+                    type="button"
+                >
+                    1 heure
+                </button>
+
+                <button
+                    class="period-button"
+                    data-hours="6"
+                    type="button"
+                >
+                    6 heures
+                </button>
+
+                <button
+                    class="period-button active"
+                    data-hours="24"
+                    type="button"
+                >
+                    24 heures
+                </button>
+
+                <button
+                    class="period-button"
+                    data-hours="168"
+                    type="button"
+                >
+                    7 jours
+                </button>
+            </div>
+
+            <span
+                id="last-refresh"
+                class="refresh-info"
+            >
+                Chargement de l’historique…
+            </span>
+        </section>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span class="summary-label">
+                    Mesures enregistrées
+                </span>
+
+                <strong
+                    id="samples-value"
+                    class="summary-value"
+                >
+                    --
+                </strong>
+
+                <small class="summary-detail">
+                    Échantillons sur la période
+                </small>
+            </article>
+
+            <article class="summary-card">
+                <span class="summary-label">
+                    CPU moyen
+                </span>
+
+                <strong
+                    id="cpu-average"
+                    class="summary-value"
+                >
+                    --
+                </strong>
+
+                <small
+                    id="cpu-range"
+                    class="summary-detail"
+                >
+                    Min -- · Max --
+                </small>
+            </article>
+
+            <article class="summary-card">
+                <span class="summary-label">
+                    RAM moyenne
+                </span>
+
+                <strong
+                    id="memory-average"
+                    class="summary-value"
+                >
+                    --
+                </strong>
+
+                <small
+                    id="memory-range"
+                    class="summary-detail"
+                >
+                    Min -- · Max --
+                </small>
+            </article>
+
+            <article class="summary-card">
+                <span class="summary-label">
+                    Disque moyen
+                </span>
+
+                <strong
+                    id="disk-average"
+                    class="summary-value"
+                >
+                    --
+                </strong>
+
+                <small
+                    id="disk-range"
+                    class="summary-detail"
+                >
+                    Min -- · Max --
+                </small>
+            </article>
+        </section>
+
+        <section class="charts-grid">
+            <article class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <strong>Utilisation CPU</strong>
+                        <span>Évolution en pourcentage</span>
+                    </div>
+
+                    <span
+                        id="cpu-latest"
+                        class="latest-badge"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="chart-area">
+                    <canvas id="cpu-history-chart"></canvas>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat">
+                        <span>Minimum</span>
+                        <strong id="cpu-min">--</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Moyenne</span>
+                        <strong id="cpu-avg">--</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Maximum</span>
+                        <strong id="cpu-max">--</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <strong>Utilisation mémoire</strong>
+                        <span>Évolution de la RAM</span>
+                    </div>
+
+                    <span
+                        id="memory-latest"
+                        class="latest-badge"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="chart-area">
+                    <canvas id="memory-history-chart"></canvas>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat">
+                        <span>Minimum</span>
+                        <strong id="memory-min">--</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Moyenne</span>
+                        <strong id="memory-avg">--</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Maximum</span>
+                        <strong id="memory-max">--</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="chart-card disk-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <strong>Utilisation disque</strong>
+                        <span>Évolution du stockage principal</span>
+                    </div>
+
+                    <span
+                        id="disk-latest"
+                        class="latest-badge"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="chart-area">
+                    <canvas id="disk-history-chart"></canvas>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat">
+                        <span>Minimum</span>
+                        <strong id="disk-min">--</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Moyenne</span>
+                        <strong id="disk-avg">--</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Maximum</span>
+                        <strong id="disk-max">--</strong>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <div id="empty-state" class="empty-state">
+            Aucune mesure n’est disponible pour cette période.
+        </div>
+    
+</main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let selectedHours = 24;
+
+            const charts = {};
+
+            function formatPercent(value) {
+                const number = Number(value);
+
+                return Number.isFinite(number)
+                    ? `${number.toFixed(1)} %`
+                    : "--";
+            }
+
+            function setText(id, value) {
+                const element = document.getElementById(id);
+
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+
+            function createChart(
+                canvasId,
+                label,
+                borderColor,
+                backgroundColor
+            ) {
+                const canvas = document.getElementById(
+                    canvasId
+                );
+
+                return new Chart(canvas, {
+                    type: "line",
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label,
+                            data: [],
+                            borderColor,
+                            backgroundColor,
+                            borderWidth: 2.3,
+                            fill: true,
+                            tension: 0.34,
+                            pointRadius: 2,
+                            pointHoverRadius: 5,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: "index",
+                        },
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                displayColors: false,
+                                callbacks: {
+                                    label: (context) =>
+                                        `${context.dataset.label} : ${
+                                            Number(
+                                                context.raw
+                                            ).toFixed(1)
+                                        } %`,
+                                },
+                            },
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false,
+                                },
+                                ticks: {
+                                    color: "#8793a5",
+                                    maxTicksLimit: 7,
+                                    font: {
+                                        size: 9,
+                                    },
+                                },
+                                border: {
+                                    display: false,
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: 100,
+                                ticks: {
+                                    color: "#8793a5",
+                                    callback: (value) =>
+                                        `${value}%`,
+                                    font: {
+                                        size: 9,
+                                    },
+                                },
+                                grid: {
+                                    color: "#edf1f5",
+                                },
+                                border: {
+                                    display: false,
+                                },
+                            },
+                        },
+                    },
+                });
+            }
+
+            charts.cpu = createChart(
+                "cpu-history-chart",
+                "CPU",
+                "#315fd8",
+                "rgba(49, 95, 216, 0.12)"
+            );
+
+            charts.memory = createChart(
+                "memory-history-chart",
+                "RAM",
+                "#10b981",
+                "rgba(16, 185, 129, 0.12)"
+            );
+
+            charts.disk = createChart(
+                "disk-history-chart",
+                "Disque",
+                "#f59e0b",
+                "rgba(245, 158, 11, 0.12)"
+            );
+
+            function formatLabel(timestamp) {
+                const date = new Date(timestamp);
+
+                if (selectedHours <= 24) {
+                    return date.toLocaleTimeString(
+                        "fr-FR",
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }
+                    );
+                }
+
+                return date.toLocaleDateString(
+                    "fr-FR",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    }
+                );
+            }
+
+            function updateMetricSummary(
+                metric,
+                summary
+            ) {
+                const values = summary?.[metric];
+
+                if (!values) {
+                    ["min", "avg", "max"].forEach(
+                        (suffix) => {
+                            setText(
+                                `${metric}-${suffix}`,
+                                "--"
+                            );
+                        }
+                    );
+
+                    setText(
+                        `${metric}-latest`,
+                        "--"
+                    );
+
+                    return;
+                }
+
+                setText(
+                    `${metric}-min`,
+                    formatPercent(values.minimum)
+                );
+
+                setText(
+                    `${metric}-avg`,
+                    formatPercent(values.average)
+                );
+
+                setText(
+                    `${metric}-max`,
+                    formatPercent(values.maximum)
+                );
+
+                setText(
+                    `${metric}-latest`,
+                    formatPercent(values.latest)
+                );
+
+                setText(
+                    `${metric}-average`,
+                    formatPercent(values.average)
+                );
+
+                setText(
+                    `${metric}-range`,
+                    `Min ${formatPercent(
+                        values.minimum
+                    )} · Max ${formatPercent(
+                        values.maximum
+                    )}`
+                );
+            }
+
+            function updateCharts(history) {
+                const labels = history.map(
+                    (item) =>
+                        formatLabel(item.timestamp)
+                );
+
+                const mapping = {
+                    cpu: "cpu",
+                    memory: "memory",
+                    disk: "disk",
+                };
+
+                Object.entries(mapping).forEach(
+                    ([chartName, dataKey]) => {
+                        charts[chartName].data.labels =
+                            labels;
+
+                        charts[
+                            chartName
+                        ].data.datasets[0].data =
+                            history.map(
+                                (item) =>
+                                    Number(
+                                        item[dataKey]
+                                    ) || 0
+                            );
+
+                        charts[chartName].update();
+                    }
+                );
+            }
+
+            const diskCanvas = document.getElementById("diskChart");
+
+    const diskChart = diskCanvas && typeof Chart !== "undefined"
+        ? new Chart(
+            diskCanvas,
+            {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "Disque utilisé (%)",
+                            data: diskValues,
+                            borderColor: "#f59e0b",
+                            backgroundColor: "rgba(245, 158, 11, 0.14)",
+                            borderWidth: 3,
+                            pointRadius: 2,
+                            pointHoverRadius: 5,
+                            pointBackgroundColor: "#f59e0b",
+                            tension: 0.35,
+                            fill: true,
+                        },
+                        {
+                            label: "Seuil d’alerte (80 %)",
+                            data: [],
+                            borderColor: "rgba(239, 68, 68, 0.85)",
+                            borderWidth: 2,
+                            borderDash: [7, 7],
+                            pointRadius: 0,
+                            tension: 0,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: "index",
+                        intersect: false,
+                    },
+                    animation: {
+                        duration: 450,
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: "bottom",
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                padding: 18,
+                                color: "#64748b",
+                            },
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label(context) {
+                                    return (
+                                        context.dataset.label
+                                        + " : "
+                                        + Number(context.raw || 0).toFixed(1)
+                                        + " %"
+                                    );
+                                },
+                            },
+                        },
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                            ticks: {
+                                color: "#94a3b8",
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 8,
+                            },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: 100,
+                            max: 100,
+                            ticks: {
+                                color: "#94a3b8",
+                                callback(value) {
+                                    return value + " %";
+                                },
+                            },
+                            grid: {
+                                color: "rgba(148, 163, 184, 0.16)",
+                            },
+                        },
+                    },
+                },
+            }
+        )
+        : null;
+
+    async function loadHistory() {
+                try {
+                    const response = await fetch(
+                        `/api/metrics/history?hours=${
+                            selectedHours
+                        }&t=${Date.now()}`,
+                        {
+                            cache: "no-store",
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Erreur HTTP ${response.status}`
+                        );
+                    }
+
+                    const payload =
+                        await response.json();
+
+                    const history = Array.isArray(
+                        payload.history
+                    )
+                        ? payload.history
+                        : [];
+
+                    const summary =
+                        payload.summary || {};
+
+                    setText(
+                        "samples-value",
+                        summary.samples ?? 0
+                    );
+
+                    updateMetricSummary(
+                        "cpu",
+                        summary
+                    );
+
+                    updateMetricSummary(
+                        "memory",
+                        summary
+                    );
+
+                    updateMetricSummary(
+                        "disk",
+                        summary
+                    );
+
+                    updateCharts(history);
+
+                    const emptyState =
+                        document.getElementById(
+                            "empty-state"
+                        );
+
+                    if (emptyState) {
+                        emptyState.style.display =
+                            history.length
+                                ? "none"
+                                : "block";
+                    }
+
+                    setText(
+                        "last-refresh",
+                        `Actualisé à ${
+                            new Date().toLocaleTimeString(
+                                "fr-FR"
+                            )
+                        } · ${history.length} mesure(s)`
+                    );
+                } catch (error) {
+                    console.error(
+                        "Historique indisponible :",
+                        error
+                    );
+
+                    setText(
+                        "last-refresh",
+                        "Impossible de charger l’historique"
+                    );
+                }
+            }
+
+            document
+                .querySelectorAll(".period-button")
+                .forEach((button) => {
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            selectedHours = Number(
+                                button.dataset.hours
+                            );
+
+                            document
+                                .querySelectorAll(
+                                    ".period-button"
+                                )
+                                .forEach((item) => {
+                                    item.classList.remove(
+                                        "active"
+                                    );
+                                });
+
+                            button.classList.add(
+                                "active"
+                            );
+
+                            loadHistory();
+                        }
+                    );
+                });
+
+            loadHistory();
+
+            window.setInterval(
+                loadHistory,
+                60000
+            );
+        });
+    </script>
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script src="{{ url_for(
+'static',
+filename='js/monitoring-clean.js',
+v='20260803-final'
+) }}"></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/monitoring-remove-legacy.js',
+        v='remove-legacy-20260803-1'
+    ) }}"
+></script>
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/monitoring-export-pro.js',
+        v='monitoring-export-centered-20260803-2'
+    ) }}"
+></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/monitoring-print-contrast.js',
+        v='print-contrast-20260804-133805'
+    ) }}"
+></script>
+
+</body>
+</html>
+
+<style id="disk-monitoring-responsive-v1">
+    .monitoring-disk-chart-card {
+        width: min(100%, 1180px);
+        margin: 28px auto;
+        padding: 26px;
+        background:
+            radial-gradient(
+                circle at 96% 5%,
+                rgba(245, 158, 11, 0.11),
+                transparent 32%
+            ),
+            linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.98),
+                rgba(248, 250, 252, 0.96)
+            );
+        border: 1px solid rgba(203, 213, 225, 0.82);
+        border-radius: 24px;
+        box-shadow:
+            0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    .monitoring-disk-chart-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .monitoring-disk-chart-kicker {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 11px;
+        color: #b45309;
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        border-radius: 999px;
+        font-size: 0.69rem;
+        font-weight: 850;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .monitoring-disk-chart-header h2 {
+        margin: 12px 0 7px;
+        color: #17243c;
+        font-size: clamp(1.3rem, 2vw, 1.75rem);
+        font-weight: 900;
+        letter-spacing: -0.035em;
+    }
+
+    .monitoring-disk-chart-header p {
+        max-width: 600px;
+        margin: 0;
+        color: #64748b;
+        font-size: 0.91rem;
+        line-height: 1.65;
+    }
+
+    .monitoring-disk-current {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        min-width: 145px;
+        padding: 14px 17px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(203, 213, 225, 0.78);
+        border-radius: 17px;
+        box-shadow:
+            0 10px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .monitoring-disk-current span {
+        color: #94a3b8;
+        font-size: 0.7rem;
+        font-weight: 750;
+        text-transform: uppercase;
+    }
+
+    .monitoring-disk-current strong {
+        margin-top: 4px;
+        color: #17243c;
+        font-size: 1.55rem;
+        font-weight: 900;
+    }
+
+    .monitoring-disk-current strong[data-level="normal"] {
+        color: #16a34a;
+    }
+
+    .monitoring-disk-current strong[data-level="warning"] {
+        color: #d97706;
+    }
+
+    .monitoring-disk-current strong[data-level="critical"] {
+        color: #dc2626;
+    }
+
+    .monitoring-disk-chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 330px;
+        padding: 12px;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(248, 250, 252, 0.82),
+                rgba(255, 255, 255, 0.94)
+            );
+        border: 1px solid rgba(226, 232, 240, 0.92);
+        border-radius: 19px;
+    }
+
+    .monitoring-disk-chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .monitoring-disk-thresholds {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 17px;
+    }
+
+    .disk-threshold {
+        display: inline-flex;
+        align-items: center;
+        min-height: 31px;
+        padding: 0 11px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 780;
+    }
+
+    .disk-threshold-normal {
+        color: #15803d;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.18);
+    }
+
+    .disk-threshold-warning {
+        color: #b45309;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .disk-threshold-critical {
+        color: #b91c1c;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.18);
+    }
+
+    @media (max-width: 760px) {
+        .monitoring-disk-chart-card {
+            width: auto;
+            margin: 20px 10px 105px;
+            padding: 18px 15px;
+            border-radius: 20px;
+        }
+
+        .monitoring-disk-chart-header {
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 17px;
+        }
+
+        .monitoring-disk-chart-header h2 {
+            margin-top: 10px;
+            font-size: 1.3rem;
+        }
+
+        .monitoring-disk-chart-header p {
+            font-size: 0.81rem;
+            line-height: 1.55;
+        }
+
+        .monitoring-disk-current {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            min-width: 0;
+            padding: 11px 13px;
+        }
+
+        .monitoring-disk-current strong {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .monitoring-disk-chart-wrapper {
+            height: 250px;
+            padding: 7px;
+            border-radius: 15px;
+        }
+
+        .monitoring-disk-thresholds {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 7px;
+            margin-top: 13px;
+        }
+
+        .disk-threshold {
+            justify-content: center;
+            width: 100%;
+            font-size: 0.66rem;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .monitoring-disk-chart-card {
+            margin-inline: 7px;
+            padding-inline: 12px;
+        }
+
+        .monitoring-disk-chart-wrapper {
+            height: 220px;
+        }
+    }
+</style>

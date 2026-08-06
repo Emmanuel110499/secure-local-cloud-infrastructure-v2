@@ -1,0 +1,57 @@
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Donnees d'execution et journaux
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.jsonl
+logs/
+log_exports/
+application/data/
+application/instance/
+
+# Sauvegardes et artefacts locaux
+application/archive/
+application/audits/
+application/*audit*.txt
+application/*inventory*.json
+application/*summary*.json
+*.bak
+*.bak.*
+*.before-*
+*.backup.yml
+*.zip
+*.tar
+*.tar.gz
+
+# IDE et systeme
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Captures locales non selectionnees
+docs/screenshots/*
+!docs/screenshots/.gitkeep

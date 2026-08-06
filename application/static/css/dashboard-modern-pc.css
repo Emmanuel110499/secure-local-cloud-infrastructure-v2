@@ -1,0 +1,289 @@
+/* ======================================================
+   DASHBOARD MODERN PC
+   N'affecte pas le mobile
+====================================================== */
+
+@media screen and (min-width:821px){
+
+:root{
+
+--card-radius:22px;
+--card-shadow:
+0 16px 42px rgba(15,23,42,.08);
+
+}
+
+/* fond */
+
+body.portal-v4{
+
+background:
+radial-gradient(circle at top left,#edf5ff 0,#f7faff 32%,#ffffff 70%);
+
+}
+
+/* cartes */
+
+.panel{
+
+position:relative;
+
+overflow:hidden;
+
+border-radius:var(--card-radius);
+
+background:
+linear-gradient(
+180deg,
+rgba(255,255,255,.98),
+rgba(248,251,255,.97)
+);
+
+border:1px solid rgba(120,150,255,.08);
+
+box-shadow:var(--card-shadow);
+
+transition:
+transform .28s ease,
+box-shadow .28s ease,
+border-color .28s ease;
+
+animation:
+panelFade .45s ease forwards;
+
+opacity:0;
+
+}
+
+/* délai d'apparition */
+
+.panel:nth-child(1){animation-delay:.05s;}
+.panel:nth-child(2){animation-delay:.12s;}
+.panel:nth-child(3){animation-delay:.19s;}
+.panel:nth-child(4){animation-delay:.26s;}
+
+/* halo */
+
+.panel::before{
+
+content:"";
+
+position:absolute;
+
+right:-70px;
+top:-70px;
+
+width:180px;
+height:180px;
+
+border-radius:50%;
+
+background:
+radial-gradient(
+circle,
+rgba(78,122,255,.12),
+transparent 70%
+);
+
+pointer-events:none;
+
+}
+
+/* hover */
+
+.panel:hover{
+
+transform:
+translateY(-6px);
+
+box-shadow:
+0 26px 58px rgba(15,23,42,.12);
+
+border-color:
+rgba(77,119,255,.22);
+
+}
+
+/* titres */
+
+.panel-header strong{
+
+font-size:1.95rem;
+
+font-weight:800;
+
+letter-spacing:-.02em;
+
+}
+
+/* badges */
+
+.service-status{
+
+border-radius:999px;
+
+padding:8px 16px;
+
+font-weight:700;
+
+box-shadow:
+0 8px 20px rgba(46,204,113,.14);
+
+}
+
+/* pulse */
+
+.service-dot.up{
+
+animation:
+greenPulse 2s infinite;
+
+}
+
+/* activité récente */
+
+.recent-item{
+
+border-radius:18px;
+
+transition:.25s;
+
+}
+
+.recent-item:hover{
+
+transform:
+translateX(5px);
+
+}
+
+/* cartes infrastructure */
+
+.infra-summary-item{
+
+border-radius:18px;
+
+transition:.25s;
+
+}
+
+.infra-summary-item:hover{
+
+transform:
+translateX(4px);
+
+background:
+linear-gradient(
+90deg,
+#f9fcff,
+#eef5ff
+);
+
+}
+
+/* visiteurs */
+
+.platform-activity-panel .platform-activity-card{
+
+transition:.25s;
+
+}
+
+.platform-activity-panel .platform-activity-card:hover{
+
+transform:
+scale(1.02);
+
+}
+
+/* globe */
+
+.platform-activity-panel .activity-icon{
+
+animation:
+slowRotate 14s linear infinite;
+
+}
+
+/* boutons */
+
+.button,
+.quick-card{
+
+transition:.25s;
+
+}
+
+.button:hover,
+.quick-card:hover{
+
+transform:
+translateY(-3px);
+
+}
+
+/* animations */
+
+@keyframes panelFade{
+
+from{
+
+opacity:0;
+
+transform:
+translateY(22px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+@keyframes greenPulse{
+
+0%{
+
+box-shadow:
+0 0 0 0 rgba(46,204,113,.45);
+
+}
+
+70%{
+
+box-shadow:
+0 0 0 12px rgba(46,204,113,0);
+
+}
+
+100%{
+
+box-shadow:
+0 0 0 0 rgba(46,204,113,0);
+
+}
+
+}
+
+@keyframes slowRotate{
+
+from{
+
+transform:rotate(0);
+
+}
+
+to{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+}

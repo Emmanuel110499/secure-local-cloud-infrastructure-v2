@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Mon compte — Secure Local Cloud</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 28px 16px;
+            color: #172033;
+            background: #f4f7fb;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        .page {
+            width: min(920px, 100%);
+            margin: auto;
+        }
+
+        .back {
+            display: inline-flex;
+            margin-bottom: 20px;
+            color: #315fd8;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .avatar {
+            display: grid;
+            place-items: center;
+            width: 58px;
+            height: 58px;
+            color: #315fd8;
+            background: #eaf1ff;
+            border: 1px solid #d7e3f7;
+            border-radius: 18px;
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.65rem;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            color: #6b7a90;
+            font-size: 0.8rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            padding: 24px;
+            background: #ffffff;
+            border: 1px solid #e4eaf2;
+            border-radius: 20px;
+            box-shadow:
+                0 12px 35px rgba(15, 23, 42, 0.06);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 19px;
+        }
+
+        .card-title span {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            background: #edf3ff;
+            border-radius: 12px;
+        }
+
+        .card-title strong {
+            font-size: 0.92rem;
+        }
+
+        label {
+            display: block;
+            margin: 13px 0 6px;
+            color: #475569;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        input {
+            width: 100%;
+            min-height: 44px;
+            padding: 0 12px;
+            color: #172033;
+            background: #f8fafc;
+            border: 1px solid #dde5ef;
+            border-radius: 11px;
+            outline: none;
+        }
+
+        input:focus {
+            background: #ffffff;
+            border-color: #4f7df3;
+            box-shadow:
+                0 0 0 4px rgba(79, 125, 243, 0.1);
+        }
+
+        button {
+            width: 100%;
+            min-height: 44px;
+            margin-top: 18px;
+            color: #ffffff;
+            background: #315fd8;
+            border: 0;
+            border-radius: 11px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .alert {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 11px;
+            font-size: 0.78rem;
+        }
+
+        .alert-success {
+            color: #047857;
+            background: #dcfce7;
+        }
+
+        .alert-danger {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        @media (max-width: 720px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 19px;
+            }
+        }
+    </style>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/account-ui.css', v='desktop-mobile-account-5') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-theme-v2.css', v='dashboard-unified-3') }}"
+    >
+
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4 portal-body">
+    <main class="page">
+        <a class="back" href="/">
+            ← Retour au tableau de bord
+        </a>
+
+        <header class="header">
+            <div class="account-page-avatar">
+                {{ username[0] | upper }}
+            </div>
+
+            <div>
+                <h1>Mon compte</h1>
+                <p>
+                    Gérez votre identifiant et votre mot de passe.
+                </p>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="grid">
+            <form method="post" class="card">
+                <input
+                    type="hidden"
+                    name="action"
+                    value="username"
+                >
+
+                <div class="card-title">
+                    <span class="account-symbol card-symbol" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="8" r="3.5"/>
+                            <path d="M5.5 20a6.5 6.5 0 0 1 10.8-4.9"/>
+                            <path d="m16 18 3.7-3.7 1.4 1.4-3.7 3.7-2 .6Z"/>
+                        </svg>
+                    </span>
+                    <strong>Modifier l’identifiant</strong>
+                </div>
+
+                <label for="new_username">
+                    Nouvel identifiant
+                </label>
+
+                <input
+                    id="new_username"
+                    name="new_username"
+                    type="text"
+                    value="{{ username }}"
+                    minlength="3"
+                    required
+                >
+
+                <label for="username_password">
+                    Mot de passe actuel
+                </label>
+
+                <input
+                    id="username_password"
+                    name="current_password"
+                    type="password"
+                    required
+                >
+<button
+    class="password-toggle" data-toggle-for="username_password"
+    type="button"
+    aria-label="Afficher le mot de passe"
+    title="Afficher le mot de passe"
+>
+    <svg
+        class="password-eye-open"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+        <circle cx="12" cy="12" r="2.8"/>
+    </svg>
+
+    <svg
+        class="password-eye-closed"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        hidden
+    >
+        <path d="M3 3l18 18"/>
+        <path d="M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.5 15.5 0 0 1-2.7 3.3"/>
+        <path d="M6.1 6.1C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9.9 9.9 0 0 0 3.2-.5"/>
+        <path d="M9.8 9.8a3 3 0 0 0 4.4 4.4"/>
+    </svg>
+</button>
+
+
+                <button type="submit">
+                    Enregistrer l’identifiant
+                </button>
+            </form>
+
+            <form method="post" class="card">
+                <input
+                    type="hidden"
+                    name="action"
+                    value="password"
+                >
+
+                <div class="card-title">
+                    <span class="account-symbol card-symbol" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="5" y="10" width="14" height="10" rx="2.5"/>
+                            <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                            <circle cx="12" cy="15" r="1"/>
+                        </svg>
+                    </span>
+                    <strong>Modifier le mot de passe</strong>
+                </div>
+
+                <label for="current_password">
+                    Mot de passe actuel
+                </label>
+
+                <input
+                    id="current_password"
+                    name="current_password"
+                    type="password"
+                    required
+                >
+<button
+    class="password-toggle" data-toggle-for="current_password"
+    type="button"
+    aria-label="Afficher le mot de passe"
+    title="Afficher le mot de passe"
+>
+    <svg
+        class="password-eye-open"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+        <circle cx="12" cy="12" r="2.8"/>
+    </svg>
+
+    <svg
+        class="password-eye-closed"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        hidden
+    >
+        <path d="M3 3l18 18"/>
+        <path d="M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.5 15.5 0 0 1-2.7 3.3"/>
+        <path d="M6.1 6.1C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9.9 9.9 0 0 0 3.2-.5"/>
+        <path d="M9.8 9.8a3 3 0 0 0 4.4 4.4"/>
+    </svg>
+</button>
+
+
+                <label for="new_password">
+                    Nouveau mot de passe
+                </label>
+
+                <input
+                    id="new_password"
+                    name="new_password"
+                    type="password"
+                    minlength="8"
+                    required
+                >
+<button
+    class="password-toggle" data-toggle-for="new_password"
+    type="button"
+    aria-label="Afficher le mot de passe"
+    title="Afficher le mot de passe"
+>
+    <svg
+        class="password-eye-open"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+        <circle cx="12" cy="12" r="2.8"/>
+    </svg>
+
+    <svg
+        class="password-eye-closed"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        hidden
+    >
+        <path d="M3 3l18 18"/>
+        <path d="M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.5 15.5 0 0 1-2.7 3.3"/>
+        <path d="M6.1 6.1C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9.9 9.9 0 0 0 3.2-.5"/>
+        <path d="M9.8 9.8a3 3 0 0 0 4.4 4.4"/>
+    </svg>
+</button>
+
+
+                <label for="confirm_password">
+                    Confirmer le nouveau mot de passe
+                </label>
+
+                <input
+                    id="confirm_password"
+                    name="confirm_password"
+                    type="password"
+                    minlength="8"
+                    required
+                >
+<button
+    class="password-toggle" data-toggle-for="confirm_password"
+    type="button"
+    aria-label="Afficher le mot de passe"
+    title="Afficher le mot de passe"
+>
+    <svg
+        class="password-eye-open"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+        <circle cx="12" cy="12" r="2.8"/>
+    </svg>
+
+    <svg
+        class="password-eye-closed"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        hidden
+    >
+        <path d="M3 3l18 18"/>
+        <path d="M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.5 15.5 0 0 1-2.7 3.3"/>
+        <path d="M6.1 6.1C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9.9 9.9 0 0 0 3.2-.5"/>
+        <path d="M9.8 9.8a3 3 0 0 0 4.4 4.4"/>
+    </svg>
+</button>
+
+
+                <button type="submit">
+                    Enregistrer le mot de passe
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script
+        src="{{ url_for('static', filename='js/password-toggle.js', v='2') }}"
+    ></script>
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

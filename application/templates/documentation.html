@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        http-equiv="Cache-Control"
+        content="no-cache, no-store, must-revalidate"
+    >
+
+    <title>
+        Documentation - Secure Local Cloud Infrastructure
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/portal-theme-v2.css',
+            v='documentation-user-1'
+        ) }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/portal-pages.css',
+            v='documentation-user-1'
+        ) }}"
+    >
+
+    <style>
+        :root {
+            --doc-blue: #2563eb;
+            --doc-purple: #7c3aed;
+            --doc-green: #059669;
+            --doc-orange: #d97706;
+            --doc-red: #dc2626;
+            --doc-text: #17243c;
+            --doc-muted: #65758b;
+            --doc-border: #dce5f2;
+            --doc-surface: #ffffff;
+            --doc-background: #f2f6fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--doc-text);
+            background:
+                radial-gradient(
+                    circle at 5% 0,
+                    rgba(37, 99, 235, 0.12),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 95% 5%,
+                    rgba(124, 58, 237, 0.09),
+                    transparent 25%
+                ),
+                var(--doc-background);
+            font-family:
+                Inter,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .doc-page {
+            width: min(1450px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 24px 0 55px;
+        }
+
+        .doc-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .doc-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 42px;
+            padding: 0 15px;
+            color: #315fd8;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--doc-border);
+            border-radius: 13px;
+            box-shadow:
+                0 8px 22px rgba(30, 48, 82, 0.08);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .doc-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 34px;
+            padding: 0 12px;
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 850;
+        }
+
+        .doc-status::before {
+            width: 8px;
+            height: 8px;
+            content: "";
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow:
+                0 0 0 5px rgba(16, 185, 129, 0.12);
+        }
+
+        .doc-hero {
+            position: relative;
+            padding: clamp(25px, 5vw, 48px);
+            overflow: hidden;
+            color: #ffffff;
+            background:
+                radial-gradient(
+                    circle at 92% 5%,
+                    rgba(255, 255, 255, 0.19),
+                    transparent 26%
+                ),
+                linear-gradient(
+                    135deg,
+                    #1746bd,
+                    #3268dc 52%,
+                    #6d4bd2
+                );
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 26px;
+            box-shadow:
+                0 24px 60px rgba(39, 71, 151, 0.25);
+        }
+
+        .doc-hero::after {
+            position: absolute;
+            right: -70px;
+            bottom: -100px;
+            width: 310px;
+            height: 310px;
+            content: "";
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(255, 255, 255, 0.17),
+                    transparent 68%
+                );
+            border-radius: 50%;
+        }
+
+        .doc-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+        }
+
+        .doc-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 31px;
+            padding: 0 12px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 850;
+        }
+
+        .doc-hero h1 {
+            margin: 18px 0 0;
+            color: #ffffff;
+            font-size: clamp(1.8rem, 4vw, 3.15rem);
+            line-height: 1.08;
+            letter-spacing: -0.045em;
+        }
+
+        .doc-hero p {
+            max-width: 820px;
+            margin: 17px 0 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: clamp(0.92rem, 1.5vw, 1.08rem);
+            line-height: 1.75;
+        }
+
+        .doc-hero-points {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 22px;
+        }
+
+        .doc-hero-point {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            padding: 0 11px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            font-size: 0.71rem;
+            font-weight: 750;
+        }
+
+        .doc-layout {
+            display: grid;
+            grid-template-columns:
+                minmax(210px, 0.27fr)
+                minmax(0, 1fr);
+            gap: 22px;
+            margin-top: 24px;
+        }
+
+        .doc-navigation {
+            position: sticky;
+            top: 20px;
+            align-self: start;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--doc-border);
+            border-radius: 20px;
+            box-shadow:
+                0 14px 36px rgba(30, 48, 82, 0.09);
+        }
+
+        .doc-navigation h2 {
+            margin: 0 0 13px;
+            font-size: 0.85rem;
+        }
+
+        .doc-navigation a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 42px;
+            margin-top: 5px;
+            padding: 0 11px;
+            color: #536278;
+            border-radius: 11px;
+            font-size: 0.73rem;
+            font-weight: 750;
+            text-decoration: none;
+            transition:
+                color 0.18s ease,
+                background 0.18s ease,
+                transform 0.18s ease;
+        }
+
+        .doc-navigation a:hover {
+            color: #2559d5;
+            background: #edf3ff;
+            transform: translateX(3px);
+        }
+
+        .doc-content {
+            display: grid;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .doc-section {
+            position: relative;
+            padding: clamp(20px, 3vw, 30px);
+            overflow: hidden;
+            background:
+                linear-gradient(
+                    155deg,
+                    rgba(255, 255, 255, 0.99),
+                    rgba(248, 250, 255, 0.97)
+                );
+            border: 1px solid var(--doc-border);
+            border-radius: 22px;
+            box-shadow:
+                0 14px 38px rgba(30, 48, 82, 0.085);
+        }
+
+        .doc-section::before {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            left: 25px;
+            height: 3px;
+            content: "";
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #2563eb,
+                    #7c3aed,
+                    transparent
+                );
+            border-radius: 0 0 999px 999px;
+        }
+
+        .doc-section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .doc-icon {
+            display: grid;
+            place-items: center;
+            flex: 0 0 54px;
+            width: 54px;
+            height: 54px;
+            color: #ffffff;
+            background:
+                linear-gradient(
+                    145deg,
+                    #2563eb,
+                    #5d6cdd
+                );
+            border-radius: 16px;
+            box-shadow:
+                0 13px 27px rgba(37, 99, 235, 0.24);
+            font-size: 1.45rem;
+        }
+
+        .doc-section-header h2 {
+            margin: 0;
+            font-size: clamp(1.05rem, 2vw, 1.35rem);
+            letter-spacing: -0.025em;
+        }
+
+        .doc-section-header p {
+            margin: 5px 0 0;
+            color: var(--doc-muted);
+            font-size: 0.78rem;
+            line-height: 1.55;
+        }
+
+        .doc-text {
+            color: var(--doc-muted);
+            font-size: 0.88rem;
+            line-height: 1.8;
+        }
+
+        .doc-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 13px;
+            margin-top: 18px;
+        }
+
+        .doc-feature {
+            position: relative;
+            min-width: 0;
+            padding: 17px;
+            background: #f7f9fd;
+            border: 1px solid #e2e9f3;
+            border-radius: 15px;
+            transition:
+                transform 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .doc-feature:hover {
+            transform: translateY(-3px);
+            border-color: #b9cbea;
+            box-shadow:
+                0 12px 28px rgba(37, 99, 235, 0.09);
+        }
+
+        .doc-feature h3 {
+            margin: 0;
+            color: #26354d;
+            font-size: 0.85rem;
+        }
+
+        .doc-feature p {
+            margin: 7px 0 0;
+            color: var(--doc-muted);
+            font-size: 0.76rem;
+            line-height: 1.6;
+        }
+
+        .doc-indicator-list {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .doc-indicator {
+            min-width: 0;
+            padding: 16px;
+            background: #f7f9fd;
+            border: 1px solid #e2e9f3;
+            border-radius: 15px;
+        }
+
+        .doc-indicator strong {
+            display: block;
+            color: #26354d;
+            font-size: 0.85rem;
+        }
+
+        .doc-indicator span {
+            display: block;
+            margin-top: 7px;
+            color: var(--doc-muted);
+            font-size: 0.71rem;
+            line-height: 1.55;
+        }
+
+        .doc-colors {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .doc-color-card {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 14px;
+            background: #ffffff;
+            border: 1px solid #e2e9f3;
+            border-radius: 14px;
+        }
+
+        .doc-color-dot {
+            flex: 0 0 13px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+        }
+
+        .doc-color-dot.green {
+            background: #10b981;
+            box-shadow:
+                0 0 0 5px rgba(16, 185, 129, 0.12);
+        }
+
+        .doc-color-dot.orange {
+            background: #f59e0b;
+            box-shadow:
+                0 0 0 5px rgba(245, 158, 11, 0.12);
+        }
+
+        .doc-color-dot.red {
+            background: #ef4444;
+            box-shadow:
+                0 0 0 5px rgba(239, 68, 68, 0.12);
+        }
+
+        .doc-color-card strong,
+        .doc-color-card span {
+            display: block;
+        }
+
+        .doc-color-card strong {
+            color: #27364e;
+            font-size: 0.77rem;
+        }
+
+        .doc-color-card span {
+            margin-top: 3px;
+            color: var(--doc-muted);
+            font-size: 0.67rem;
+        }
+
+        .doc-steps {
+            display: grid;
+            gap: 11px;
+            margin-top: 18px;
+        }
+
+        .doc-step {
+            display: grid;
+            grid-template-columns:
+                38px minmax(0, 1fr);
+            align-items: start;
+            gap: 12px;
+            padding: 14px;
+            background: #f7f9fd;
+            border: 1px solid #e2e9f3;
+            border-radius: 14px;
+        }
+
+        .doc-step-number {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            color: #ffffff;
+            background:
+                linear-gradient(
+                    145deg,
+                    #2563eb,
+                    #6d4bd2
+                );
+            border-radius: 12px;
+            font-size: 0.76rem;
+            font-weight: 900;
+        }
+
+        .doc-step h3 {
+            margin: 0;
+            color: #26354d;
+            font-size: 0.82rem;
+        }
+
+        .doc-step p {
+            margin: 6px 0 0;
+            color: var(--doc-muted);
+            font-size: 0.73rem;
+            line-height: 1.6;
+        }
+
+        .doc-note {
+            margin-top: 18px;
+            padding: 15px 17px;
+            color: #31527f;
+            background: #edf5ff;
+            border: 1px solid #cfe0f8;
+            border-left: 4px solid #3b82f6;
+            border-radius: 13px;
+            font-size: 0.76rem;
+            line-height: 1.65;
+        }
+
+        .doc-warning {
+            margin-top: 18px;
+            padding: 15px 17px;
+            color: #854d0e;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 13px;
+            font-size: 0.76rem;
+            line-height: 1.65;
+        }
+
+        .doc-glossary {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 11px;
+            margin-top: 18px;
+        }
+
+        .doc-term {
+            padding: 15px;
+            background: #f7f9fd;
+            border: 1px solid #e2e9f3;
+            border-radius: 14px;
+        }
+
+        .doc-term strong {
+            display: block;
+            color: #2559d5;
+            font-size: 0.81rem;
+        }
+
+        .doc-term span {
+            display: block;
+            margin-top: 6px;
+            color: var(--doc-muted);
+            font-size: 0.72rem;
+            line-height: 1.6;
+        }
+
+        .doc-footer {
+            margin-top: 23px;
+            padding: 22px;
+            color: #ffffff;
+            text-align: center;
+            background:
+                linear-gradient(
+                    135deg,
+                    #173f9f,
+                    #315fd8,
+                    #6d4bd2
+                );
+            border-radius: 20px;
+            box-shadow:
+                0 18px 40px rgba(37, 75, 166, 0.20);
+        }
+
+        .doc-footer h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        .doc-footer p {
+            margin: 9px auto 0;
+            max-width: 700px;
+            color: rgba(255, 255, 255, 0.84);
+            font-size: 0.79rem;
+            line-height: 1.65;
+        }
+
+        .doc-footer-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .doc-footer-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 14px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 12px;
+            font-size: 0.73rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        @media (max-width: 1050px) {
+            .doc-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .doc-navigation {
+                position: static;
+                display: flex;
+                overflow-x: auto;
+                gap: 7px;
+                scrollbar-width: none;
+            }
+
+            .doc-navigation::-webkit-scrollbar {
+                display: none;
+            }
+
+            .doc-navigation h2 {
+                display: none;
+            }
+
+            .doc-navigation a {
+                flex: 0 0 auto;
+                margin: 0;
+                padding-inline: 13px;
+                background: #f7f9fd;
+                border: 1px solid #e2e9f3;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .doc-page {
+                width: min(100% - 22px, 1450px);
+                padding-top: 12px;
+            }
+
+            .doc-topbar {
+                margin-bottom: 12px;
+            }
+
+            .doc-status {
+                display: none;
+            }
+
+            .doc-hero {
+                padding: 25px 19px;
+                border-radius: 21px;
+            }
+
+            .doc-hero h1 {
+                font-size: 1.65rem;
+            }
+
+            .doc-hero p {
+                font-size: 0.83rem;
+            }
+
+            .doc-layout {
+                gap: 14px;
+                margin-top: 14px;
+            }
+
+            .doc-navigation {
+                padding: 10px;
+                border-radius: 15px;
+            }
+
+            .doc-content {
+                gap: 14px;
+            }
+
+            .doc-section {
+                padding: 19px 16px;
+                border-radius: 18px;
+            }
+
+            .doc-section-header {
+                align-items: flex-start;
+            }
+
+            .doc-icon {
+                flex-basis: 47px;
+                width: 47px;
+                height: 47px;
+                border-radius: 14px;
+                font-size: 1.2rem;
+            }
+
+            .doc-grid,
+            .doc-glossary,
+            .doc-colors {
+                grid-template-columns: 1fr;
+            }
+
+            .doc-indicator-list {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body>
+    <main class="doc-page">
+        <header class="doc-topbar">
+            <a class="doc-back" href="/">
+                ← Retour au tableau de bord
+            </a>
+
+            <span class="doc-status">
+                Documentation accessible à tous
+            </span>
+        </header>
+
+        <section class="doc-hero">
+            <div class="doc-hero-content">
+                <span class="doc-badge">
+                    Guide utilisateur
+                </span>
+
+                <h1>
+                    Comprendre Secure Local Cloud Infrastructure
+                </h1>
+
+                <p>
+                    Cette documentation explique la plateforme avec des
+                    mots simples. Elle s’adresse aussi bien aux personnes
+                    travaillant dans l’informatique qu’aux utilisateurs
+                    qui découvrent la supervision d’une infrastructure.
+                </p>
+
+                <div class="doc-hero-points">
+                    <span class="doc-hero-point">
+                        ✓ Sans prérequis technique
+                    </span>
+
+                    <span class="doc-hero-point">
+                        ✓ Explications simples
+                    </span>
+
+                    <span class="doc-hero-point">
+                        ✓ Exemples concrets
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <div class="doc-layout">
+            <nav class="doc-navigation">
+                <h2>Sommaire</h2>
+
+                <a href="#presentation">
+                    🏠 Présentation
+                </a>
+
+                <a href="#tableau-de-bord">
+                    📊 Tableau de bord
+                </a>
+
+                <a href="#indicateurs">
+                    📈 Indicateurs
+                </a>
+
+                <a href="#conteneurs">
+                    🐳 Conteneurs
+                </a>
+
+                <a href="#monitoring">
+                    🔎 Supervision
+                </a>
+
+                <a href="#securite">
+                    🔐 Sécurité
+                </a>
+
+                <a href="#emma">
+                    🤖 Emma_IA
+                </a>
+
+                <a href="#audit">
+                    📜 Historique
+                </a>
+
+                <a href="#glossaire">
+                    📖 Glossaire
+                </a>
+            </nav>
+
+            <div class="doc-content">
+                <section
+                    id="presentation"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">☁️</div>
+
+                        <div>
+                            <h2>Qu’est-ce que cette plateforme ?</h2>
+
+                            <p>
+                                Une interface unique pour comprendre
+                                l’état d’une infrastructure informatique.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-text">
+                        Secure Local Cloud Infrastructure est une plateforme
+                        de supervision. Elle rassemble sur une même interface
+                        les informations importantes concernant les serveurs,
+                        les applications, les conteneurs et la sécurité.
+                    </div>
+
+                    <div class="doc-grid">
+                        <article class="doc-feature">
+                            <h3>Voir l’état général</h3>
+
+                            <p>
+                                Vous savez rapidement si la plateforme
+                                fonctionne normalement ou si une anomalie
+                                nécessite une vérification.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Centraliser les informations</h3>
+
+                            <p>
+                                Il n’est pas nécessaire de consulter plusieurs
+                                outils séparés pour comprendre la situation.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Suivre les performances</h3>
+
+                            <p>
+                                Les ressources principales du serveur sont
+                                affichées sous forme d’indicateurs et de
+                                graphiques faciles à lire.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Être assisté</h3>
+
+                            <p>
+                                Emma_IA peut expliquer les informations
+                                présentées et aider à identifier un problème.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="doc-note">
+                        La plateforme ne remplace pas l’administrateur.
+                        Elle lui permet de voir plus rapidement ce qui se
+                        passe et de prendre de meilleures décisions.
+                    </div>
+                </section>
+
+                <section
+                    id="tableau-de-bord"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">📊</div>
+
+                        <div>
+                            <h2>Le tableau de bord</h2>
+
+                            <p>
+                                La page d’accueil donne une vue résumée
+                                de toute la plateforme.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-text">
+                        Le tableau de bord permet de consulter en quelques
+                        secondes l’utilisation du serveur, le nombre de
+                        conteneurs, l’état des services et le score global
+                        de santé de l’infrastructure.
+                    </div>
+
+                    <div class="doc-colors">
+                        <div class="doc-color-card">
+                            <span class="doc-color-dot green"></span>
+
+                            <div>
+                                <strong>Vert</strong>
+                                <span>
+                                    Fonctionnement normal.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="doc-color-card">
+                            <span class="doc-color-dot orange"></span>
+
+                            <div>
+                                <strong>Orange</strong>
+                                <span>
+                                    Une vérification est recommandée.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="doc-color-card">
+                            <span class="doc-color-dot red"></span>
+
+                            <div>
+                                <strong>Rouge</strong>
+                                <span>
+                                    Une anomalie importante est détectée.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doc-steps">
+                        <article class="doc-step">
+                            <span class="doc-step-number">1</span>
+
+                            <div>
+                                <h3>Consultez l’état global</h3>
+
+                                <p>
+                                    Il indique immédiatement si
+                                    l’infrastructure est considérée comme saine.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="doc-step">
+                            <span class="doc-step-number">2</span>
+
+                            <div>
+                                <h3>Regardez les ressources</h3>
+
+                                <p>
+                                    Vérifiez le processeur, la mémoire
+                                    et l’espace de stockage.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="doc-step">
+                            <span class="doc-step-number">3</span>
+
+                            <div>
+                                <h3>Contrôlez les services</h3>
+
+                                <p>
+                                    Les services essentiels doivent apparaître
+                                    comme opérationnels.
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section
+                    id="indicateurs"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">📈</div>
+
+                        <div>
+                            <h2>Comprendre les indicateurs</h2>
+
+                            <p>
+                                Ces valeurs montrent comment le serveur
+                                utilise ses ressources.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-indicator-list">
+                        <article class="doc-indicator">
+                            <strong>CPU</strong>
+
+                            <span>
+                                Il représente l’effort demandé au processeur.
+                                Une valeur très élevée pendant longtemps peut
+                                indiquer une surcharge.
+                            </span>
+                        </article>
+
+                        <article class="doc-indicator">
+                            <strong>Mémoire</strong>
+
+                            <span>
+                                Elle correspond à la RAM utilisée par les
+                                applications actuellement en fonctionnement.
+                            </span>
+                        </article>
+
+                        <article class="doc-indicator">
+                            <strong>Disque</strong>
+
+                            <span>
+                                Il indique la part de l’espace de stockage
+                                déjà utilisée sur le serveur.
+                            </span>
+                        </article>
+
+                        <article class="doc-indicator">
+                            <strong>Uptime</strong>
+
+                            <span>
+                                Il indique depuis combien de temps le serveur
+                                fonctionne sans redémarrage.
+                            </span>
+                        </article>
+                    </div>
+
+                    <div class="doc-warning">
+                        Une valeur ponctuellement élevée n’est pas toujours
+                        un problème. C’est surtout une valeur élevée pendant
+                        une longue période qui mérite une analyse.
+                    </div>
+                </section>
+
+                <section
+                    id="conteneurs"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">🐳</div>
+
+                        <div>
+                            <h2>Les conteneurs Docker</h2>
+
+                            <p>
+                                Des espaces indépendants dans lesquels
+                                fonctionnent les applications.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-text">
+                        Un conteneur peut être comparé à une petite boîte
+                        contenant une application et tout ce dont elle a
+                        besoin pour fonctionner. Plusieurs conteneurs peuvent
+                        fonctionner sur le même serveur sans se mélanger.
+                    </div>
+
+                    <div class="doc-grid">
+                        <article class="doc-feature">
+                            <h3>Nom</h3>
+
+                            <p>
+                                Permet de reconnaître l’application ou le
+                                service exécuté dans le conteneur.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>État</h3>
+
+                            <p>
+                                « Running » signifie que le conteneur est
+                                actuellement en fonctionnement.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>CPU et mémoire</h3>
+
+                            <p>
+                                Montrent la quantité de ressources consommées
+                                par chaque conteneur.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Uptime</h3>
+
+                            <p>
+                                Indique depuis combien de temps le conteneur
+                                est en cours d’exécution.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="doc-note">
+                        Les boutons de démarrage, d’arrêt et de redémarrage
+                        modifient réellement l’état d’un conteneur. Une
+                        confirmation est donc demandée avant chaque action.
+                    </div>
+                </section>
+
+                <section
+                    id="monitoring"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">🔎</div>
+
+                        <div>
+                            <h2>La supervision et les graphiques</h2>
+
+                            <p>
+                                Observer l’évolution de la plateforme
+                                dans le temps.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-grid">
+                        <article class="doc-feature">
+                            <h3>Prometheus</h3>
+
+                            <p>
+                                Prometheus récupère régulièrement les
+                                informations concernant les serveurs,
+                                les services et les conteneurs.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Grafana</h3>
+
+                            <p>
+                                Grafana transforme les informations collectées
+                                en graphiques et en tableaux faciles à lire.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Node Exporter</h3>
+
+                            <p>
+                                Il fournit les informations principales du
+                                serveur, comme le processeur, la mémoire
+                                et le disque.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>cAdvisor</h3>
+
+                            <p>
+                                Il observe spécifiquement les ressources
+                                consommées par les conteneurs Docker.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="doc-note">
+                        En résumé : les outils de collecte récupèrent les
+                        informations, Prometheus les conserve et Grafana
+                        les présente sous forme de graphiques.
+                    </div>
+                </section>
+
+                <section
+                    id="securite"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">🔐</div>
+
+                        <div>
+                            <h2>La sécurité expliquée simplement</h2>
+
+                            <p>
+                                Plusieurs protections travaillent ensemble
+                                pour limiter les accès non autorisés.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-grid">
+                        <article class="doc-feature">
+                            <h3>Connexion sécurisée</h3>
+
+                            <p>
+                                Le protocole HTTPS chiffre les échanges entre
+                                le navigateur et la plateforme.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Authentification</h3>
+
+                            <p>
+                                L’utilisateur doit fournir un identifiant
+                                et un mot de passe valides pour accéder
+                                aux pages protégées.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Pare-feu</h3>
+
+                            <p>
+                                UFW bloque les connexions entrantes qui
+                                n’ont pas été explicitement autorisées.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Protection SSH</h3>
+
+                            <p>
+                                Fail2ban repère les tentatives répétées
+                                de connexion et bloque temporairement
+                                leur origine.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Cloudflare Zero Trust</h3>
+
+                            <p>
+                                Il ajoute un contrôle d’accès avant même
+                                que l’utilisateur n’atteigne directement
+                                la plateforme.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Alertes</h3>
+
+                            <p>
+                                Alertmanager permet de transmettre une alerte
+                                lorsqu’une situation anormale est détectée.
+                            </p>
+                        </article>
+                    </div>
+                </section>
+
+                <section
+                    id="emma"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">🤖</div>
+
+                        <div>
+                            <h2>Emma_IA</h2>
+
+                            <p>
+                                L’assistant intégré qui explique les données
+                                de la plateforme.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-text">
+                        Emma_IA peut répondre à des questions formulées avec
+                        des mots simples. Elle utilise les informations
+                        actuelles de la plateforme et la documentation locale
+                        pour fournir une réponse adaptée.
+                    </div>
+
+                    <div class="doc-steps">
+                        <article class="doc-step">
+                            <span class="doc-step-number">1</span>
+
+                            <div>
+                                <h3>Posez une question</h3>
+
+                                <p>
+                                    Exemple : « Mon infrastructure est-elle
+                                    saine ? »
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="doc-step">
+                            <span class="doc-step-number">2</span>
+
+                            <div>
+                                <h3>Emma_IA analyse les données</h3>
+
+                                <p>
+                                    Elle consulte les métriques, les services
+                                    et les conteneurs disponibles.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="doc-step">
+                            <span class="doc-step-number">3</span>
+
+                            <div>
+                                <h3>Elle présente une réponse lisible</h3>
+
+                                <p>
+                                    La réponse indique les constats, les
+                                    éventuels risques et les vérifications
+                                    recommandées.
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="doc-warning">
+                        Emma_IA possède un accès en lecture uniquement.
+                        Elle ne redémarre, n’arrête et ne supprime aucun
+                        service.
+                    </div>
+                </section>
+
+                <section
+                    id="audit"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">📜</div>
+
+                        <div>
+                            <h2>Historique et journal d’audit</h2>
+
+                            <p>
+                                Savoir qui a réalisé une action et à quel
+                                moment.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-text">
+                        Le journal d’audit conserve la trace des opérations
+                        administratives effectuées depuis la plateforme,
+                        notamment les actions réalisées sur les conteneurs.
+                    </div>
+
+                    <div class="doc-grid">
+                        <article class="doc-feature">
+                            <h3>Date</h3>
+
+                            <p>
+                                Indique le moment précis auquel l’action
+                                a été demandée.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Utilisateur</h3>
+
+                            <p>
+                                Permet de savoir quel compte était connecté
+                                lors de l’opération.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Ressource</h3>
+
+                            <p>
+                                Identifie le conteneur ou le composant
+                                concerné par l’action.
+                            </p>
+                        </article>
+
+                        <article class="doc-feature">
+                            <h3>Résultat</h3>
+
+                            <p>
+                                Indique si l’opération s’est terminée avec
+                                succès ou si elle a échoué.
+                            </p>
+                        </article>
+                    </div>
+                </section>
+
+                <section
+                    id="glossaire"
+                    class="doc-section"
+                >
+                    <header class="doc-section-header">
+                        <div class="doc-icon">📖</div>
+
+                        <div>
+                            <h2>Glossaire</h2>
+
+                            <p>
+                                Définitions simples des mots utilisés
+                                dans la plateforme.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="doc-glossary">
+                        <article class="doc-term">
+                            <strong>Serveur</strong>
+
+                            <span>
+                                Ordinateur chargé d’exécuter des applications
+                                et de fournir des services.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Infrastructure</strong>
+
+                            <span>
+                                Ensemble des serveurs, réseaux, applications
+                                et outils nécessaires au fonctionnement
+                                d’un système informatique.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Docker</strong>
+
+                            <span>
+                                Outil permettant d’exécuter des applications
+                                dans des environnements isolés.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Conteneur</strong>
+
+                            <span>
+                                Environnement isolé dans lequel une application
+                                fonctionne.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Image Docker</strong>
+
+                            <span>
+                                Modèle utilisé pour créer un ou plusieurs
+                                conteneurs.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>CPU</strong>
+
+                            <span>
+                                Processeur chargé d’effectuer les calculs
+                                nécessaires au fonctionnement du serveur.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>RAM</strong>
+
+                            <span>
+                                Mémoire temporaire utilisée par les applications
+                                actuellement ouvertes.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Métrique</strong>
+
+                            <span>
+                                Valeur mesurée permettant de suivre l’état
+                                ou les performances d’un système.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Monitoring</strong>
+
+                            <span>
+                                Surveillance continue d’une infrastructure
+                                et de ses ressources.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Service</strong>
+
+                            <span>
+                                Programme fonctionnant en arrière-plan pour
+                                fournir une fonctionnalité précise.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>HTTPS</strong>
+
+                            <span>
+                                Protocole qui chiffre la communication entre
+                                le navigateur et la plateforme.
+                            </span>
+                        </article>
+
+                        <article class="doc-term">
+                            <strong>Journal d’audit</strong>
+
+                            <span>
+                                Historique des opérations réalisées sur
+                                la plateforme.
+                            </span>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="doc-footer">
+            <h2>Besoin d’une explication supplémentaire ?</h2>
+
+            <p>
+                Utilisez Emma_IA pour poser une question sur la plateforme,
+                les indicateurs, les services ou les conteneurs.
+            </p>
+
+            <div class="doc-footer-actions">
+                <a href="/assistant">
+                    Ouvrir Emma_IA
+                </a>
+
+                <a href="/help">
+                    Consulter le centre d’aide
+                </a>
+
+                <a href="/">
+                    Revenir au tableau de bord
+                </a>
+            </div>
+        </footer>
+    </main>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

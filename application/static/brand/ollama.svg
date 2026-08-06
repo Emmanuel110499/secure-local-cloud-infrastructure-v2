@@ -1,0 +1,60 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 64 64"
+>
+    <defs>
+        <linearGradient
+            id="ollamaGradient"
+            x1="12"
+            y1="8"
+            x2="52"
+            y2="57"
+            gradientUnits="userSpaceOnUse"
+        >
+            <stop offset="0" stop-color="#334155"/>
+            <stop offset="1" stop-color="#020617"/>
+        </linearGradient>
+    </defs>
+
+    <path
+        d="
+            M20 16
+            C20 10 24 7 29 11
+            L32 14
+            L35 11
+            C40 7 44 10 44 16
+            V23
+            C49 27 52 34 52 42
+            C52 52 44 57 32 57
+            C20 57 12 52 12 42
+            C12 34 15 27 20 23
+            Z
+        "
+        fill="url(#ollamaGradient)"
+    />
+
+    <path
+        d="
+            M22 19
+            C22 14 25 12 28 15
+            L32 19
+            L36 15
+            C39 12 42 14 42 19
+        "
+        fill="none"
+        stroke="#fff"
+        stroke-width="3"
+        stroke-linecap="round"
+    />
+
+    <circle cx="25" cy="36" r="3" fill="#fff"/>
+    <circle cx="39" cy="36" r="3" fill="#fff"/>
+
+    <path
+        d="M27 46c3 2 7 2 10 0"
+        fill="none"
+        stroke="#fff"
+        stroke-width="3"
+        stroke-linecap="round"
+    />
+</svg>

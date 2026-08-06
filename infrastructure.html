@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Secure Local Cloud Infrastructure</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, system-ui, sans-serif; }
+    body { margin: 0; background: #f4f7fb; color: #13233f; }
+    main { max-width: 980px; margin: 48px auto; padding: 0 24px; }
+    h1 { margin-bottom: 8px; font-size: clamp(2rem, 5vw, 3.5rem); }
+    .lead { color: #50627f; font-size: 1.1rem; line-height: 1.7; }
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 36px 0; }
+    .card { background: white; border: 1px solid #d9e2f0; border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(31, 61, 115, .08); }
+    .card strong { display: block; color: #245fe0; margin-bottom: 8px; }
+    a { color: #245fe0; font-weight: 700; }
+    @media (max-width: 760px) { .flow { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p>DOCUMENTATION D'ARCHITECTURE</p>
+    <h1>Secure Local Cloud Infrastructure</h1>
+    <p class="lead">Vue synthetique du chemin d'une requete et de la chaine de supervision. Les configurations detaillees se trouvent dans <code>docs/ARCHITECTURE.md</code> et <code>docs/INSTALLATION.md</code>.</p>
+    <section class="flow" aria-label="Flux principal">
+      <div class="card"><strong>1. Utilisateur</strong>Acces HTTPS depuis un navigateur autorise.</div>
+      <div class="card"><strong>2. Publication</strong>Cloudflare Tunnel puis reverse proxy Nginx.</div>
+      <div class="card"><strong>3. Application</strong>Gunicorn execute le portail Flask dans Docker.</div>
+      <div class="card"><strong>4. Supervision</strong>Prometheus, Grafana, Alertmanager, Node Exporter et cAdvisor.</div>
+    </section>
+    <p><a href="docs/ARCHITECTURE.md">Lire l'architecture detaillee</a></p>
+  </main>
+</body>
+</html>

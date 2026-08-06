@@ -1,0 +1,216 @@
+{
+  "plateforme": {
+    "keywords": [
+      "plateforme",
+      "projet",
+      "application",
+      "à quoi sert",
+      "a quoi sert"
+    ],
+    "answer": "Secure Local Cloud Infrastructure est une plateforme de supervision et d’administration. Elle permet de suivre les serveurs, les conteneurs Docker, les métriques système, les services de monitoring et les mécanismes de sécurité."
+  },
+  "architecture": {
+    "keywords": [
+      "architecture",
+      "srv-web",
+      "srv-monitoring",
+      "deux serveurs",
+      "fonctionnement général"
+    ],
+    "answer": "L’architecture repose sur deux serveurs Ubuntu. srv-web héberge Flask, Gunicorn, Nginx, Docker, cAdvisor, Node Exporter et Cloudflare Tunnel. srv-monitoring héberge Prometheus, Grafana et Alertmanager."
+  },
+  "docker": {
+    "keywords": [
+      "docker",
+      "conteneur",
+      "container",
+      "conteneurs"
+    ],
+    "answer": "Docker exécute les services dans des conteneurs isolés et reproductibles. Sur srv-web, il héberge notamment l’application Flask et cAdvisor."
+  },
+  "prometheus": {
+    "keywords": [
+      "prometheus",
+      "métrique",
+      "metrique",
+      "metrics",
+      "target",
+      "cible"
+    ],
+    "answer": "Prometheus collecte régulièrement les métriques exposées par Node Exporter et cAdvisor. Il conserve ces données sous forme de séries temporelles et permet de vérifier l’état des cibles de supervision."
+  },
+  "grafana": {
+    "keywords": [
+      "grafana",
+      "graphe",
+      "graphique",
+      "dashboard grafana"
+    ],
+    "answer": "Grafana lit les métriques stockées dans Prometheus et les transforme en tableaux de bord interactifs pour suivre le CPU, la mémoire, les disques, le réseau et les conteneurs."
+  },
+  "cadvisor": {
+    "keywords": [
+      "cadvisor",
+      "docker metrics",
+      "métriques docker"
+    ],
+    "answer": "cAdvisor collecte les métriques des conteneurs Docker : CPU, mémoire, trafic réseau et opérations disque. Prometheus récupère ensuite ces données."
+  },
+  "node_exporter": {
+    "keywords": [
+      "node exporter",
+      "node_exporter",
+      "cpu",
+      "ram",
+      "mémoire",
+      "disque"
+    ],
+    "answer": "Node Exporter expose les métriques système du serveur : CPU, mémoire, espace disque, charge système et trafic réseau."
+  },
+  "alertmanager": {
+    "keywords": [
+      "alertmanager",
+      "alerte",
+      "telegram",
+      "notification"
+    ],
+    "answer": "Prometheus déclenche les alertes selon ses règles. Alertmanager les reçoit, les regroupe et envoie les notifications vers Telegram."
+  },
+  "cloudflare": {
+    "keywords": [
+      "cloudflare",
+      "tunnel",
+      "domaine",
+      "internet",
+      "url publique"
+    ],
+    "answer": "Cloudflare Tunnel rend la plateforme accessible depuis Internet sans ouvrir de port entrant sur la box. Le tunnel fonctionne comme un service automatique sur srv-web."
+  },
+  "zero_trust": {
+    "keywords": [
+      "zero trust",
+      "authentification",
+      "connexion grafana",
+      "connexion prometheus",
+      "code email"
+    ],
+    "answer": "Cloudflare Zero Trust protège Grafana et Prometheus. Seules les adresses e-mail autorisées peuvent accéder à ces interfaces après vérification."
+  },
+  "nginx": {
+    "keywords": [
+      "nginx",
+      "reverse proxy",
+      "proxy inverse"
+    ],
+    "answer": "Nginx reçoit les requêtes web et les transmet à l’application Flask exécutée par Gunicorn. Il gère également la redirection HTTP vers HTTPS en local."
+  },
+  "gunicorn": {
+    "keywords": [
+      "gunicorn",
+      "serveur flask",
+      "production flask"
+    ],
+    "answer": "Gunicorn est le serveur WSGI de production qui exécute l’application Flask. Il remplace le serveur de développement intégré à Flask."
+  },
+  "urls": {
+    "keywords": [
+      "url",
+      "adresse",
+      "lien",
+      "ouvrir grafana",
+      "ouvrir prometheus"
+    ],
+    "answer": "Les URL principales sont : app.emmanuelinfra.fr pour la plateforme, grafana.emmanuelinfra.fr pour Grafana et prometheus.emmanuelinfra.fr pour Prometheus."
+  }
+     ,
+"metriques": {
+  "keywords": [
+    "metrique",
+    "metriques",
+    "métrique",
+    "métriques",
+    "c'est quoi une metrique",
+    "c est quoi une metrique",
+    "que sont les metriques",
+    "cpu usage",
+    "ram usage",
+    "donnee de supervision"
+  ],
+  "answer": "Une métrique est une mesure chiffrée utilisée pour suivre l’état ou les performances d’un système. Dans cette plateforme, les métriques correspondent par exemple à l’utilisation CPU, la mémoire RAM, l’espace disque, le trafic réseau, le nombre de conteneurs actifs ou l’état des services. Node Exporter et cAdvisor exposent ces données, Prometheus les collecte et Grafana les affiche sous forme de graphiques."
+},
+     "metriques_detaillees": {
+  "keywords": [
+    "metrique",
+    "metriques",
+    "mesure de performance",
+    "donnee de supervision",
+    "indicateur",
+    "indicateurs",
+    "valeur cpu",
+    "valeur ram",
+    "monitoring metrics"
+  ],
+  "answer": "Une métrique est une mesure chiffrée qui décrit l’état ou les performances d’un système. Dans cette plateforme, les métriques permettent notamment de surveiller le CPU, la mémoire RAM, l’espace disque, le réseau, les conteneurs et la disponibilité des services."
+},
+"cpu": {
+  "keywords": [
+    "cpu",
+    "processeur",
+    "utilisation cpu",
+    "charge cpu",
+    "consommation processeur",
+    "cpu usage"
+  ],
+  "answer": "La métrique CPU mesure la quantité de puissance de calcul utilisée. Elle permet de détecter une surcharge, un processus trop gourmand ou un serveur sous-dimensionné. Une utilisation élevée pendant une longue période peut entraîner des ralentissements."
+},
+"ram": {
+  "keywords": [
+    "ram",
+    "memoire",
+    "memoire vive",
+    "utilisation ram",
+    "consommation memoire",
+    "memory usage"
+  ],
+  "answer": "La métrique RAM indique la quantité de mémoire utilisée et disponible. Elle sert à détecter un manque de mémoire, une fuite mémoire ou un service qui consomme anormalement des ressources."
+},
+"cpu_ram": {
+  "keywords": [
+    "cpu et ram",
+    "cpu ram",
+    "metriques cpu et ram",
+    "a quoi servent cpu et ram",
+    "utilisation processeur et memoire"
+  ],
+  "answer": "Les métriques CPU et RAM servent à surveiller les performances du serveur. Le CPU indique la charge du processeur, tandis que la RAM indique la quantité de mémoire utilisée. Node Exporter expose ces valeurs, Prometheus les collecte et Grafana les affiche sous forme de graphiques."
+},
+"prometheus_grafana": {
+  "keywords": [
+    "difference prometheus grafana",
+    "prometheus et grafana",
+    "prometheus ou grafana",
+    "lien entre prometheus et grafana"
+  ],
+  "answer": "Prometheus collecte et stocke les métriques. Grafana utilise ensuite les données de Prometheus pour produire des graphiques et des tableaux de bord. Prometheus est donc la source de données et Grafana l’outil de visualisation."
+},
+"target_down": {
+  "keywords": [
+    "target down",
+    "cible down",
+    "prometheus down",
+    "cible prometheus indisponible",
+    "target indisponible"
+  ],
+  "answer": "Une cible Prometheus DOWN signifie que Prometheus ne parvient plus à récupérer ses métriques. La cause peut être un service arrêté, une mauvaise adresse, un port fermé, un pare-feu ou un problème réseau."
+},
+"zero_trust_access": {
+  "keywords": [
+    "grafana demande email",
+    "prometheus demande email",
+    "code par email",
+    "connexion cloudflare",
+    "protection grafana prometheus"
+  ],
+  "answer": "Grafana et Prometheus sont protégés par Cloudflare Zero Trust car ils exposent des informations techniques sensibles. L’utilisateur doit utiliser une adresse e-mail autorisée et saisir un code de vérification avant d’y accéder."
+}
+}

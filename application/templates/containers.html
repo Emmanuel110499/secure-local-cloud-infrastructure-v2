@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Conteneurs Docker — Secure Local Cloud</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-pages.css', v='docker-page-2') }}"
+    >
+
+    <style>
+        .docker-summary {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .docker-summary-card {
+            padding: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .docker-summary-card span,
+        .docker-summary-card strong,
+        .docker-summary-card small {
+            display: block;
+        }
+
+        .docker-summary-card span {
+            color: var(--muted);
+            font-size: 0.64rem;
+            font-weight: 700;
+        }
+
+        .docker-summary-card strong {
+            margin-top: 7px;
+            font-size: 1.3rem;
+        }
+
+        .docker-summary-card small {
+            margin-top: 4px;
+            color: #8995a6;
+            font-size: 0.56rem;
+        }
+
+        .docker-tools {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .docker-tools::-webkit-scrollbar {
+            display: none;
+        }
+
+        .docker-tool-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            min-height: 36px;
+            padding: 0 11px;
+            color: #536277;
+            background: #f7f9fc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.64rem;
+            font-weight: 800;
+        }
+
+        .docker-tool-link.active {
+            color: #ffffff;
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .container-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .container-card {
+            position: relative;
+            display: grid;
+            grid-template-columns:
+                minmax(230px, 1.6fr)
+                repeat(4, minmax(90px, 0.7fr))
+                auto;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+            padding: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: var(--shadow);
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        .container-card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 15px 35px rgba(15, 23, 42, 0.09);
+        }
+
+        .container-identity {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-width: 0;
+        }
+
+        .container-symbol {
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 42px;
+            height: 42px;
+            color: #315fd8;
+            background: #eaf1ff;
+            border: 1px solid #dae5f7;
+            border-radius: 13px;
+        }
+
+        .container-symbol svg {
+            width: 23px;
+            height: 23px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .container-name,
+        .container-image {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .container-name {
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .container-image {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.58rem;
+        }
+
+        .container-metric span,
+        .container-metric strong {
+            display: block;
+        }
+
+        .container-metric span {
+            color: var(--muted);
+            font-size: 0.54rem;
+            font-weight: 700;
+        }
+
+        .container-metric strong {
+            margin-top: 5px;
+            color: #334155;
+            font-size: 0.7rem;
+        }
+
+        .container-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            min-height: 27px;
+            padding: 0 9px;
+            color: #047857;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            font-size: 0.56rem;
+            font-weight: 900;
+        }
+
+        .container-status::before {
+            width: 7px;
+            height: 7px;
+            content: "";
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .container-status.stopped {
+            color: #b91c1c;
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        .container-status.stopped::before {
+            background: #ef4444;
+        }
+
+        .container-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .container-action {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.16s ease;
+        }
+
+        .container-action svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .container-action.start {
+            color: #047857;
+            background: #ecfdf5;
+        }
+
+        .container-action.stop {
+            color: #b91c1c;
+            background: #fff1f2;
+        }
+
+        .container-action.restart {
+            color: #b45309;
+            background: #fffbeb;
+        }
+
+        .container-action.logs {
+            color: #315fd8;
+            background: #eef3ff;
+        }
+
+        .container-action:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(0.97);
+        }
+
+        .container-action:disabled {
+            cursor: not-allowed;
+            opacity: 0.35;
+        }
+
+        .docker-message {
+            min-height: 20px;
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.65rem;
+        }
+
+        .docker-message.success {
+            color: #047857;
+        }
+
+        .docker-message.error {
+            color: #b91c1c;
+        }
+
+        .logs-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(5px);
+        }
+
+        .logs-modal[hidden] {
+            display: none;
+        }
+
+        .logs-panel {
+            width: min(900px, 100%);
+            max-height: 82vh;
+            overflow: hidden;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 18px;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.32);
+        }
+
+        .logs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            color: #e2e8f0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .logs-header strong {
+            font-size: 0.76rem;
+        }
+
+        .logs-close {
+            width: 32px;
+            height: 32px;
+            color: #cbd5e1;
+            background: #1e293b;
+            border: 0;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .logs-content {
+            max-height: 65vh;
+            margin: 0;
+            padding: 16px;
+            overflow: auto;
+            color: #d1fae5;
+            background: #07101f;
+            font-family: Consolas, monospace;
+            font-size: 0.68rem;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 1050px) {
+            .container-card {
+                grid-template-columns:
+                    minmax(220px, 1.4fr)
+                    repeat(2, minmax(90px, 0.7fr))
+                    auto;
+            }
+
+            .container-metric.secondary {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .docker-summary {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .docker-summary::-webkit-scrollbar {
+                display: none;
+            }
+
+            .docker-summary-card {
+                flex: 0 0 140px;
+                padding: 12px;
+            }
+
+            .container-card {
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    auto;
+                gap: 11px;
+                padding: 14px;
+            }
+
+            .container-identity {
+                grid-column: 1 / -1;
+            }
+
+            .container-metric {
+                display: block;
+            }
+
+            .container-metric.secondary {
+                display: none;
+            }
+
+            .container-actions {
+                grid-column: 1 / -1;
+                justify-content: flex-start;
+            }
+
+            .container-action {
+                width: 38px;
+                height: 36px;
+            }
+        }
+    </style>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-theme-v2.css', v='dashboard-unified-3') }}"
+    >
+
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4 portal-body">
+    <main class="portal-page">
+        <header class="portal-header">
+            <div class="portal-title">
+                <div class="portal-title-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="7" width="5" height="5" rx="1"/>
+                        <rect x="9.5" y="7" width="5" height="5" rx="1"/>
+                        <rect x="16" y="7" width="5" height="5" rx="1"/>
+                        <path d="M4 15h16c-.7 3.5-3.2 5-7.5 5H9c-3 0-5-1.7-5-5Z"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>Conteneurs Docker</h1>
+
+                    <p>
+                        Supervision et gestion des conteneurs
+                        exécutés sur srv-web.
+                    </p>
+                </div>
+            </div>
+
+            <a class="portal-back" href="/">
+                ← Tableau de bord
+            </a>
+        </header>
+
+        <section class="portal-toolbar">
+            <label class="portal-search">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="m20 20-4-4"/>
+                </svg>
+
+                <input
+                    id="container-search"
+                    type="search"
+                    placeholder="Rechercher un conteneur ou une image…"
+                    autocomplete="off"
+                >
+            </label>
+
+            <div class="docker-tools">
+                <a
+                    href="/containers"
+                    class="docker-tool-link active"
+                >
+                    Conteneurs
+                </a>
+
+                <a
+                    href="/images"
+                    class="docker-tool-link"
+                >
+                    Images
+                </a>
+
+                <a
+                    href="/volumes"
+                    class="docker-tool-link"
+                >
+                    Volumes
+                </a>
+
+                <a
+                    href="/networks"
+                    class="docker-tool-link"
+                >
+                    Réseaux
+                </a>
+            </div>
+        </section>
+
+        <section class="docker-summary">
+            <article class="docker-summary-card">
+                <span>Conteneurs détectés</span>
+                <strong id="total-containers">--</strong>
+                <small>Environnement Docker</small>
+            </article>
+
+            <article class="docker-summary-card">
+                <span>Conteneurs actifs</span>
+                <strong id="running-containers">--</strong>
+                <small>État running</small>
+            </article>
+
+            <article class="docker-summary-card">
+                <span>CPU Docker total</span>
+                <strong id="total-container-cpu">--</strong>
+                <small>Somme instantanée</small>
+            </article>
+
+            <article class="docker-summary-card">
+                <span>Mémoire Docker</span>
+                <strong id="total-container-memory">--</strong>
+                <small>Consommation totale</small>
+            </article>
+        </section>
+
+        <section class="portal-section">
+            <div class="portal-section-header">
+                <h2>Services conteneurisés</h2>
+
+                <span id="containers-updated-at">
+                    Chargement…
+                </span>
+            </div>
+
+            <div
+                id="containers-list"
+                class="container-list"
+            >
+                {% for container in containers %}
+                    <article
+                        class="container-card"
+                        data-search="{{ container.name }} {{ container.image }}"
+                    >
+                        <div class="container-identity">
+                            <span class="container-symbol">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="4" y="6" width="16" height="12" rx="2"/>
+                                    <path d="M8 10h8M8 14h5"/>
+                                </svg>
+                            </span>
+
+                            <div style="min-width:0">
+                                <strong class="container-name">
+                                    {{ container.name }}
+                                </strong>
+
+                                <span class="container-image">
+                                    {{ container.image }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="container-metric">
+                            <span>CPU</span>
+                            <strong>{{ container.cpu }} %</strong>
+                        </div>
+
+                        <div class="container-metric">
+                            <span>Mémoire</span>
+                            <strong>
+                                {{ container.memory_mb }} Mo
+                            </strong>
+                        </div>
+
+                        <div class="container-metric secondary">
+                            <span>Uptime</span>
+                            <strong>{{ container.uptime }}</strong>
+                        </div>
+
+                        <div class="container-metric secondary">
+                            <span>État</span>
+
+                            <strong
+                                class="container-status {% if container.status != 'running' %}stopped{% endif %}"
+                            >
+                                {{ container.status }}
+                            </strong>
+                        </div>
+
+                        <div class="container-actions">
+                            <button
+                                class="container-action start docker-action"
+                                type="button"
+                                data-container="{{ container.name }}"
+                                data-action="start"
+                                title="Démarrer"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="m8 5 11 7-11 7Z"/>
+                                </svg>
+                            </button>
+
+                            <button
+                                class="container-action stop docker-action"
+                                type="button"
+                                data-container="{{ container.name }}"
+                                data-action="stop"
+                                title="Arrêter"
+                                {% if container.name == "secure-web-app-v2" %}disabled{% endif %}
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="7" y="7" width="10" height="10"/>
+                                </svg>
+                            </button>
+
+                            <button
+                                class="container-action restart docker-action"
+                                type="button"
+                                data-container="{{ container.name }}"
+                                data-action="restart"
+                                title="Redémarrer"
+                                {% if container.name == "secure-web-app-v2" %}disabled{% endif %}
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M20 7v5h-5"/>
+                                    <path d="M18.5 9A7 7 0 1 0 19 15"/>
+                                </svg>
+                            </button>
+
+                            <button
+                                class="container-action logs docker-logs"
+                                type="button"
+                                data-container="{{ container.name }}"
+                                title="Voir les logs"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 4h14v16H5Z"/>
+                                    <path d="M8 8h8M8 12h8M8 16h5"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+                {% else %}
+                    <div class="portal-empty" style="display:block">
+                        Aucun conteneur Docker détecté.
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div
+                id="docker-message"
+                class="docker-message"
+            >
+                Actualisation automatique toutes les 10 secondes.
+            </div>
+        </section>
+    </main>
+
+    <div
+        id="logs-modal"
+        class="logs-modal"
+        hidden
+    >
+        <section class="logs-panel">
+            <header class="logs-header">
+                <strong id="logs-title">
+                    Journaux du conteneur
+                </strong>
+
+                <button
+                    id="logs-close"
+                    class="logs-close"
+                    type="button"
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
+            </header>
+
+            <pre
+                id="logs-content"
+                class="logs-content"
+            >Chargement…</pre>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const list = document.getElementById(
+                "containers-list"
+            );
+
+            const message = document.getElementById(
+                "docker-message"
+            );
+
+            const searchInput = document.getElementById(
+                "container-search"
+            );
+
+            const modal = document.getElementById(
+                "logs-modal"
+            );
+
+            const logsContent = document.getElementById(
+                "logs-content"
+            );
+
+            const logsTitle = document.getElementById(
+                "logs-title"
+            );
+
+            function escapeHtml(value) {
+                const element =
+                    document.createElement("div");
+
+                element.textContent =
+                    String(value ?? "");
+
+                return element.innerHTML;
+            }
+
+            function formatNumber(value, digits = 1) {
+                const number = Number(value);
+
+                return Number.isFinite(number)
+                    ? number.toFixed(digits)
+                    : "0.0";
+            }
+
+            function statusIsRunning(status) {
+                return [
+                    "running",
+                    "up",
+                    "active",
+                ].includes(
+                    String(status).toLowerCase()
+                );
+            }
+
+            function updateSummary(containers) {
+                const running = containers.filter(
+                    (container) =>
+                        statusIsRunning(container.status)
+                );
+
+                const cpu = containers.reduce(
+                    (total, container) =>
+                        total
+                        + Number(container.cpu || 0),
+                    0
+                );
+
+                const memory = containers.reduce(
+                    (total, container) =>
+                        total
+                        + Number(
+                            container.memory_mb || 0
+                        ),
+                    0
+                );
+
+                document.getElementById(
+                    "total-containers"
+                ).textContent = containers.length;
+
+                document.getElementById(
+                    "running-containers"
+                ).textContent = running.length;
+
+                document.getElementById(
+                    "total-container-cpu"
+                ).textContent =
+                    `${cpu.toFixed(2)} %`;
+
+                document.getElementById(
+                    "total-container-memory"
+                ).textContent =
+                    `${memory.toFixed(1)} Mo`;
+            }
+
+            function renderContainers(containers) {
+                if (!containers.length) {
+                    list.innerHTML = `
+                        <div
+                            class="portal-empty"
+                            style="display:block"
+                        >
+                            Aucun conteneur Docker détecté.
+                        </div>
+                    `;
+
+                    return;
+                }
+
+                list.innerHTML = containers.map(
+                    (container) => {
+                        const running =
+                            statusIsRunning(
+                                container.status
+                            );
+
+                        const protectedContainer =
+                            container.name
+                            === "secure-web-app-v2";
+
+                        return `
+                            <article
+                                class="container-card"
+                                data-search="${
+                                    escapeHtml(
+                                        container.name
+                                    )
+                                } ${
+                                    escapeHtml(
+                                        container.image
+                                    )
+                                }"
+                            >
+                                <div class="container-identity">
+                                    <span class="container-symbol">
+                                        <svg viewBox="0 0 24 24">
+                                            <rect x="4" y="6" width="16" height="12" rx="2"/>
+                                            <path d="M8 10h8M8 14h5"/>
+                                        </svg>
+                                    </span>
+
+                                    <div style="min-width:0">
+                                        <strong class="container-name">
+                                            ${
+                                                escapeHtml(
+                                                    container.name
+                                                )
+                                            }
+                                        </strong>
+
+                                        <span class="container-image">
+                                            ${
+                                                escapeHtml(
+                                                    container.image
+                                                )
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="container-metric">
+                                    <span>CPU</span>
+                                    <strong>
+                                        ${
+                                            formatNumber(
+                                                container.cpu,
+                                                2
+                                            )
+                                        } %
+                                    </strong>
+                                </div>
+
+                                <div class="container-metric">
+                                    <span>Mémoire</span>
+                                    <strong>
+                                        ${
+                                            formatNumber(
+                                                container.memory_mb
+                                            )
+                                        } Mo
+                                    </strong>
+                                </div>
+
+                                <div class="container-metric secondary">
+                                    <span>Uptime</span>
+                                    <strong>
+                                        ${
+                                            escapeHtml(
+                                                container.uptime
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div class="container-metric secondary">
+                                    <span>État</span>
+
+                                    <strong
+                                        class="container-status ${
+                                            running
+                                                ? ""
+                                                : "stopped"
+                                        }"
+                                    >
+                                        ${
+                                            escapeHtml(
+                                                container.status
+                                            )
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div class="container-actions">
+                                    <button
+                                        class="container-action start docker-action"
+                                        type="button"
+                                        data-container="${
+                                            escapeHtml(
+                                                container.name
+                                            )
+                                        }"
+                                        data-action="start"
+                                        title="Démarrer"
+                                    >
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="m8 5 11 7-11 7Z"/>
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        class="container-action stop docker-action"
+                                        type="button"
+                                        data-container="${
+                                            escapeHtml(
+                                                container.name
+                                            )
+                                        }"
+                                        data-action="stop"
+                                        title="Arrêter"
+                                        ${
+                                            protectedContainer
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    >
+                                        <svg viewBox="0 0 24 24">
+                                            <rect x="7" y="7" width="10" height="10"/>
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        class="container-action restart docker-action"
+                                        type="button"
+                                        data-container="${
+                                            escapeHtml(
+                                                container.name
+                                            )
+                                        }"
+                                        data-action="restart"
+                                        title="Redémarrer"
+                                        ${
+                                            protectedContainer
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    >
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M20 7v5h-5"/>
+                                            <path d="M18.5 9A7 7 0 1 0 19 15"/>
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        class="container-action logs docker-logs"
+                                        type="button"
+                                        data-container="${
+                                            escapeHtml(
+                                                container.name
+                                            )
+                                        }"
+                                        title="Voir les logs"
+                                    >
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M5 4h14v16H5Z"/>
+                                            <path d="M8 8h8M8 12h8M8 16h5"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </article>
+                        `;
+                    }
+                ).join("");
+
+                filterContainers();
+            }
+
+            function filterContainers() {
+                const query =
+                    searchInput.value
+                        .trim()
+                        .toLowerCase();
+
+                document
+                    .querySelectorAll(".container-card")
+                    .forEach((card) => {
+                        const searchable =
+                            String(
+                                card.dataset.search || ""
+                            ).toLowerCase();
+
+                        card.hidden =
+                            Boolean(query)
+                            && !searchable.includes(query);
+                    });
+            }
+
+            async function refreshContainers() {
+                try {
+                    const response = await fetch(
+                        `/api/docker/containers?t=${
+                            Date.now()
+                        }`,
+                        {
+                            cache: "no-store",
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Erreur HTTP ${response.status}`
+                        );
+                    }
+
+                    const payload =
+                        await response.json();
+
+                    const containers =
+                        Array.isArray(
+                            payload.containers
+                        )
+                            ? payload.containers
+                            : [];
+
+                    updateSummary(containers);
+                    renderContainers(containers);
+
+                    document.getElementById(
+                        "containers-updated-at"
+                    ).textContent =
+                        `Actualisé à ${
+                            new Date(
+                                payload.updated_at
+                            ).toLocaleTimeString(
+                                "fr-FR"
+                            )
+                        }`;
+
+                    message.className =
+                        "docker-message";
+
+                    message.textContent =
+                        "Données Docker actualisées.";
+                } catch (error) {
+                    console.error(error);
+
+                    message.className =
+                        "docker-message error";
+
+                    message.textContent =
+                        "Impossible d’actualiser Docker.";
+                }
+            }
+
+            async function executeAction(
+                container,
+                action
+            ) {
+                const labels = {
+                    start: "démarrer",
+                    stop: "arrêter",
+                    restart: "redémarrer",
+                };
+
+                const confirmed = window.confirm(
+                    `Voulez-vous ${
+                        labels[action]
+                    } le conteneur ${container} ?`
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                message.className = "docker-message";
+                message.textContent =
+                    "Action Docker en cours…";
+
+                const response = await fetch(
+                    `/api/docker/${
+                        encodeURIComponent(container)
+                    }/${action}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type":
+                                "application/json",
+                        },
+                    }
+                );
+
+                const payload =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        payload.error
+                        || "Action Docker impossible."
+                    );
+                }
+
+                message.className =
+                    "docker-message success";
+
+                message.textContent =
+                    `Action ${action} exécutée sur ${container}.`;
+
+                window.setTimeout(
+                    refreshContainers,
+                    1500
+                );
+            }
+
+            async function openLogs(container) {
+                modal.hidden = false;
+                logsTitle.textContent =
+                    `Journaux — ${container}`;
+                logsContent.textContent =
+                    "Chargement des journaux…";
+
+                try {
+                    const response = await fetch(
+                        `/api/docker/${
+                            encodeURIComponent(container)
+                        }/logs?t=${Date.now()}`,
+                        {
+                            cache: "no-store",
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        }
+                    );
+
+                    const payload =
+                        await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            payload.error
+                            || "Logs indisponibles."
+                        );
+                    }
+
+                    logsContent.textContent =
+                        payload.logs
+                        || payload.content
+                        || JSON.stringify(
+                            payload,
+                            null,
+                            2
+                        );
+                } catch (error) {
+                    logsContent.textContent =
+                        error.message;
+                }
+            }
+
+            document.addEventListener(
+                "click",
+                async (event) => {
+                    const actionButton =
+                        event.target.closest(
+                            ".docker-action"
+                        );
+
+                    if (actionButton) {
+                        actionButton.disabled = true;
+
+                        try {
+                            await executeAction(
+                                actionButton.dataset.container,
+                                actionButton.dataset.action
+                            );
+                        } catch (error) {
+                            message.className =
+                                "docker-message error";
+
+                            message.textContent =
+                                error.message;
+                        } finally {
+                            actionButton.disabled = false;
+                        }
+
+                        return;
+                    }
+
+                    const logsButton =
+                        event.target.closest(
+                            ".docker-logs"
+                        );
+
+                    if (logsButton) {
+                        openLogs(
+                            logsButton.dataset.container
+                        );
+                    }
+                }
+            );
+
+            searchInput.addEventListener(
+                "input",
+                filterContainers
+            );
+
+            document.getElementById(
+                "logs-close"
+            ).addEventListener(
+                "click",
+                () => {
+                    modal.hidden = true;
+                }
+            );
+
+            modal.addEventListener(
+                "click",
+                (event) => {
+                    if (event.target === modal) {
+                        modal.hidden = true;
+                    }
+                }
+            );
+
+            document.addEventListener(
+                "keydown",
+                (event) => {
+                    if (event.key === "Escape") {
+                        modal.hidden = true;
+                    }
+                }
+            );
+
+            refreshContainers();
+
+            window.setInterval(
+                refreshContainers,
+                10000
+            );
+        });
+    </script>
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

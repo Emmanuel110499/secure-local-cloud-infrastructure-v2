@@ -1,0 +1,348 @@
+{% extends "portal_v3_base.html" %}
+
+{% block title %}Prometheus — Secure Local Cloud{% endblock %}
+{% block breadcrumb %}Monitoring / Prometheus{% endblock %}
+{% block page_title %}Targets Prometheus{% endblock %}
+
+{% block page_description %}
+État en temps réel des sources de métriques supervisées
+par Prometheus.
+{% endblock %}
+
+{% block page_icon %}
+<svg viewBox="0 0 24 24">
+    <path d="M12 3c2.5 3 4.5 5.3 4.5 8.2A4.5 4.5 0 0 1 12 16a4.5 4.5 0 0 1-4.5-4.8C7.5 8.3 9.5 6 12 3Z"/>
+    <path d="M5 20h14M8 16.5 6.5 20M16 16.5l1.5 3.5"/>
+</svg>
+{% endblock %}
+
+{% block content %}
+<section class="v3-toolbar">
+    <label class="v3-search">
+        <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-4-4"/>
+        </svg>
+
+        <input
+            id="target-search"
+            type="search"
+            placeholder="Rechercher une target, une instance ou un job…"
+        >
+    </label>
+
+    <div class="v3-tabs">
+        <a class="v3-tab" href="/monitoring">Monitoring</a>
+        <a class="v3-tab active" href="/prometheus">Prometheus</a>
+
+        <a
+            class="v3-tab"
+            href="https://grafana.emmanuelinfra.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Grafana
+        </a>
+    </div>
+</section>
+
+<section class="v3-stat-grid">
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Targets détectées</span>
+            <span class="v3-icon">{{ "" }}</span>
+        </div>
+
+        <strong id="targets-total">--</strong>
+        <small>Sources configurées</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Targets disponibles</span>
+
+            <span class="v3-icon green">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="targets-up">--</strong>
+        <small>État UP</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Targets indisponibles</span>
+
+            <span class="v3-icon orange">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 4 3 20h18Z"/>
+                    <path d="M12 9v5M12 17h.01"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="targets-down">--</strong>
+        <small>État DOWN ou inconnu</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>État Prometheus</span>
+
+            <span class="v3-icon purple">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 12h3l2-5 4 10 2-5h5"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="prometheus-state" style="font-size:.88rem">
+            Analyse…
+        </strong>
+
+        <small>Collecteur central</small>
+    </article>
+</section>
+
+<section class="v3-panel">
+    <header class="v3-panel-header">
+        <div>
+            <h2>Sources supervisées</h2>
+            <p>Actualisation automatique toutes les 10 secondes.</p>
+        </div>
+
+        <span id="targets-updated">Chargement…</span>
+    </header>
+
+    <div
+        id="targets-list"
+        class="v3-list"
+    ></div>
+
+    <div
+        id="targets-empty"
+        class="v3-empty"
+        hidden
+    >
+        <span class="v3-empty-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 12h3l2-5 4 10 2-5h5"/>
+            </svg>
+        </span>
+
+        <h3>Aucune target Prometheus trouvée</h3>
+        <p>Vérifiez la configuration et la disponibilité de Prometheus.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const list = document.getElementById("targets-list");
+    const empty = document.getElementById("targets-empty");
+
+    function getTargets(payload) {
+        if (Array.isArray(payload)) {
+            return payload;
+        }
+
+        if (Array.isArray(payload.targets)) {
+            return payload.targets;
+        }
+
+        if (Array.isArray(payload.data)) {
+            return payload.data;
+        }
+
+        if (Array.isArray(payload.activeTargets)) {
+            return payload.activeTargets;
+        }
+
+        return [];
+    }
+
+    function isUp(target) {
+        const state = String(
+            target.health
+            || target.status
+            || target.state
+            || ""
+        ).toLowerCase();
+
+        return [
+            "up",
+            "healthy",
+            "active",
+            "true",
+        ].includes(state);
+    }
+
+    function render(targets) {
+        const escape = PortalV3.escapeHtml;
+
+        list.innerHTML = targets.map((target) => {
+            const up = isUp(target);
+
+            const name =
+                target.job
+                || target.labels?.job
+                || target.name
+                || "Target Prometheus";
+
+            const instance =
+                target.instance
+                || target.labels?.instance
+                || target.scrapeUrl
+                || target.url
+                || "--";
+
+            const error =
+                target.lastError
+                || target.error
+                || "";
+
+            return `
+                <article class="v3-list-item target-item">
+                    <span class="v3-icon ${up ? "green" : "orange"}">
+                        <svg viewBox="0 0 24 24">
+                            ${
+                                up
+                                    ? `
+                                        <circle cx="12" cy="12" r="9"/>
+                                        <path d="m8 12 2.5 2.5L16 9"/>
+                                    `
+                                    : `
+                                        <path d="M12 4 3 20h18Z"/>
+                                        <path d="M12 9v5M12 17h.01"/>
+                                    `
+                            }
+                        </svg>
+                    </span>
+
+                    <div class="v3-list-field mobile-full">
+                        <span>Job</span>
+                        <strong>${escape(name)}</strong>
+                    </div>
+
+                    <div class="v3-list-field">
+                        <span>Instance</span>
+                        <strong>${escape(instance)}</strong>
+                    </div>
+
+                    <div class="v3-list-field optional">
+                        <span>Dernier scrape</span>
+                        <strong>
+                            ${escape(
+                                target.lastScrape
+                                || target.last_scrape
+                                || "--"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div class="v3-list-field">
+                        <span>État</span>
+                        <strong>
+                            <span class="v3-badge ${
+                                up ? "success" : "danger"
+                            }">
+                                ${up ? "UP" : "DOWN"}
+                            </span>
+                        </strong>
+                    </div>
+
+                    ${
+                        error
+                            ? `
+                                <div class="v3-list-field optional">
+                                    <span>Erreur</span>
+                                    <strong>${escape(error)}</strong>
+                                </div>
+                            `
+                            : ""
+                    }
+                </article>
+            `;
+        }).join("");
+
+        empty.hidden = targets.length !== 0;
+
+        const upCount = targets.filter(isUp).length;
+
+        document.getElementById(
+            "targets-total"
+        ).textContent = targets.length;
+
+        document.getElementById(
+            "targets-up"
+        ).textContent = upCount;
+
+        document.getElementById(
+            "targets-down"
+        ).textContent = targets.length - upCount;
+
+        document.getElementById(
+            "prometheus-state"
+        ).textContent =
+            targets.length > 0
+            && upCount === targets.length
+                ? "Opérationnel"
+                : targets.length
+                    ? "Dégradé"
+                    : "Indisponible";
+    }
+
+    async function refresh() {
+        try {
+            const response = await fetch(
+                `/api/prometheus/targets?t=${Date.now()}`,
+                { cache: "no-store" }
+            );
+
+            if (!response.ok) {
+                throw new Error("Prometheus indisponible");
+            }
+
+            const payload = await response.json();
+            const targets = getTargets(payload);
+
+            render(targets);
+
+            document.getElementById(
+                "targets-updated"
+            ).textContent =
+                `Actualisé à ${
+                    new Date().toLocaleTimeString("fr-FR")
+                }`;
+        } catch (error) {
+            console.error(error);
+            render([]);
+
+            PortalV3.showToast(
+                "Impossible d’actualiser les targets Prometheus.",
+                "error"
+            );
+        }
+    }
+
+    PortalV3.bindSearch({
+        input: "#target-search",
+        selector: ".target-item",
+        empty: "#targets-empty",
+    });
+
+    refresh();
+    window.setInterval(refresh, 10000);
+});
+</script>
+{% endblock %}
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>

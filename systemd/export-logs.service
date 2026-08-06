@@ -1,0 +1,7 @@
+[Unit]
+Description=Export logs for Secure Infrastructure Dashboard
+After=docker.service nginx.service fail2ban.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/export-logs.sh

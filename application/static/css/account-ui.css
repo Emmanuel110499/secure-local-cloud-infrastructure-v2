@@ -1,0 +1,454 @@
+/* ===== IDENTITÉ VISUELLE DU COMPTE ===== */
+
+.account-symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    color: currentColor;
+}
+
+.account-symbol svg {
+    display: block;
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.account-symbol.brand-mark {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    color: #ffffff;
+    background:
+        linear-gradient(
+            145deg,
+            #1e40af,
+            #3b82f6 58%,
+            #60a5fa
+        );
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 15px;
+    box-shadow:
+        0 12px 25px rgba(37, 99, 235, 0.23),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.account-symbol.brand-mark::after {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    width: 7px;
+    height: 7px;
+    content: "";
+    background: #34d399;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+}
+
+.account-symbol.field-symbol {
+    width: 34px;
+    height: 34px;
+    color: #315fd8;
+    background:
+        linear-gradient(
+            145deg,
+            #e7efff,
+            #f4f7ff
+        );
+    border: 1px solid #d9e4f7;
+    border-radius: 11px;
+}
+
+.account-symbol.card-symbol {
+    width: 40px;
+    height: 40px;
+    color: #315fd8;
+    background:
+        linear-gradient(
+            145deg,
+            #eaf1ff,
+            #f6f8ff
+        );
+    border: 1px solid #dae5f6;
+    border-radius: 13px;
+    box-shadow:
+        0 7px 18px rgba(49, 95, 216, 0.08);
+}
+
+.account-symbol.menu-symbol {
+    width: 28px;
+    height: 28px;
+    color: #52647c;
+    background: #f1f5fa;
+    border: 1px solid #e5eaf1;
+    border-radius: 9px;
+}
+
+.logout-link .account-symbol,
+.mobile-logout-link .account-symbol {
+    color: #b42318;
+    background: #fff1f0;
+    border-color: #fee2e2;
+}
+
+/* Carte de connexion plus raffinée */
+
+.login-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card::before {
+    position: absolute;
+    top: -85px;
+    right: -85px;
+    width: 190px;
+    height: 190px;
+    content: "";
+    background:
+        radial-gradient(
+            circle,
+            rgba(59, 130, 246, 0.13),
+            transparent 68%
+        );
+    pointer-events: none;
+}
+
+.identity,
+.login-card h1,
+.login-card .subtitle,
+.login-card form,
+.login-card .security {
+    position: relative;
+    z-index: 1;
+}
+
+.field {
+    min-height: 54px;
+    padding: 0 10px;
+}
+
+.field input {
+    min-height: 52px;
+}
+
+.login-card button {
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.01em;
+}
+
+.login-card button::after {
+    position: absolute;
+    top: -60%;
+    left: -35%;
+    width: 28%;
+    height: 220%;
+    content: "";
+    background: rgba(255, 255, 255, 0.22);
+    transform: rotate(22deg);
+    transition: left 0.45s ease;
+}
+
+.login-card button:hover::after {
+    left: 115%;
+}
+
+/* Page Compte */
+
+.account-page-avatar {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    color: #ffffff;
+    background:
+        linear-gradient(
+            145deg,
+            #1e40af,
+            #4f7df3
+        );
+    border: 1px solid #c8d8f4;
+    border-radius: 18px;
+    box-shadow:
+        0 13px 25px rgba(49, 95, 216, 0.2);
+    font-size: 1.08rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    content: "";
+    background:
+        linear-gradient(
+            90deg,
+            #315fd8,
+            #60a5fa,
+            transparent
+        );
+}
+
+/* Menus du compte */
+
+.user-menu a,
+.mobile-user-menu a {
+    gap: 9px;
+}
+
+.user-menu a > .account-symbol,
+.mobile-user-menu a > .account-symbol {
+    display: inline-flex;
+}
+
+.user-menu-soft-icon,
+.mobile-account-button > span {
+    font-size: 0;
+}
+
+.user-menu-soft-icon::before,
+.mobile-account-button > span::before {
+    display: block;
+    width: 18px;
+    height: 18px;
+    content: "";
+    background-color: currentColor;
+    mask:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0'/%3E%3C/svg%3E")
+        center / contain no-repeat;
+}
+
+@media (max-width: 520px) {
+    .login-card {
+        padding: 26px 20px;
+        border-radius: 20px;
+    }
+
+    .account-symbol.brand-mark {
+        width: 43px;
+        height: 43px;
+    }
+}
+
+/* ===== MOTS DE PASSE AFFICHABLES ===== */
+
+.field,
+.card {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: #607087;
+    background: #eef3fa;
+    border: 1px solid #dfe6ef;
+    border-radius: 11px;
+    cursor: pointer;
+    transition:
+        color 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.password-toggle:hover {
+    color: #315fd8;
+    background: #e8efff;
+    border-color: #cbd9f3;
+    transform: translateY(-1px);
+}
+
+.password-toggle:focus-visible {
+    outline: 3px solid rgba(49, 95, 216, 0.16);
+    outline-offset: 2px;
+}
+
+.password-toggle svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Connexion */
+
+.login-card .field {
+    position: relative;
+}
+
+.login-card .field input[type="password"],
+.login-card .field input.password-visible {
+    padding-right: 48px;
+}
+
+.login-card .field .password-toggle {
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+}
+
+.login-card .field .password-toggle:hover {
+    transform: translateY(-50%) scale(1.03);
+}
+
+/* Page compte */
+
+.card input[type="password"],
+.card input.password-visible {
+    padding-right: 49px;
+}
+
+.card .password-toggle {
+    right: 30px;
+}
+
+/*
+ * Positionnement selon les champs de la page Compte.
+ * Les boutons suivent directement leurs inputs.
+ */
+
+.card input + .password-toggle {
+    position: relative;
+    float: right;
+    margin-top: -40px;
+    margin-right: 6px;
+    margin-bottom: 4px;
+}
+
+/* ===== VERSION PC ALIGNÉE SUR LE STYLE MOBILE ===== */
+
+@media (min-width: 821px) {
+    .user-box {
+        min-height: 45px;
+        padding: 5px 6px 5px 12px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid #e3e9f2;
+        border-radius: 14px;
+        box-shadow:
+            0 8px 24px rgba(15, 23, 42, 0.07);
+    }
+
+    .user-box > span {
+        max-width: 150px;
+        overflow: hidden;
+        color: #344054;
+        font-size: 0.73rem;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .avatar-button {
+        width: 34px;
+        height: 34px;
+        background:
+            linear-gradient(
+                145deg,
+                #315fd8,
+                #5b83f7
+            );
+        border-radius: 11px;
+        box-shadow:
+            0 8px 17px rgba(49, 95, 216, 0.2);
+    }
+
+    .user-menu {
+        top: calc(100% + 9px);
+        width: 270px;
+        padding: 10px;
+        border-radius: 17px;
+    }
+
+    .user-menu-header {
+        min-height: 61px;
+        padding: 11px;
+        background:
+            linear-gradient(
+                135deg,
+                #f2f6ff,
+                #fafcff
+            );
+        border: 1px solid #edf1f7;
+        border-radius: 13px;
+    }
+
+    .user-menu-soft-icon {
+        width: 38px;
+        height: 38px;
+        color: #315fd8;
+        background: #e6efff;
+        border: 1px solid #d9e4f7;
+        border-radius: 12px;
+    }
+
+    .user-menu a {
+        min-height: 42px;
+        padding: 7px 9px;
+        border-radius: 11px;
+        font-size: 0.7rem;
+    }
+
+    .user-menu a > .account-symbol {
+        width: 29px;
+        height: 29px;
+        color: #52647c;
+        background:
+            linear-gradient(
+                145deg,
+                #f0f4fa,
+                #f8fafc
+            );
+        border: 1px solid #e4eaf1;
+        border-radius: 9px;
+    }
+
+    .user-menu a:hover > .account-symbol {
+        color: #315fd8;
+        background: #e9f0ff;
+        border-color: #d7e2f8;
+    }
+
+    .user-menu .logout-link {
+        margin-top: 2px;
+    }
+
+    .user-menu .logout-link > .account-symbol {
+        color: #b42318;
+        background: #fff1f0;
+        border-color: #fee2e2;
+    }
+}
+
+@media (max-width: 520px) {
+    .password-toggle {
+        width: 34px;
+        height: 34px;
+    }
+
+    .card input + .password-toggle {
+        margin-top: -39px;
+    }
+}

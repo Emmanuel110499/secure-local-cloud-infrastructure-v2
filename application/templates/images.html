@@ -1,0 +1,332 @@
+{% extends "portal_v3_base.html" %}
+
+{% set active_docker_page = "images" %}
+
+{% block title %}Images Docker — Secure Local Cloud{% endblock %}
+{% block breadcrumb %}Docker / Images{% endblock %}
+{% block page_title %}Images Docker{% endblock %}
+
+{% block page_description %}
+Inventaire des images disponibles sur srv-web, avec leur taille,
+leur tag et leur état d’utilisation.
+{% endblock %}
+
+{% block page_icon %}
+<svg viewBox="0 0 24 24">
+    <rect x="3" y="5" width="18" height="14" rx="2"/>
+    <circle cx="8" cy="10" r="1.5"/>
+    <path d="m4 17 5-5 3 3 2-2 6 6"/>
+</svg>
+{% endblock %}
+
+{% block content %}
+<section class="v3-toolbar">
+    <label class="v3-search">
+        <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-4-4"/>
+        </svg>
+
+        <input
+            id="image-search"
+            type="search"
+            placeholder="Rechercher un repository, un tag ou un identifiant…"
+        >
+    </label>
+
+    {% include "_docker_tabs.html" %}
+</section>
+
+<section class="v3-stat-grid">
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Images détectées</span>
+
+            <span class="v3-icon">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                    <path d="m4 17 5-5 3 3 2-2 6 6"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="images-total">{{ images | length }}</strong>
+        <small>Images présentes localement</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Images utilisées</span>
+
+            <span class="v3-icon green">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="images-used">
+            {{ images | selectattr("used") | list | length }}
+        </strong>
+
+        <small>Référencées par un conteneur</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Taille totale</span>
+
+            <span class="v3-icon purple">
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 4h14v16H5Z"/>
+                    <path d="M9 4v16M15 4v16"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="images-size">--</strong>
+        <small>Espace occupé approximatif</small>
+    </article>
+
+    <article class="v3-stat-card">
+        <div class="v3-stat-top">
+            <span>Repository principal</span>
+
+            <span class="v3-icon cyan">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 7h16v13H4Z"/>
+                    <path d="M7 4h10v3H7Z"/>
+                </svg>
+            </span>
+        </div>
+
+        <strong id="images-main" style="font-size:.82rem">
+            {% if images %}
+                {{ images[0].repository }}
+            {% else %}
+                Aucun
+            {% endif %}
+        </strong>
+
+        <small>Première image inventoriée</small>
+    </article>
+</section>
+
+<section class="v3-panel">
+    <header class="v3-panel-header">
+        <div>
+            <h2>Catalogue des images</h2>
+            <p>Actualisation automatique toutes les 10 secondes.</p>
+        </div>
+
+        <span id="images-updated">Chargement…</span>
+    </header>
+
+    <div
+        id="images-grid"
+        class="v3-card-grid"
+    >
+        {% for image in images %}
+            <article class="v3-resource-card image-card">
+                <header class="v3-resource-header">
+                    <div class="v3-resource-identity">
+                        <span class="v3-icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                                <path d="m4 17 5-5 3 3 2-2 6 6"/>
+                            </svg>
+                        </span>
+
+                        <div style="min-width:0">
+                            <strong>{{ image.repository }}</strong>
+                            <span>{{ image.id }}</span>
+                        </div>
+                    </div>
+
+                    <span class="v3-badge {% if image.used %}success{% endif %}">
+                        {% if image.used %}Utilisée{% else %}Disponible{% endif %}
+                    </span>
+                </header>
+
+                <div class="v3-detail-grid">
+                    <div class="v3-detail">
+                        <span>Tag</span>
+                        <strong>{{ image.tag }}</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Taille</span>
+                        <strong>{{ image.size_mb }} Mo</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Créée le</span>
+                        <strong>{{ image.created }}</strong>
+                    </div>
+
+                    <div class="v3-detail">
+                        <span>Identifiant</span>
+                        <strong>{{ image.id }}</strong>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+
+    <div
+        id="images-empty"
+        class="v3-empty"
+        {% if images %}hidden{% endif %}
+    >
+        <span class="v3-empty-icon">
+            <svg viewBox="0 0 24 24">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="M8 9h.01M5 17l4-4 3 3"/>
+            </svg>
+        </span>
+
+        <h3>Aucune image Docker trouvée</h3>
+
+        <p>
+            Les images téléchargées ou construites apparaîtront
+            automatiquement dans cette page.
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("images-grid");
+    const empty = document.getElementById("images-empty");
+    let images = {{ images | tojson }};
+
+    function render(items) {
+        const escape = PortalV3.escapeHtml;
+
+        if (!items.length) {
+            grid.innerHTML = "";
+            empty.hidden = false;
+        } else {
+            empty.hidden = true;
+
+            grid.innerHTML = items.map((image) => `
+                <article class="v3-resource-card image-card">
+                    <header class="v3-resource-header">
+                        <div class="v3-resource-identity">
+                            <span class="v3-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                                    <path d="m4 17 5-5 3 3 2-2 6 6"/>
+                                </svg>
+                            </span>
+
+                            <div style="min-width:0">
+                                <strong>${escape(image.repository)}</strong>
+                                <span>${escape(image.id)}</span>
+                            </div>
+                        </div>
+
+                        <span class="v3-badge ${image.used ? "success" : ""}">
+                            ${image.used ? "Utilisée" : "Disponible"}
+                        </span>
+                    </header>
+
+                    <div class="v3-detail-grid">
+                        <div class="v3-detail">
+                            <span>Tag</span>
+                            <strong>${escape(image.tag)}</strong>
+                        </div>
+
+                        <div class="v3-detail">
+                            <span>Taille</span>
+                            <strong>${PortalV3.number(image.size_mb)} Mo</strong>
+                        </div>
+
+                        <div class="v3-detail">
+                            <span>Créée le</span>
+                            <strong>${escape(image.created)}</strong>
+                        </div>
+
+                        <div class="v3-detail">
+                            <span>Identifiant</span>
+                            <strong>${escape(image.id)}</strong>
+                        </div>
+                    </div>
+                </article>
+            `).join("");
+        }
+
+        const totalSize = items.reduce(
+            (total, image) =>
+                total + Number(image.size_mb || 0),
+            0
+        );
+
+        document.getElementById("images-total").textContent =
+            items.length;
+
+        document.getElementById("images-used").textContent =
+            items.filter((image) => image.used).length;
+
+        document.getElementById("images-size").textContent =
+            `${totalSize.toFixed(1)} Mo`;
+
+        document.getElementById("images-main").textContent =
+            items[0]?.repository || "Aucun";
+    }
+
+    async function refresh() {
+        try {
+            const response = await fetch(
+                `/api/docker/images?t=${Date.now()}`,
+                { cache: "no-store" }
+            );
+
+            if (!response.ok) {
+                throw new Error("API Docker indisponible");
+            }
+
+            const payload = await response.json();
+
+            images = Array.isArray(payload.images)
+                ? payload.images
+                : [];
+
+            render(images);
+
+            document.getElementById(
+                "images-updated"
+            ).textContent =
+                `Actualisé à ${
+                    new Date(
+                        payload.updated_at
+                    ).toLocaleTimeString("fr-FR")
+                }`;
+        } catch (error) {
+            console.error(error);
+            PortalV3.showToast(
+                "Impossible d’actualiser les images Docker.",
+                "error"
+            );
+        }
+    }
+
+    PortalV3.bindSearch({
+        input: "#image-search",
+        selector: ".image-card",
+        empty: "#images-empty",
+    });
+
+    render(images);
+    window.setInterval(refresh, 10000);
+});
+</script>
+{% endblock %}
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>

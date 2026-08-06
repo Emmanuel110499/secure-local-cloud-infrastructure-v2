@@ -1,0 +1,37 @@
+groups:
+  - name: infrastructure
+
+    rules:
+
+      - alert: TargetDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service indisponible"
+          description: "{{ $labels.job }} est DOWN"
+
+      - alert: HighCPU
+        expr: 100 - (avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU élevé"
+
+      - alert: HighMemory
+        expr: (1-node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes)*100 > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Mémoire élevée"
+
+      - alert: HighDisk
+        expr: 100*(1-node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}/node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}) > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disque presque plein"

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Connexion — Secure Local Cloud</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            color: #172033;
+            background:
+                radial-gradient(
+                    circle at 15% 10%,
+                    #dbeafe 0,
+                    transparent 34%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    #e0e7ff 0,
+                    transparent 32%
+                ),
+                #f4f7fb;
+            font-family:
+                Inter,
+                Arial,
+                sans-serif;
+        }
+
+        .login-card {
+            width: min(430px, 100%);
+            padding: 34px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid #e5eaf2;
+            border-radius: 24px;
+            box-shadow:
+                0 24px 70px rgba(15, 23, 42, 0.12);
+        }
+
+        .identity {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .identity-icon {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #e0ecff,
+                    #edf2ff
+                );
+            border: 1px solid #d7e3f7;
+            border-radius: 17px;
+            font-size: 1.45rem;
+        }
+
+        .identity strong,
+        .identity span {
+            display: block;
+        }
+
+        .identity strong {
+            color: #10203a;
+            font-size: 1rem;
+        }
+
+        .identity span {
+            margin-top: 4px;
+            color: #6b7a90;
+            font-size: 0.72rem;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.7rem;
+        }
+
+        .subtitle {
+            margin: 0 0 25px;
+            color: #6b7a90;
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 17px;
+            padding: 0 13px;
+            background: #f8fafc;
+            border: 1px solid #dde5ef;
+            border-radius: 13px;
+            transition: 0.2s ease;
+        }
+
+        .field:focus-within {
+            background: #ffffff;
+            border-color: #4f7df3;
+            box-shadow:
+                0 0 0 4px rgba(79, 125, 243, 0.1);
+        }
+
+        .field-icon {
+            display: grid;
+            place-items: center;
+            width: 31px;
+            height: 31px;
+            background: #eaf1ff;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            min-height: 48px;
+            padding: 0;
+            color: #172033;
+            background: transparent;
+            border: 0;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        button {
+            width: 100%;
+            min-height: 49px;
+            margin-top: 5px;
+            color: #ffffff;
+            background:
+                linear-gradient(
+                    135deg,
+                    #315fd8,
+                    #4f7df3
+                );
+            border: 0;
+            border-radius: 13px;
+            box-shadow:
+                0 12px 25px rgba(49, 95, 216, 0.2);
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .alert {
+            margin-bottom: 17px;
+            padding: 11px 13px;
+            border-radius: 11px;
+            font-size: 0.78rem;
+        }
+
+        .alert-danger {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .alert-success {
+            color: #047857;
+            background: #dcfce7;
+        }
+
+        .security {
+            margin-top: 20px;
+            color: #8290a3;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+    </style>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/account-ui.css', v='desktop-mobile-account-5') }}"
+    >
+<link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/portal-v4.css', v='portal-v4-7') }}"
+    >
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/premium-global-polish.css',
+        v='sections-tables-20260804-131446'
+    ) }}"
+>
+
+</head>
+
+<body class="portal-v4">
+    <main class="login-card">
+        <div class="identity">
+            
+<span class="account-symbol brand-mark" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <path d="M7.5 17.5h9.2a4.3 4.3 0 0 0 .7-8.5A6.1 6.1 0 0 0 6 8.3a4.7 4.7 0 0 0 1.5 9.2Z"/>
+        <path d="M9 13h6M10.5 10.5h3M10.5 15.5h3"/>
+    </svg>
+</span>
+
+            <div>
+                <strong>Secure Local Cloud</strong>
+                <span>Infrastructure & Supervision</span>
+            </div>
+        </div>
+
+        <h1>Bienvenue 👋</h1>
+
+        <p class="subtitle">
+            Connectez-vous pour accéder à votre plateforme
+            sécurisée de supervision.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="post">
+            <label for="username">
+                Identifiant
+            </label>
+
+            <div class="field">
+                
+<span class="account-symbol field-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="3.6"/>
+        <path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>
+    </svg>
+</span>
+
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Votre identifiant"
+                    autocomplete="username"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <label for="password">
+                Mot de passe
+            </label>
+
+            <div class="field">
+                
+<span class="account-symbol field-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+        <circle cx="8" cy="12" r="3.5"/>
+        <path d="M11.5 12H21M17 12v3M20 12v2"/>
+    </svg>
+</span>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Votre mot de passe"
+                    autocomplete="current-password"
+                    required
+                >
+<button
+    class="password-toggle"
+    type="button"
+    aria-label="Afficher le mot de passe"
+    title="Afficher le mot de passe"
+>
+    <svg
+        class="password-eye-open"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+        <circle cx="12" cy="12" r="2.8"/>
+    </svg>
+
+    <svg
+        class="password-eye-closed"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        hidden
+    >
+        <path d="M3 3l18 18"/>
+        <path d="M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.5 15.5 0 0 1-2.7 3.3"/>
+        <path d="M6.1 6.1C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9.9 9.9 0 0 0 3.2-.5"/>
+        <path d="M9.8 9.8a3 3 0 0 0 4.4 4.4"/>
+    </svg>
+</button>
+
+            </div>
+
+            <button type="submit">
+                Se connecter
+            </button>
+        </form>
+
+        <div class="security">
+            🔒 Session Flask sécurisée et connexion HTTPS
+        </div>
+    </main>
+
+    <script
+        src="{{ url_for('static', filename='js/password-toggle.js', v='2') }}"
+    ></script>
+
+<script
+        src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
+        defer
+    ></script>
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/recent-pages.js',
+        v='recent-global-20260804-002621'
+    ) }}"
+></script>
+
+</body>
+</html>

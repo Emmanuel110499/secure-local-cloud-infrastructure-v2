@@ -1,0 +1,153 @@
+.docker-donut-layout {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 36px !important;
+    min-height: 230px !important;
+    padding: 22px !important;
+    background: linear-gradient(
+        135deg,
+        #f8fbff,
+        #eef5ff
+    ) !important;
+    border-radius: 18px !important;
+}
+
+.docker-donut {
+    position: relative !important;
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 145px !important;
+    width: 145px !important;
+    height: 145px !important;
+    background: conic-gradient(
+        #10b981 0deg 290deg,
+        #dbe3ee 290deg 360deg
+    ) !important;
+    border-radius: 50% !important;
+    box-shadow:
+        0 14px 30px rgba(16, 185, 129, 0.18) !important;
+}
+
+.docker-donut::before {
+    position: absolute !important;
+    width: 88px !important;
+    height: 88px !important;
+    content: "" !important;
+    background: #ffffff !important;
+    border-radius: 50% !important;
+    box-shadow:
+        inset 0 0 0 1px #e5eaf1 !important;
+}
+
+.docker-donut-center {
+    position: relative !important;
+    z-index: 2 !important;
+    text-align: center !important;
+}
+
+.docker-donut-center strong,
+.docker-donut-center span {
+    display: block !important;
+}
+
+.docker-donut-center strong {
+    color: #0f172a !important;
+    font-size: 1.9rem !important;
+    font-weight: 800 !important;
+}
+
+.docker-donut-center span {
+    margin-top: 3px !important;
+    color: #64748b !important;
+    font-size: 0.7rem !important;
+}
+
+.docker-legend {
+    display: flex !important;
+    flex: 0 1 190px !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+.docker-legend > div {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto !important;
+    align-items: center !important;
+    gap: 9px !important;
+    color: #64748b !important;
+    font-size: 0.78rem !important;
+}
+
+.docker-legend strong {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+.docker-legend-dot {
+    display: block !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+}
+
+.docker-legend-dot.active {
+    background: #10b981 !important;
+}
+
+.docker-legend-dot.stopped {
+    background: #cbd5e1 !important;
+}
+
+.docker-legend-dot.total {
+    background: #2563eb !important;
+}
+
+@media (max-width: 820px) {
+    .docker-donut-layout {
+        gap: 20px !important;
+        min-height: 145px !important;
+        padding: 13px !important;
+    }
+
+    .docker-donut {
+        flex-basis: 105px !important;
+        width: 105px !important;
+        height: 105px !important;
+    }
+
+    .docker-donut::before {
+        width: 64px !important;
+        height: 64px !important;
+    }
+
+    .docker-donut-center strong {
+        font-size: 1.3rem !important;
+    }
+
+    .docker-legend {
+        gap: 9px !important;
+    }
+
+    .docker-legend > div {
+        font-size: 0.62rem !important;
+    }
+}
+
+@media (max-width: 430px) {
+    .docker-donut-layout {
+        justify-content: space-between !important;
+        gap: 12px !important;
+    }
+
+    .docker-donut {
+        flex-basis: 92px !important;
+        width: 92px !important;
+        height: 92px !important;
+    }
+
+    .docker-donut::before {
+        width: 57px !important;
+        height: 57px !important;
+    }
+}
