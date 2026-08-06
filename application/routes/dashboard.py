@@ -41,6 +41,10 @@ def get_complete_services_status() -> dict:
             current_app.config["GRAFANA_URL"]
             + "/api/health"
         ),
+        "alertmanager": security.check_http_service(
+            current_app.config["ALERTMANAGER_URL"]
+            + "/-/healthy"
+        ),
     })
 
     return services
@@ -201,8 +205,31 @@ def api_equipment_metrics(equipment_id: str):
             "equipment_id": equipment_id,
         }), 404
 
+    platform_services = get_complete_services_status()
+    service_names = {
+        "srv-web": ("flask", "node_exporter", "cadvisor"),
+        "srv-monitoring": ("prometheus", "grafana", "alertmanager"),
+        "pc-emmanuel": ("windows_exporter", "battery_collector"),
+    }.get(equipment_id, ())
+
+    if equipment_id == "pc-emmanuel":
+        battery = result.get("metrics", {}).get("battery") or {}
+        contextual_services = {
+            "windows_exporter": result.get("state") == "up",
+            "battery_collector": (
+                battery.get("collector_age_seconds") is not None
+                and battery.get("collector_age_seconds") < 180
+            ),
+        }
+    else:
+        contextual_services = {
+            name: platform_services.get(name)
+            for name in service_names
+        }
+
     return jsonify({
         **result,
+        "services": contextual_services,
         "updated_at": datetime.now().isoformat(),
     })
 

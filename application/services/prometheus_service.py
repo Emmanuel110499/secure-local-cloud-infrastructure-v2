@@ -222,6 +222,12 @@ class PrometheusService:
         )
         load = self.query_scalar(f'node_load1{{{labels}}}')
         processes = self.query_scalar(f'node_procs_running{{{labels}}}')
+        disk_total = self.query_scalar(
+            f'node_filesystem_size_bytes{{{labels},mountpoint="/",fstype!~"tmpfs|overlay"}}'
+        )
+        disk_available = self.query_scalar(
+            f'node_filesystem_avail_bytes{{{labels},mountpoint="/",fstype!~"tmpfs|overlay"}}'
+        )
 
         result = self._common_metrics(
             cpu, memory, disk, uptime, receive, transmit
@@ -229,6 +235,8 @@ class PrometheusService:
         result.update({
             "load_1m": self._metric_value(load, 2),
             "processes": int(processes) if processes is not None else None,
+            "disk_total_bytes": disk_total,
+            "disk_available_bytes": disk_available,
         })
 
         docker_job = equipment.get("docker_job")
@@ -293,6 +301,12 @@ class PrometheusService:
         transmit = self.query_scalar(
             f'sum(rate(windows_net_bytes_sent_total{{{labels}}}[1m]))'
         )
+        disk_total = self.query_scalar(
+            f'windows_logical_disk_size_bytes{{{labels},volume="C:"}}'
+        )
+        disk_available = self.query_scalar(
+            f'windows_logical_disk_free_bytes{{{labels},volume="C:"}}'
+        )
         result = self._common_metrics(
             cpu, memory, disk, uptime, receive, transmit
         )
@@ -325,6 +339,8 @@ class PrometheusService:
             "collector_last_success_unixtime": collector_time,
             "collector_age_seconds": self._metric_value(collector_age, 0),
         }
+        result["disk_total_bytes"] = disk_total
+        result["disk_available_bytes"] = disk_available
         return result
 
     def _common_metrics(

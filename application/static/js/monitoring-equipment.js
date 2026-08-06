@@ -47,16 +47,33 @@
         setText("kpi-memory", value(metrics.memory));
         setText("kpi-disk", value(metrics.disk));
         setText("kpi-network", metrics.network_receive_kbps == null ? "—" : `${metrics.network_receive_kbps.toFixed(1)} Ko/s`);
+        setText("kpi-load", metrics.load_1m == null ? "—" : Number(metrics.load_1m).toFixed(2));
         setText("kpi-uptime", metrics.uptime || "—");
         setText("chart-cpu-current", value(metrics.cpu));
         setText("chart-memory-current", value(metrics.memory));
         setText("chart-disk-current", value(metrics.disk));
         setText("detail-title", equipment.name);
         setText("detail-subtitle", equipment.role);
-        setText("detail-os", equipment.os === "windows" ? "Windows" : "Linux");
+        setText("detail-os", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Linux + Windows" : "Linux");
         setText("detail-state", item.state === "up" ? "Opérationnel" : item.state === "down" ? "Indisponible" : "Inconnu");
         setText("detail-source", equipment.id === "pc-emmanuel" ? "Windows Exporter → Prometheus" : "Node Exporter → Prometheus");
         setText("detail-updated", new Date(updatedAt).toLocaleTimeString("fr-FR"));
+        setText("os-badge", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Multi-équipement" : "Linux");
+        setText("online-badge", item.state === "up" ? "● En ligne" : "● État partiel");
+        setText("system-name", equipment.name);
+        setText("system-role", equipment.role);
+        setText("system-os", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Linux + Windows" : "Linux");
+        setText("system-exporter", equipment.id === "pc-emmanuel" ? "Windows Exporter" : equipment.os === "multi" ? "Prometheus" : "Node Exporter");
+        const total = Number(metrics.disk_total_bytes);
+        const available = Number(metrics.disk_available_bytes);
+        const used = total - available;
+        const bytes = amount => Number.isFinite(amount) ? `${(amount / 1073741824).toFixed(1)} Gio` : "—";
+        setText("storage-volume", equipment.os === "windows" ? "Disque système" : "Système racine");
+        setText("storage-mount", equipment.os === "windows" ? "C:" : "/");
+        setText("storage-used", bytes(used));
+        setText("storage-total", bytes(total));
+        setText("storage-percent", value(metrics.disk));
+        $("storage-bar").style.width = Number.isFinite(Number(metrics.disk)) ? `${Math.min(100, Number(metrics.disk))}%` : "0";
         const battery = metrics.battery;
         $("battery-kpi").hidden = !battery;
         if (battery) {
@@ -66,10 +83,24 @@
     }
 
     function renderInventory(items) {
-        $("equipment-list").innerHTML = items.map(item => `
+        $("service-list").innerHTML = items.map(item => `
             <div class="equipment-row ${item.state}">
                 <i></i><div><b>${item.equipment.name}</b><small>${item.equipment.role}</small></div>
                 <span>${item.state === "up" ? "OPÉRATIONNEL" : item.state.toUpperCase()}</span>
+            </div>`).join("");
+    }
+
+    function renderServices(services) {
+        const labels = {
+            flask: "Application Flask", node_exporter: "Node Exporter",
+            cadvisor: "cAdvisor", prometheus: "Prometheus", grafana: "Grafana",
+            alertmanager: "Alertmanager", windows_exporter: "Windows Exporter",
+            battery_collector: "Collecteur batterie"
+        };
+        $("service-list").innerHTML = Object.entries(services || {}).map(([name, status]) => `
+            <div class="equipment-row ${status === false ? "down" : "up"}">
+                <i></i><div><b>${labels[name] || name}</b><small>Service supervisé</small></div>
+                <span>${status === true ? "OPÉRATIONNEL" : status === false ? "INDISPONIBLE" : "INCONNU"}</span>
             </div>`).join("");
     }
 
@@ -79,7 +110,7 @@
         renderInventory(state.inventory);
         const up = state.inventory.filter(item => item.state === "up").length;
         const metrics = key => average(state.inventory.map(item => Number(item.metrics?.[key])).filter(Number.isFinite));
-        const representative = { equipment: { name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: metrics("disk"), network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Vue consolidée" } };
+        const representative = { equipment: { id: "global", name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: metrics("disk"), network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Consolidé", load_1m: null } };
         updateDetails(representative, payload.updated_at);
         setText("detail-title", "Équipements supervisés");
         setText("detail-subtitle", `${up}/${state.inventory.length} disponibles`);
@@ -94,7 +125,7 @@
             json(`/api/equipment/${id}/history?hours=${state.hours}`)
         ]);
         updateDetails(current, current.updated_at);
-        renderInventory(state.inventory.length ? state.inventory : [current]);
+        renderServices(current.services);
         ["cpu", "memory", "disk"].forEach(name => updateChart(name, history.series?.[name] || []));
         const count = Math.max(...["cpu", "memory", "disk"].map(name => history.series?.[name]?.length || 0));
         setText("sample-count", `${count} points sur ${state.hours === 168 ? "7 jours" : `${state.hours} h`}`);

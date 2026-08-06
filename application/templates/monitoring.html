@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Monitoring multi-équipement — Secure Local Cloud</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment.css', v='multi-v1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment-refined.css', v='multi-v2') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -26,7 +27,7 @@
 
 <main class="workspace">
     <header class="page-head">
-        <div><p class="breadcrumb">Monitoring / <span id="breadcrumb-equipment">Vue globale</span></p><h1 id="equipment-title">Vue globale</h1><p id="equipment-role">État consolidé de l’infrastructure</p></div>
+        <div><p class="breadcrumb">Monitoring / <span id="breadcrumb-equipment">Vue globale</span></p><div class="title-line"><span class="equipment-icon">▤</span><h1 id="equipment-title">Vue globale</h1><span class="os-badge" id="os-badge">Multi-équipement</span><span class="online-badge" id="online-badge">● En ligne</span></div><p id="equipment-role">État consolidé de l’infrastructure</p></div>
         <div class="equipment-tabs" id="equipment-tabs">
             <button class="active" data-equipment="global">Vue globale</button>
             <button data-equipment="srv-web">srv-web</button>
@@ -47,6 +48,7 @@
         <article><span>RAM</span><strong id="kpi-memory">—</strong><small>Mémoire utilisée</small></article>
         <article><span>Disque</span><strong id="kpi-disk">—</strong><small>Partition principale</small></article>
         <article><span>Réseau</span><strong id="kpi-network">—</strong><small>Réception instantanée</small></article>
+        <article><span>Charge</span><strong id="kpi-load">—</strong><small>Charge système</small></article>
         <article><span>Uptime</span><strong id="kpi-uptime">—</strong><small>Depuis le dernier démarrage</small></article>
         <article id="battery-kpi" hidden><span>Batterie</span><strong id="kpi-battery">—</strong><small id="battery-state">État électrique</small></article>
     </section>
@@ -63,7 +65,7 @@
 
         <aside class="detail-panel">
             <div class="section-title"><div><h2 id="detail-title">Équipements</h2><p id="detail-subtitle">Disponibilité instantanée</p></div></div>
-            <div id="equipment-list" class="equipment-list"></div>
+            <div id="service-list" class="equipment-list"></div>
             <dl class="technical-details">
                 <div><dt>Système</dt><dd id="detail-os">—</dd></div>
                 <div><dt>État</dt><dd id="detail-state">—</dd></div>
@@ -72,6 +74,26 @@
             </dl>
         </aside>
     </section>
+
+    <section class="bottom-grid">
+        <article class="storage-panel">
+            <div class="section-title"><div><h2>Stockage persistant</h2><p>Capacité réellement mesurée sur le stockage principal.</p></div></div>
+            <div class="storage-table">
+                <div class="storage-head"><span>Volume</span><span>Point de montage</span><span>Utilisé</span><span>Capacité</span><span>Occupation</span></div>
+                <div class="storage-row"><b id="storage-volume">Système</b><code id="storage-mount">/</code><span id="storage-used">—</span><span id="storage-total">—</span><span><i><em id="storage-bar"></em></i><b id="storage-percent">—</b></span></div>
+            </div>
+        </article>
+        <article class="system-panel">
+            <div class="section-title"><div><h2>Informations système</h2><p>Identité de la source supervisée.</p></div></div>
+            <dl class="technical-details compact">
+                <div><dt>Équipement</dt><dd id="system-name">—</dd></div>
+                <div><dt>Rôle</dt><dd id="system-role">—</dd></div>
+                <div><dt>Système</dt><dd id="system-os">—</dd></div>
+                <div><dt>Collecteur</dt><dd id="system-exporter">—</dd></div>
+            </dl>
+        </article>
+    </section>
+    <footer class="scrape-footer"><span><i></i> Dernière collecte réussie</span><span id="footer-source">Source : Prometheus</span></footer>
 </main>
 <script src="{{ url_for('static', filename='js/monitoring-equipment.js', v='multi-v1') }}"></script>
 </body>
