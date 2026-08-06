@@ -29,6 +29,8 @@ flowchart LR
 
 Les composants peuvent etre repartis sur deux machines : un serveur web pour Nginx et Flask, et un serveur de monitoring pour Prometheus, Grafana et Alertmanager. Les adresses presentes dans les fichiers Compose sont des exemples issus du reseau local d'origine.
 
+Une [architecture cible a grande echelle](docs/ARCHITECTURE.md#architecture-cible-a-grande-echelle) documente l'evolution possible vers plusieurs sites, des Prometheus regionaux, un stockage distribue, un cluster Alertmanager et une authentification centralisee.
+
 ## Arborescence utile
 
 ```text
