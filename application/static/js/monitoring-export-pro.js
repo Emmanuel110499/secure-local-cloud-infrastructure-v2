@@ -123,7 +123,11 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    function createProfessionalReport() {
+    function createProfessionalReport(orientation = "landscape") {
+        const printOrientation =
+            orientation === "portrait"
+                ? "portrait"
+                : "landscape";
         const reportWindow = window.open(
             "",
             "_blank",
@@ -203,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <style>
         @page {
-            size: A4 landscape;
+            size: A4 ${printOrientation};
             margin: 7mm;
         }
 
@@ -546,6 +550,78 @@ document.addEventListener("DOMContentLoaded", () => {
             color: #3567e8;
         }
 
+        /* Les accents restent visibles même si les fonds sont atténués. */
+        .report-header {
+            border: 3px solid #214fb9;
+        }
+
+        .overview-card:nth-child(1) {
+            border-left: 5px solid #3567e8;
+        }
+
+        .overview-card:nth-child(2) {
+            border-left: 5px solid #4f6df5;
+        }
+
+        .overview-card:nth-child(3) {
+            border-left: 5px solid #10a87f;
+        }
+
+        .overview-card:nth-child(4) {
+            border-left: 5px solid #e9810b;
+        }
+
+        body.orientation-portrait .report {
+            max-width: 760px;
+        }
+
+        body.orientation-portrait .report-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        body.orientation-portrait .report-meta {
+            text-align: left;
+        }
+
+        body.orientation-portrait .overview {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        body.orientation-portrait .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+
+        body.orientation-portrait .metric-card {
+            display: grid;
+            grid-template-columns: minmax(135px, 0.7fr) minmax(0, 1.8fr);
+            align-items: center;
+        }
+
+        body.orientation-portrait .metric-header {
+            align-self: stretch;
+            flex-direction: column;
+            justify-content: center;
+            padding: 14px;
+        }
+
+        body.orientation-portrait .metric-chart {
+            height: 150px;
+        }
+
+        body.orientation-portrait .metric-chart img {
+            height: 142px;
+        }
+
+        body.orientation-portrait .metric-stats {
+            grid-column: 1 / -1;
+            padding: 0 10px 10px;
+        }
+
+        body.orientation-landscape .metrics-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
         @media print {
             html,
             body {
@@ -638,7 +714,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </style>
 </head>
 
-<body>
+<body class="orientation-${printOrientation}">
     <main class="report">
         <header class="report-header">
             <div class="brand">
@@ -800,61 +876,20 @@ document.addEventListener("DOMContentLoaded", () => {
         reportWindow.document.close();
     }
 
-    function installProfessionalExport() {
-        const currentButton =
-            document.getElementById("cm-export");
-
-        if (!currentButton) {
-            window.setTimeout(
-                installProfessionalExport,
-                300
-            );
-
-            return;
-        }
-
-        if (
-            currentButton.dataset.exportMode
-            === "professional"
-        ) {
-            return;
-        }
-
-        const replacement =
-            currentButton.cloneNode(true);
-
-        replacement.dataset.exportMode =
-            "professional";
-
-        replacement.innerHTML = `
-            <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-            >
-                <path d="M6 2h8l4 4v16H6z"></path>
-                <path d="M14 2v5h5"></path>
-                <path d="M9 13h6"></path>
-                <path d="M9 17h6"></path>
-            </svg>
-
-            <span>Rapport PDF</span>
-        `;
-
-        currentButton.replaceWith(replacement);
-
-        replacement.addEventListener(
-            "click",
-            createProfessionalReport
+    document.addEventListener("click", event => {
+        const button = event.target.closest(
+            "[data-print-orientation]"
         );
-    }
 
-    window.setTimeout(
-        installProfessionalExport,
-        200
-    );
+        if (!button) {
+            return;
+        }
 
-    window.setTimeout(
-        installProfessionalExport,
-        800
-    );
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        createProfessionalReport(
+            button.dataset.printOrientation
+        );
+    }, true);
 });

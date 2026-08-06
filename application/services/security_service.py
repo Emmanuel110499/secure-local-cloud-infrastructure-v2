@@ -37,6 +37,20 @@ class SecurityService:
             return False
 
     @staticmethod
+    def check_http_service_status(url: str) -> str:
+        """Distingue un service UP, DOWN et impossible à vérifier."""
+
+        try:
+            response = requests.get(
+                url,
+                timeout=4,
+            )
+        except requests.RequestException:
+            return "unknown"
+
+        return "up" if response.status_code < 500 else "down"
+
+    @staticmethod
     def check_tcp_service(
         host: str,
         port: int,

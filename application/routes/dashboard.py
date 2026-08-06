@@ -172,6 +172,41 @@ def api_metrics_history():
     })
 
 
+@dashboard_bp.route("/api/equipment")
+@login_required
+def api_equipment():
+    """Catalogue et état actuel de tous les équipements."""
+
+    prometheus = current_app.extensions["prometheus_service"]
+    equipment = prometheus.get_all_equipment_metrics()
+
+    return jsonify({
+        "equipment": equipment,
+        "count": len(equipment),
+        "updated_at": datetime.now().isoformat(),
+    })
+
+
+@dashboard_bp.route("/api/equipment/<equipment_id>/metrics")
+@login_required
+def api_equipment_metrics(equipment_id: str):
+    """KPI actuels d'un équipement configuré."""
+
+    prometheus = current_app.extensions["prometheus_service"]
+    result = prometheus.get_equipment_metrics(equipment_id)
+
+    if result is None:
+        return jsonify({
+            "error": "Équipement inconnu.",
+            "equipment_id": equipment_id,
+        }), 404
+
+    return jsonify({
+        **result,
+        "updated_at": datetime.now().isoformat(),
+    })
+
+
 @dashboard_bp.route("/api/health-score")
 @login_required
 def api_health_score():
@@ -198,5 +233,4 @@ def api_health_score():
             containers=containers,
         )
     )
-
 

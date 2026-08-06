@@ -19,10 +19,11 @@
 
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
 
-    min-height: 56px;
-    padding: 8px 16px 8px 9px;
+    width: 58px;
+    height: 58px;
+    padding: 9px;
 
     color: #ffffff;
     background:
@@ -94,7 +95,7 @@
     position: fixed;
     right: 24px;
     bottom: 94px;
-    z-index: 10049;
+    z-index: 13050;
 
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto auto;
@@ -527,23 +528,53 @@
     }
 
     .emma-chat-panel {
-        right: 10px;
-        bottom: 139px;
+        top: max(118px, calc(env(safe-area-inset-top) + 94px));
+        right: 12px;
+        bottom: auto;
+        z-index: 13050;
 
-        width: calc(100vw - 20px);
-        height: min(520px, calc(100dvh - 165px));
+        width: calc(100vw - 24px);
+        height: min(64dvh, 560px);
+        max-height: calc(100dvh - 205px);
 
         border-radius: 20px;
     }
 
     .emma-chat-header {
-        padding: 11px 12px;
+        position: relative;
+        z-index: 2;
+        min-height: 62px;
+        padding: 9px 10px;
+    }
+
+    .emma-chat-header-actions {
+        position: relative;
+        z-index: 3;
+        flex: 0 0 auto;
+        gap: 7px;
+    }
+
+    .emma-chat-header-button {
+        width: 36px;
+        height: 36px;
+        border-color: rgba(255, 255, 255, 0.34);
+        font-size: 19px;
+    }
+
+    #emma-chat-close {
+        display: grid !important;
+        width: 36px;
+        height: 36px;
+        color: #ffffff;
+        background: rgba(8, 22, 58, 0.28);
+        border-color: rgba(255, 255, 255, 0.38);
+        font-size: 22px;
     }
 
     .emma-chat-avatar {
-        flex-basis: 39px;
-        width: 39px;
-        height: 39px;
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
         border-radius: 12px;
     }
 
@@ -558,11 +589,30 @@
     }
 
     .emma-chat-suggestions {
-        padding-inline: 10px;
+        max-height: 112px;
+        padding: 7px 9px;
+        overflow-y: auto;
+    }
+
+    .emma-chat-chips {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        overflow: visible;
+    }
+
+    .emma-chat-chip {
+        width: 100%;
+        min-height: 32px;
+        padding: 5px 7px;
+        overflow: hidden;
+        font-size: 0.63rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .emma-chat-composer {
-        padding: 8px 9px 9px;
+        padding: 7px 8px 8px;
     }
 }
 
@@ -583,4 +633,51 @@
         pointer-events: none !important;
         transform: translateY(12px) !important;
     }
+}
+.emma-chat-details {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.emma-chat-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.emma-chat-badges span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(53, 103, 232, 0.1);
+    color: #315bbd;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.emma-chat-details small {
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.emma-chat-followups {
+    display: grid;
+    gap: 6px;
+}
+
+.emma-chat-followups button {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid rgba(53, 103, 232, 0.22);
+    border-radius: 9px;
+    background: rgba(53, 103, 232, 0.06);
+    color: #315bbd;
+    text-align: left;
+    cursor: pointer;
+}
+
+.emma-chat-followups button:hover {
+    background: rgba(53, 103, 232, 0.12);
 }

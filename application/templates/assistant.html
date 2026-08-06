@@ -813,6 +813,7 @@ padding:10px!important;
     ) }}"
 >
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/product-system.css', v='product-v2-1') }}">
 </head>
 
 <body class="portal-v4 portal-body">
@@ -1365,7 +1366,26 @@ padding:10px!important;
             const storageKey =
                 "emma_ia_conversation_v4";
 
+            const historyRetentionMs =
+                24 * 60 * 60 * 1000;
+
+            const maxStoredMessages = 40;
+
             let conversation = [];
+
+            function persistConversation() {
+                conversation = conversation.slice(
+                    -maxStoredMessages
+                );
+
+                localStorage.setItem(
+                    storageKey,
+                    JSON.stringify({
+                        savedAt: Date.now(),
+                        messages: conversation,
+                    })
+                );
+            }
 
             function currentTime() {
                 return new Date().toLocaleTimeString(
@@ -1464,10 +1484,7 @@ padding:10px!important;
                         time,
                     });
 
-                    localStorage.setItem(
-                        storageKey,
-                        JSON.stringify(conversation)
-                    );
+                    persistConversation();
                 }
 
                 return wrapper;
@@ -1520,16 +1537,26 @@ padding:10px!important;
                     const saved = JSON.parse(
                         localStorage.getItem(
                             storageKey
-                        ) || "[]"
+                        ) || "null"
                     );
 
-                    if (!Array.isArray(saved)) {
+                    const isFresh = (
+                        saved
+                        && Number.isFinite(saved.savedAt)
+                        && Date.now() - saved.savedAt
+                            <= historyRetentionMs
+                        && Array.isArray(saved.messages)
+                    );
+
+                    if (!isFresh) {
                         throw new Error(
-                            "Historique incorrect"
+                            "Historique absent ou expiré"
                         );
                     }
 
-                    conversation = saved;
+                    conversation = saved.messages.slice(
+                        -maxStoredMessages
+                    );
 
                     conversation.forEach((message) => {
                         appendMessage(
@@ -1667,6 +1694,14 @@ padding:10px!important;
                     appendWelcomeMessage();
                 }
             );
+
+            document.querySelectorAll(
+                'a[href$="/logout"]'
+            ).forEach(link => {
+                link.addEventListener("click", () => {
+                    localStorage.removeItem(storageKey);
+                });
+            });
 
             loadConversation();
         });

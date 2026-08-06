@@ -524,7 +524,7 @@ height:190px!important;
     href="{{ url_for(
         'static',
         filename='css/monitoring-clean.css',
-        v='clean-monitoring-20260803-1'
+        v='interface-mobile-v1.4'
     ) }}"
 >
 
@@ -537,6 +537,7 @@ height:190px!important;
     ) }}"
 >
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/product-system.css', v='product-v2-1') }}">
 </head>
 
 <body class="portal-v4 portal-body">
@@ -563,7 +564,7 @@ height:190px!important;
             </div>
 
             <a class="back-link" href="/">
-                ← Tableau de bord
+                ← Retour à l’accueil
             </a>
         </header>
 
@@ -805,7 +806,7 @@ height:190px!important;
             </article>
         </section>
 
-        <div id="empty-state" class="empty-state">
+        <div id="empty-state" class="empty-state" hidden>
             Aucune mesure n’est disponible pour cette période.
         </div>
     
@@ -1289,7 +1290,7 @@ height:190px!important;
 <script src="{{ url_for(
 'static',
 filename='js/monitoring-clean.js',
-v='20260803-final'
+v='interface-visual-v1.2.1'
 ) }}"></script>
 
 <script
@@ -1303,7 +1304,7 @@ v='20260803-final'
     src="{{ url_for(
         'static',
         filename='js/monitoring-export-pro.js',
-        v='monitoring-export-centered-20260803-2'
+        v='interface-visual-v1.2.1'
     ) }}"
 ></script>
 

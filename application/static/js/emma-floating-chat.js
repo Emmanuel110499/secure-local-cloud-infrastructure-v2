@@ -45,7 +45,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const storageKey =
         "emma_floating_conversation_v1";
 
+    const historyRetentionMs =
+        24 * 60 * 60 * 1000;
+
+    const maxStoredMessages = 40;
+
     let conversation = [];
+
+    function persistConversation() {
+        conversation = conversation.slice(
+            -maxStoredMessages
+        );
+
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                savedAt: Date.now(),
+                messages: conversation,
+            })
+        );
+    }
 
     function currentTime() {
         return new Date().toLocaleTimeString(
@@ -66,7 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
         text,
         role = "assistant",
         time = currentTime(),
-        save = true
+        save = true,
+        details = null
     ) {
         const bubble =
             document.createElement("div");
@@ -91,6 +111,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 : `Emma_IA · ${time}`;
 
         bubble.appendChild(content);
+
+        if (role === "assistant" && details) {
+            const detailsBox = document.createElement("div");
+            detailsBox.className = "emma-chat-details";
+
+            const badges = document.createElement("div");
+            badges.className = "emma-chat-badges";
+
+            const confidence = Number(details.confidence || 0);
+
+            if (confidence > 0) {
+                const confidenceBadge = document.createElement("span");
+                confidenceBadge.textContent =
+                    `Confiance ${Math.round(confidence * 100)} %`;
+                badges.appendChild(confidenceBadge);
+            }
+
+            const dataBadge = document.createElement("span");
+            dataBadge.textContent = details.used_live_data
+                ? "Données en direct"
+                : "Documentation";
+            badges.appendChild(dataBadge);
+            detailsBox.appendChild(badges);
+
+            if (Array.isArray(details.sources) && details.sources.length) {
+                const sources = document.createElement("small");
+                sources.textContent = `Sources : ${details.sources.join(", ")}`;
+                detailsBox.appendChild(sources);
+            }
+
+            if (Array.isArray(details.suggestions) && details.suggestions.length) {
+                const suggestions = document.createElement("div");
+                suggestions.className = "emma-chat-followups";
+
+                details.suggestions.slice(0, 3).forEach(suggestion => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.textContent = suggestion;
+                    button.addEventListener("click", () => askAssistant(suggestion));
+                    suggestions.appendChild(button);
+                });
+
+                detailsBox.appendChild(suggestions);
+            }
+
+            bubble.appendChild(detailsBox);
+        }
+
         bubble.appendChild(meta);
         messages.appendChild(bubble);
 
@@ -99,12 +167,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 text,
                 role,
                 time,
+                details,
             });
 
-            localStorage.setItem(
-                storageKey,
-                JSON.stringify(conversation)
-            );
+            persistConversation();
         }
 
         scrollToBottom();
@@ -149,20 +215,32 @@ document.addEventListener("DOMContentLoaded", () => {
             const saved = JSON.parse(
                 localStorage.getItem(
                     storageKey
-                ) || "[]"
+                ) || "null"
             );
 
-            conversation =
-                Array.isArray(saved)
-                    ? saved
-                    : [];
+            const isFresh = (
+                saved
+                && Number.isFinite(saved.savedAt)
+                && Date.now() - saved.savedAt
+                    <= historyRetentionMs
+                && Array.isArray(saved.messages)
+            );
+
+            conversation = isFresh
+                ? saved.messages.slice(-maxStoredMessages)
+                : [];
+
+            if (!isFresh) {
+                localStorage.removeItem(storageKey);
+            }
 
             conversation.forEach(message => {
                 appendMessage(
                     message.text,
                     message.role,
                     message.time,
-                    false
+                    false,
+                    message.details || null
                 );
             });
         } catch (error) {
@@ -266,7 +344,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 payload.answer
                 || payload.response
                 || "Je n’ai pas pu générer une réponse.",
-                "assistant"
+                "assistant",
+                currentTime(),
+                true,
+                payload
             );
         } catch (error) {
             typing.remove();
@@ -372,6 +453,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     );
+
+    document.querySelectorAll(
+        'a[href$="/logout"]'
+    ).forEach(link => {
+        link.addEventListener("click", () => {
+            localStorage.removeItem(storageKey);
+        });
+    });
 
     loadConversation();
 });

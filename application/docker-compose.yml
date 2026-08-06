@@ -1,11 +1,28 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   web:
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=5)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     build: .
     container_name: secure-web-app-v2
     hostname: srv-web
     restart: unless-stopped
     ports:
-      - "5001:5000"
+      - "127.0.0.1:5001:5000"
     
     volumes:
       - /etc/nginx/ssl/nginx.crt:/security/nginx.crt:ro
@@ -14,11 +31,22 @@ services:
       - ./data:/app/data
 
     environment:
-      PROMETHEUS_URL: "http://192.168.50.20:9090"
-      GRAFANA_URL: "http://192.168.50.20:3000"
+      PROMETHEUS_URL: "${PROMETHEUS_URL}"
+      GRAFANA_URL: "${GRAFANA_URL}"
       NODE_EXPORTER_URL: "http://192.168.50.10:9100"
       CADVISOR_URL: "http://192.168.154.10:8080/containers/"
-      ALERTMANAGER_URL: "http://192.168.50.20:9093"
+      ALERTMANAGER_URL: "${ALERTMANAGER_URL}"
+      WEB_PRIVATE_IP: "${WEB_PRIVATE_IP}"
+      MONITORING_PRIVATE_IP: "${MONITORING_PRIVATE_IP}"
+      NODE_EXPORTER_JOB: "${NODE_EXPORTER_JOB}"
+      CADVISOR_JOB: "${CADVISOR_JOB}"
+      NODE_EXPORTER_INSTANCE: "${NODE_EXPORTER_INSTANCE}"
+      CADVISOR_INSTANCE: "${CADVISOR_INSTANCE}"
+      MONITORING_NODE_JOB: "${MONITORING_NODE_JOB}"
+      MONITORING_NODE_INSTANCE: "${MONITORING_NODE_INSTANCE}"
+      WINDOWS_EXPORTER_JOB: "${WINDOWS_EXPORTER_JOB}"
+      WINDOWS_EXPORTER_INSTANCE: "${WINDOWS_EXPORTER_INSTANCE}"
+      WINDOWS_EQUIPMENT: "${WINDOWS_EQUIPMENT}"
       CERTIFICATE_PATH: "/security/nginx.crt"
 
       SECRET_KEY: "${SECRET_KEY}"
@@ -26,11 +54,13 @@ services:
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    logging: *default-logging
+    image: gcr.io/cadvisor/cadvisor@sha256:3de2bd5203120b866d74a9b283b2ffb8ec382fbf9dc321814700c6ea6f44ec57
     container_name: cadvisor
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "192.168.154.10:8080:8080"
+      - "192.168.50.10:8080:8080"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro

@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 import unicodedata
 
+from datetime import datetime, timezone
+
 from flask import current_app
 
 
@@ -192,54 +194,85 @@ def services_answer() -> str:
         "security_service"
     )
 
-    statuses: dict[str, bool] = {
-        "Application Flask": True,
+    statuses: dict[str, str] = {
+        "Application Flask": "up",
     }
 
     if prometheus is not None:
-        service_status = prometheus.get_service_status()
+        service_status = prometheus.get_service_status_detailed()
 
-        statuses["Node Exporter"] = bool(
-            service_status.get("node_exporter")
+        statuses["Node Exporter"] = service_status.get(
+            "node_exporter",
+            "unknown",
         )
-        statuses["cAdvisor"] = bool(
-            service_status.get("cadvisor")
+        statuses["cAdvisor"] = service_status.get(
+            "cadvisor",
+            "unknown",
         )
-        statuses["Prometheus"] = bool(
-            prometheus.is_healthy()
-        )
+        statuses["Prometheus"] = prometheus.get_health_status()
+    else:
+        statuses["Node Exporter"] = "unknown"
+        statuses["cAdvisor"] = "unknown"
+        statuses["Prometheus"] = "unknown"
 
     if security is not None:
         grafana_url = current_app.config.get(
             "GRAFANA_URL",
-            "http://192.168.50.20:3000",
+            "http://127.0.0.1:3000",
         )
 
-        statuses["Grafana"] = bool(
-            security.check_http_service(
-                grafana_url.rstrip("/") + "/api/health"
-            )
+        statuses["Grafana"] = security.check_http_service_status(
+            grafana_url.rstrip("/") + "/api/health"
         )
+    else:
+        statuses["Grafana"] = "unknown"
 
     lines = [
         "🖥️ Services actuellement supervisés",
         "",
     ]
 
+    labels = {
+        "up": ("✅", "opérationnel"),
+        "down": ("❌", "indisponible"),
+        "unknown": ("⚪", "état inconnu"),
+    }
+
     for name, status in statuses.items():
+        icon, label = labels.get(
+            status,
+            labels["unknown"],
+        )
         lines.append(
-            f"{'✅' if status else '❌'} "
-            f"{name} : "
-            f"{'opérationnel' if status else 'indisponible'}"
+            f"{icon} {name} : {label}"
         )
 
-    operational = sum(statuses.values())
+    operational = sum(
+        status == "up"
+        for status in statuses.values()
+    )
+    down = sum(
+        status == "down"
+        for status in statuses.values()
+    )
+    unknown = sum(
+        status == "unknown"
+        for status in statuses.values()
+    )
 
     lines.extend([
         "",
         (
             f"{operational}/{len(statuses)} service(s) "
             "sont opérationnels."
+        ),
+        f"Indisponibles : {down} | Inconnus : {unknown}",
+        (
+            "Contrôle effectué le "
+            + datetime.now(timezone.utc).strftime(
+                "%d/%m/%Y à %H:%M:%S UTC"
+            )
+            + "."
         ),
     ])
 
@@ -261,7 +294,10 @@ def infrastructure_answer() -> str:
         "🏗️ Infrastructure principale",
         "",
         "• Serveur : srv-web",
-        "• Adresse IP : 192.168.50.10",
+        (
+            "• Adresse IP : "
+            + current_app.config["WEB_PRIVATE_IP"]
+        ),
         "• Système : Ubuntu Server 24.04 LTS",
         (
             "• Uptime : "
@@ -318,10 +354,16 @@ def architecture_answer() -> str:
         "",
         "L’infrastructure est organisée autour de deux serveurs :",
         "",
-        "• srv-web — 192.168.50.10",
+        (
+            "• srv-web — "
+            + current_app.config["WEB_PRIVATE_IP"]
+        ),
         "  Héberge l’application Flask, Docker, Node Exporter et cAdvisor.",
         "",
-        "• srv-monitoring — 192.168.50.20",
+        (
+            "• srv-monitoring — "
+            + current_app.config["MONITORING_PRIVATE_IP"]
+        ),
         "  Héberge Prometheus, Grafana et Alertmanager.",
         "",
         "Fonctionnement général :",

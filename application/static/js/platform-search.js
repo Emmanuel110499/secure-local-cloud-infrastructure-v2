@@ -491,6 +491,43 @@
         );
     }
 
+    let searchVisibilityTimer = null;
+
+    function handleSearchVisibility() {
+        const searchInput = document.getElementById(
+            "platform-search-input"
+        );
+
+        if (!window.matchMedia("(max-width: 820px)").matches) {
+            document.body.classList.remove(
+                "platform-search-hidden"
+            );
+            return;
+        }
+
+        if (
+            window.scrollY > 60
+            && document.activeElement !== searchInput
+        ) {
+            document.body.classList.add(
+                "platform-search-hidden"
+            );
+        }
+
+        window.clearTimeout(searchVisibilityTimer);
+        searchVisibilityTimer = window.setTimeout(() => {
+            document.body.classList.remove(
+                "platform-search-hidden"
+            );
+        }, 550);
+    }
+
+    window.addEventListener(
+        "scroll",
+        handleSearchVisibility,
+        { passive: true }
+    );
+
     if (
         document.readyState === "loading"
     ) {

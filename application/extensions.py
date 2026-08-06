@@ -16,7 +16,12 @@ def initialize_services(app):
     )
 
     app.extensions["prometheus_service"] = PrometheusService(
-        app.config["PROMETHEUS_URL"]
+        app.config["PROMETHEUS_URL"],
+        node_exporter_job=app.config["NODE_EXPORTER_JOB"],
+        cadvisor_job=app.config["CADVISOR_JOB"],
+        node_exporter_instance=app.config["NODE_EXPORTER_INSTANCE"],
+        cadvisor_instance=app.config["CADVISOR_INSTANCE"],
+        equipments=app.config["EQUIPMENTS"],
     )
 
     app.extensions["docker_service"] = DockerService(
