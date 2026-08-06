@@ -84,7 +84,27 @@ Les secrets sont lus depuis `application/.env`, fichier ignore par Git. Le model
 
 ## Captures d'ecran
 
-Placez uniquement des captures expurgees dans `docs/screenshots/`. Masquez les IP publiques, noms de domaine internes, utilisateurs, journaux, jetons et autres informations identifiantes avant publication.
+### Vue d'ensemble
+
+![Accueil de Secure Local Cloud Infrastructure](docs/screenshots/accueil.png)
+
+### Supervision des ressources
+
+La vue de monitoring présente les mesures en temps réel et leur historique : CPU, mémoire vive, espace disque, seuils surveillés et export PDF.
+
+![Monitoring CPU, mémoire et disque](docs/screenshots/monitoring.png)
+
+### Conteneurs Docker
+
+Cette vue centralise l'état, la consommation et les actions d'exploitation des conteneurs exécutés sur `srv-web`.
+
+![Supervision des conteneurs Docker](docs/screenshots/conteneurs-docker.png)
+
+### Architecture de l'infrastructure
+
+La cartographie visualise le chemin d'accès externe, les réseaux privés, les deux serveurs et les principaux services de la plateforme.
+
+![Architecture de Secure Local Cloud Infrastructure](docs/screenshots/architecture.png)
 
 ## Securite
 

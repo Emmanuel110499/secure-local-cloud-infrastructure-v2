@@ -55,3 +55,7 @@ Thumbs.db
 # Captures locales non selectionnees
 docs/screenshots/*
 !docs/screenshots/.gitkeep
+!docs/screenshots/accueil.png
+!docs/screenshots/monitoring.png
+!docs/screenshots/conteneurs-docker.png
+!docs/screenshots/architecture.png
