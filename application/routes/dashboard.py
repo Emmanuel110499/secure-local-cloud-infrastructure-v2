@@ -207,6 +207,28 @@ def api_equipment_metrics(equipment_id: str):
     })
 
 
+@dashboard_bp.route("/api/equipment/<equipment_id>/history")
+@login_required
+def api_equipment_history(equipment_id: str):
+    """Historique Prometheus d'un équipement sur 1 à 168 heures."""
+
+    try:
+        hours = int(request.args.get("hours", 24))
+    except (TypeError, ValueError):
+        hours = 24
+
+    prometheus = current_app.extensions["prometheus_service"]
+    result = prometheus.get_equipment_history(equipment_id, hours)
+
+    if result is None:
+        return jsonify({"error": "Équipement inconnu."}), 404
+
+    return jsonify({
+        **result,
+        "updated_at": datetime.now().isoformat(),
+    })
+
+
 @dashboard_bp.route("/api/health-score")
 @login_required
 def api_health_score():
@@ -233,4 +255,3 @@ def api_health_score():
             containers=containers,
         )
     )
-

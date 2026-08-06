@@ -1,3 +1,4 @@
+from time import time
 from typing import Any
 
 import requests
@@ -104,6 +105,83 @@ class PrometheusService:
             for equipment_id in self.equipments
             if (result := self.get_equipment_metrics(equipment_id)) is not None
         ]
+
+    def get_equipment_history(
+        self,
+        equipment_id: str,
+        hours: int = 24,
+    ) -> dict[str, Any] | None:
+        """Retourne les séries CPU, RAM et disque d'un équipement."""
+
+        equipment = self.equipments.get(equipment_id)
+        if equipment is None:
+            return None
+
+        hours = max(1, min(int(hours), 168))
+        labels = self._labels(equipment)
+
+        if equipment["os"] == "windows":
+            queries = {
+                "cpu": (
+                    '100 - (avg(rate(windows_cpu_time_total{'
+                    f'{labels},mode="idle"'
+                    '}[5m])) * 100)'
+                ),
+                "memory": (
+                    '100 * (1 - windows_memory_available_bytes{'
+                    f'{labels}'
+                    '} / windows_memory_physical_total_bytes{'
+                    f'{labels}'
+                    '})'
+                ),
+                "disk": (
+                    '100 * (1 - windows_logical_disk_free_bytes{'
+                    f'{labels},volume="C:"'
+                    '} / windows_logical_disk_size_bytes{'
+                    f'{labels},volume="C:"'
+                    '})'
+                ),
+            }
+        else:
+            queries = {
+                "cpu": (
+                    '100 - (avg(rate(node_cpu_seconds_total{'
+                    f'{labels},mode="idle"'
+                    '}[5m])) * 100)'
+                ),
+                "memory": (
+                    '(1 - node_memory_MemAvailable_bytes{'
+                    f'{labels}'
+                    '} / node_memory_MemTotal_bytes{'
+                    f'{labels}'
+                    '}) * 100'
+                ),
+                "disk": (
+                    '100 * (1 - node_filesystem_avail_bytes{'
+                    f'{labels},mountpoint="/",fstype!~"tmpfs|overlay"'
+                    '} / node_filesystem_size_bytes{'
+                    f'{labels},mountpoint="/",fstype!~"tmpfs|overlay"'
+                    '})'
+                ),
+            }
+
+        end = int(time())
+        start = end - hours * 3600
+        step = max(60, hours * 60)
+
+        return {
+            "equipment": {
+                "id": equipment["id"],
+                "name": equipment["name"],
+                "role": equipment["role"],
+                "os": equipment["os"],
+            },
+            "hours": hours,
+            "series": {
+                name: self.query_range(query, start, end, step)
+                for name, query in queries.items()
+            },
+        }
 
     def _get_linux_metrics(
         self,
@@ -346,6 +424,44 @@ class PrometheusService:
             requests.RequestException,
             ValueError,
             TypeError,
+        ):
+            return []
+
+    def query_range(
+        self,
+        query: str,
+        start: int,
+        end: int,
+        step: int,
+    ) -> list[dict[str, float]]:
+        """Retourne une série Prometheus normalisée pour les graphiques."""
+
+        try:
+            response = requests.get(
+                f"{self.prometheus_url}/api/v1/query_range",
+                params={
+                    "query": query,
+                    "start": start,
+                    "end": end,
+                    "step": step,
+                },
+                timeout=8,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            results = payload.get("data", {}).get("result", [])
+            if payload.get("status") != "success" or not results:
+                return []
+            return [
+                {"timestamp": float(point[0]), "value": round(float(point[1]), 2)}
+                for point in results[0].get("values", [])
+            ]
+        except (
+            requests.RequestException,
+            ValueError,
+            TypeError,
+            KeyError,
+            IndexError,
         ):
             return []
 
