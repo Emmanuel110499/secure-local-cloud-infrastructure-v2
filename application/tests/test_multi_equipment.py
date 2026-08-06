@@ -88,6 +88,7 @@ class MultiEquipmentTests(unittest.TestCase):
 
         queries = " ".join(call.args[0] for call in query.call_args_list)
         self.assertIn("windows_cpu_time_total", queries)
+        self.assertIn("windows_memory_physical_total_bytes", queries)
         self.assertIn("secure_windows_battery_charge_percent", queries)
         self.assertEqual(
             result["metrics"]["battery"]["charge_percent"],

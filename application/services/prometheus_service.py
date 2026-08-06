@@ -177,6 +177,11 @@ class PrometheusService:
             '}[5m])) * 100)'
         )
         memory = self._first_scalar(
+            '100 * (1 - windows_memory_physical_free_bytes{'
+            f'{labels}'
+            '} / windows_memory_physical_total_bytes{'
+            f'{labels}'
+            '})',
             '100 * (1 - windows_memory_available_bytes{'
             f'{labels}'
             '} / windows_cs_physical_memory_bytes{'
