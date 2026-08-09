@@ -123,6 +123,7 @@ class MultiEquipmentResponsiveTests(unittest.TestCase):
         self.assertIn('id="mobile-sidebar-overlay"', template)
         self.assertIn("configureMobileMenu", javascript)
         self.assertIn("grid-template-columns:1fr", css)
+        self.assertIn("grid-template-columns:repeat(2,minmax(0,1fr))", css)
         self.assertIn("overflow-x:hidden", css)
         self.assertIn("overflow-x:auto", css)
 

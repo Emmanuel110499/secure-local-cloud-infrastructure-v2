@@ -18,8 +18,8 @@ body.mobile-menu-open{overflow:hidden}
 .page-head{width:100%;gap:12px}
 .page-head>div:first-child{min-width:0;width:100%;padding-right:48px}
 .page-head h1{font-size:25px;line-height:1.15}
-.equipment-tabs{display:flex;width:100%;max-width:100%;padding:4px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin}
-.equipment-tabs button{flex:0 0 auto;padding:9px 12px}
+.equipment-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:100%;padding:4px;overflow:visible}
+.equipment-tabs button{min-width:0;padding:9px 7px;white-space:normal;line-height:1.2}
 .toolbar{width:100%;margin:12px 0;gap:12px}
 .period-tabs{display:flex;max-width:100%;padding:4px;overflow-x:auto}
 .period-tabs button{flex:0 0 auto}
