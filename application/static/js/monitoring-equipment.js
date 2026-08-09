@@ -7,6 +7,37 @@
     const value = number => Number.isFinite(Number(number)) ? `${Number(number).toFixed(1)} %` : "—";
     const number = item => Number(item?.value);
 
+    function configureMobileMenu() {
+        const toggle = $("mobile-menu-toggle");
+        const sidebar = $("monitoring-sidebar");
+        const overlay = $("mobile-sidebar-overlay");
+        if (!toggle || !sidebar || !overlay) return;
+
+        const close = () => {
+            sidebar.classList.remove("is-open");
+            overlay.hidden = true;
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.setAttribute("aria-label", "Ouvrir le menu");
+            document.body.classList.remove("mobile-menu-open");
+        };
+        const open = () => {
+            sidebar.classList.add("is-open");
+            overlay.hidden = false;
+            toggle.setAttribute("aria-expanded", "true");
+            toggle.setAttribute("aria-label", "Fermer le menu");
+            document.body.classList.add("mobile-menu-open");
+        };
+
+        toggle.addEventListener("click", () => {
+            sidebar.classList.contains("is-open") ? close() : open();
+        });
+        overlay.addEventListener("click", close);
+        sidebar.querySelectorAll("a").forEach(link => link.addEventListener("click", close));
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 720) close();
+        });
+    }
+
     async function json(url) {
         const response = await fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`, {
             headers: { Accept: "application/json" }, credentials: "same-origin"
@@ -195,6 +226,7 @@
         if (state.equipment !== "global") refresh();
     });
 
+    configureMobileMenu();
     refresh();
     setInterval(refresh, 60000);
 })();

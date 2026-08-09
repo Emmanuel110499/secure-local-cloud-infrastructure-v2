@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Monitoring multi-équipement — Secure Local Cloud</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment.css', v='multi-v1') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment-refined.css', v='multi-v2') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment-refined.css', v='multi-v3.2') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 </head>
 <body>
-<aside class="shell-sidebar">
+<button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-controls="monitoring-sidebar" aria-expanded="false" aria-label="Ouvrir le menu">
+    <span></span><span></span><span></span>
+</button>
+<div class="mobile-sidebar-overlay" id="mobile-sidebar-overlay" hidden></div>
+<aside class="shell-sidebar" id="monitoring-sidebar">
     <a class="brand" href="/"><span class="brand-mark">SC</span><span><b>Secure Local Cloud</b><small>Console d’observabilité</small></span></a>
     <nav>
         <a href="/">⌂ <span>Accueil</span></a>
@@ -95,6 +99,6 @@
     </section>
     <footer class="scrape-footer"><span><i></i> Dernière collecte réussie</span><span id="footer-source">Source : Prometheus</span></footer>
 </main>
-<script src="{{ url_for('static', filename='js/monitoring-equipment.js', v='multi-v1') }}"></script>
+<script src="{{ url_for('static', filename='js/monitoring-equipment.js', v='multi-v3.2') }}"></script>
 </body>
 </html>

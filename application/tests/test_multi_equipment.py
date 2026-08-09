@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 import sys
 import types
+from pathlib import Path
 
 try:
     import requests  # noqa: F401
@@ -103,6 +104,27 @@ class MultiEquipmentTests(unittest.TestCase):
 
         self.assertEqual(result["state"], "unknown")
         self.assertIsNone(result["metrics"]["cpu"])
+
+
+class MultiEquipmentResponsiveTests(unittest.TestCase):
+    def test_mobile_navigation_and_single_column_layout_exist(self):
+        root = Path(__file__).resolve().parents[1]
+        template = (root / "templates" / "monitoring.html").read_text(
+            encoding="utf-8"
+        )
+        css = (
+            root / "static" / "css" / "monitoring-equipment-refined.css"
+        ).read_text(encoding="utf-8")
+        javascript = (
+            root / "static" / "js" / "monitoring-equipment.js"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('id="mobile-menu-toggle"', template)
+        self.assertIn('id="mobile-sidebar-overlay"', template)
+        self.assertIn("configureMobileMenu", javascript)
+        self.assertIn("grid-template-columns:1fr", css)
+        self.assertIn("overflow-x:hidden", css)
+        self.assertIn("overflow-x:auto", css)
 
 
 if __name__ == "__main__":
