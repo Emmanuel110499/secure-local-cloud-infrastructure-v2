@@ -1,0 +1,8 @@
+[Unit]
+Description=Mesure des volumes persistants de la supervision
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/collect-monitoring-volumes.sh

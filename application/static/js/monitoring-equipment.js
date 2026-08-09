@@ -64,22 +64,46 @@
         setText("system-role", equipment.role);
         setText("system-os", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Linux + Windows" : "Linux");
         setText("system-exporter", equipment.id === "pc-emmanuel" ? "Windows Exporter" : equipment.os === "multi" ? "Prometheus" : "Node Exporter");
-        const total = Number(metrics.disk_total_bytes);
-        const available = Number(metrics.disk_available_bytes);
-        const used = total - available;
-        const bytes = amount => Number.isFinite(amount) ? `${(amount / 1073741824).toFixed(1)} Gio` : "—";
-        setText("storage-volume", equipment.os === "windows" ? "Disque système" : "Système racine");
-        setText("storage-mount", equipment.os === "windows" ? "C:" : "/");
-        setText("storage-used", bytes(used));
-        setText("storage-total", bytes(total));
-        setText("storage-percent", value(metrics.disk));
-        $("storage-bar").style.width = Number.isFinite(Number(metrics.disk)) ? `${Math.min(100, Number(metrics.disk))}%` : "0";
+        renderStorage(equipment, metrics);
         const battery = metrics.battery;
         $("battery-kpi").hidden = !battery;
         if (battery) {
             setText("kpi-battery", value(battery.charge_percent));
             setText("battery-state", battery.on_ac_power ? "Branché au secteur" : "Sur batterie");
         }
+    }
+
+    function renderStorage(equipment, metrics) {
+        const bytes = amount => Number.isFinite(Number(amount))
+            ? `${(Number(amount) / 1073741824).toFixed(2)} Gio` : "—";
+        const total = Number(metrics.disk_total_bytes);
+        const available = Number(metrics.disk_available_bytes);
+        const used = Number.isFinite(total) && Number.isFinite(available)
+            ? total - available : null;
+        const rows = [{
+            name: equipment.os === "windows" ? "Disque système" : equipment.os === "multi" ? "Stockage consolidé" : "Système racine",
+            mountpoint: equipment.os === "windows" ? "C:" : equipment.os === "multi" ? "3 équipements" : "/",
+            used_bytes: used,
+            total_bytes: total,
+            percent: metrics.disk,
+        }];
+        (metrics.volumes || []).forEach(volume => rows.push({
+            name: volume.name,
+            mountpoint: volume.mountpoint,
+            used_bytes: volume.used_bytes,
+            total_bytes: total,
+            percent: Number.isFinite(total) && total > 0
+                ? volume.used_bytes / total * 100 : null,
+        }));
+        $("storage-rows").innerHTML = rows.map(row => {
+            const percent = Number(row.percent);
+            const width = Number.isFinite(percent) ? Math.min(100, percent) : 0;
+            return `<div class="storage-row">
+                <b>${row.name || "Volume"}</b><code title="${row.mountpoint || ""}">${row.mountpoint || "—"}</code>
+                <span>${bytes(row.used_bytes)}</span><span>${bytes(row.total_bytes)}</span>
+                <span><i><em style="width:${width}%"></em></i><b>${Number.isFinite(percent) ? `${percent.toFixed(1)} %` : "—"}</b></span>
+            </div>`;
+        }).join("");
     }
 
     function renderInventory(items) {
@@ -110,13 +134,17 @@
         renderInventory(state.inventory);
         const up = state.inventory.filter(item => item.state === "up").length;
         const metrics = key => average(state.inventory.map(item => Number(item.metrics?.[key])).filter(Number.isFinite));
-        const representative = { equipment: { id: "global", name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: metrics("disk"), network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Consolidé", load_1m: null } };
+        const totalDisk = state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.disk_total_bytes) || 0), 0);
+        const availableDisk = state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.disk_available_bytes) || 0), 0);
+        const representative = { equipment: { id: "global", name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: totalDisk > 0 ? (1 - availableDisk / totalDisk) * 100 : metrics("disk"), disk_total_bytes: totalDisk || null, disk_available_bytes: totalDisk ? availableDisk : null, network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Consolidé", load_1m: null } };
         updateDetails(representative, payload.updated_at);
         setText("detail-title", "Équipements supervisés");
         setText("detail-subtitle", `${up}/${state.inventory.length} disponibles`);
         $("battery-kpi").hidden = true;
-        ["cpu", "memory", "disk"].forEach(name => updateChart(name, []));
-        setText("sample-count", "Sélectionnez un équipement pour afficher son historique");
+        const history = await json(`/api/equipment/global/history?hours=${state.hours}`);
+        ["cpu", "memory", "disk"].forEach(name => updateChart(name, history.series?.[name] || []));
+        const count = Math.max(...["cpu", "memory", "disk"].map(name => history.series?.[name]?.length || 0));
+        setText("sample-count", `${count} points consolidés`);
     }
 
     async function loadEquipment(id) {

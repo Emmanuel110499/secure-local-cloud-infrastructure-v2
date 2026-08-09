@@ -183,6 +183,46 @@ class PrometheusService:
             },
         }
 
+    def get_global_history(self, hours: int = 24) -> dict[str, Any]:
+        """Agrège les historiques des équipements pour la vue globale."""
+
+        histories = [
+            history
+            for equipment_id in self.equipments
+            if (history := self.get_equipment_history(equipment_id, hours))
+        ]
+
+        aggregated: dict[str, list[dict[str, float]]] = {}
+        for metric in ("cpu", "memory", "disk"):
+            available = [
+                history["series"].get(metric, [])
+                for history in histories
+                if history["series"].get(metric)
+            ]
+            length = min((len(series) for series in available), default=0)
+            aggregated[metric] = [
+                {
+                    "timestamp": available[0][index]["timestamp"],
+                    "value": round(
+                        sum(series[index]["value"] for series in available)
+                        / len(available),
+                        2,
+                    ),
+                }
+                for index in range(length)
+            ]
+
+        return {
+            "equipment": {
+                "id": "global",
+                "name": "Vue globale",
+                "role": "État consolidé de l’infrastructure",
+                "os": "multi",
+            },
+            "hours": max(1, min(int(hours), 168)),
+            "series": aggregated,
+        }
+
     def _get_linux_metrics(
         self,
         equipment: dict[str, str],
@@ -250,7 +290,28 @@ class PrometheusService:
             result["containers"] = (
                 int(containers) if containers is not None else None
             )
+        if equipment["id"] == "srv-monitoring":
+            result["volumes"] = self._get_monitoring_volumes()
         return result
+
+    def _get_monitoring_volumes(self) -> list[dict[str, Any]]:
+        """Lit les tailles réelles publiées par le collecteur textfile."""
+
+        rows = []
+        for item in self.query_vector(
+            'secure_docker_volume_size_bytes{equipment="srv-monitoring"}'
+        ):
+            try:
+                labels = item.get("metric", {})
+                rows.append({
+                    "name": labels.get("logical_name") or labels.get("volume"),
+                    "docker_name": labels.get("volume"),
+                    "mountpoint": labels.get("mountpoint", "Volume Docker"),
+                    "used_bytes": float(item["value"][1]),
+                })
+            except (TypeError, ValueError, KeyError, IndexError):
+                continue
+        return sorted(rows, key=lambda row: row["name"] or "")
 
     def _get_windows_metrics(
         self,

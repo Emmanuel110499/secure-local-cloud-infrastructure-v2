@@ -245,7 +245,11 @@ def api_equipment_history(equipment_id: str):
         hours = 24
 
     prometheus = current_app.extensions["prometheus_service"]
-    result = prometheus.get_equipment_history(equipment_id, hours)
+    result = (
+        prometheus.get_global_history(hours)
+        if equipment_id == "global"
+        else prometheus.get_equipment_history(equipment_id, hours)
+    )
 
     if result is None:
         return jsonify({"error": "Équipement inconnu."}), 404
