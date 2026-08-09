@@ -56,8 +56,18 @@
         setText("detail-subtitle", equipment.role);
         setText("detail-os", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Linux + Windows" : "Linux");
         setText("detail-state", item.state === "up" ? "Opérationnel" : item.state === "down" ? "Indisponible" : "Inconnu");
-        setText("detail-source", equipment.id === "pc-emmanuel" ? "Windows Exporter → Prometheus" : "Node Exporter → Prometheus");
-        setText("detail-updated", new Date(updatedAt).toLocaleTimeString("fr-FR"));
+        setText(
+            "detail-source",
+            equipment.id === "global"
+                ? "Prometheus — vue consolidée"
+                : equipment.id === "pc-emmanuel"
+                    ? "Windows Exporter → Prometheus"
+                    : "Node Exporter → Prometheus"
+        );
+        const normalizedUpdatedAt = /(?:Z|[+-]\d{2}:?\d{2})$/.test(updatedAt)
+            ? updatedAt
+            : `${updatedAt}Z`;
+        setText("detail-updated", new Date(normalizedUpdatedAt).toLocaleTimeString("fr-FR"));
         setText("os-badge", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Multi-équipement" : "Linux");
         setText("online-badge", item.state === "up" ? "● En ligne" : "● État partiel");
         setText("system-name", equipment.name);
@@ -136,7 +146,7 @@
         const metrics = key => average(state.inventory.map(item => Number(item.metrics?.[key])).filter(Number.isFinite));
         const totalDisk = state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.disk_total_bytes) || 0), 0);
         const availableDisk = state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.disk_available_bytes) || 0), 0);
-        const representative = { equipment: { id: "global", name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: totalDisk > 0 ? (1 - availableDisk / totalDisk) * 100 : metrics("disk"), disk_total_bytes: totalDisk || null, disk_available_bytes: totalDisk ? availableDisk : null, network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Consolidé", load_1m: null } };
+        const representative = { equipment: { id: "global", name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: totalDisk > 0 ? (1 - availableDisk / totalDisk) * 100 : metrics("disk"), disk_total_bytes: totalDisk || null, disk_available_bytes: totalDisk ? availableDisk : null, network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Consolidé", load_1m: metrics("load_1m") } };
         updateDetails(representative, payload.updated_at);
         setText("detail-title", "Équipements supervisés");
         setText("detail-subtitle", `${up}/${state.inventory.length} disponibles`);
