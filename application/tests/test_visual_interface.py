@@ -71,13 +71,16 @@ class VisualInterfaceTests(unittest.TestCase):
         template = (ROOT / "templates/monitoring.html").read_text(
             encoding="utf-8"
         )
-        script = (ROOT / "static/js/monitoring-clean.js").read_text(
+        script = (ROOT / "static/js/monitoring-equipment.js").read_text(
             encoding="utf-8"
         )
-        self.assertIn('class="empty-state" hidden', template)
-        self.assertIn('class="cm-insights"', script)
-        self.assertIn("loadCurrentMetrics", script)
-        self.assertIn("Valeurs actuelles de Prometheus", script)
+        self.assertIn('id="equipment-tabs"', template)
+        self.assertIn('id="storage-rows"', template)
+        self.assertIn('id="chart-cpu"', template)
+        self.assertIn("loadEquipment", script)
+        self.assertIn("/history?hours=", script)
+        self.assertIn("updateChart", script)
+        self.assertNotIn('class="empty-state"', template)
 
     def test_documentation_status_is_left_and_dashboard_return_is_right(self):
         template = (ROOT / "templates/documentation.html").read_text(

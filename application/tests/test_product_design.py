@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ProductDesignTests(unittest.TestCase):
     def test_product_system_is_loaded_on_every_primary_page(self):
         templates = (
-            "index_v2.html", "monitoring.html", "containers.html",
+            "index_v2.html", "containers.html",
             "infrastructure.html", "security.html", "audit.html",
             "documentation.html", "assistant.html", "account.html",
             "login.html", "portal_v3_base.html",
@@ -17,6 +17,12 @@ class ProductDesignTests(unittest.TestCase):
             with self.subTest(template=filename):
                 text = (ROOT / "templates" / filename).read_text(encoding="utf-8")
                 self.assertIn("css/product-system.css", text)
+
+        monitoring = (ROOT / "templates/monitoring.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("css/monitoring-equipment.css", monitoring)
+        self.assertIn("css/monitoring-equipment-refined.css", monitoring)
 
     def test_sidebar_icons_are_real_svg(self):
         script = (ROOT / "static/js/product-icons.js").read_text(encoding="utf-8")

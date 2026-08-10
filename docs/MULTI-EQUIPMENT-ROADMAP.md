@@ -1,36 +1,22 @@
-# Évolution vers la supervision multi-équipement
+# État de la supervision multi-équipement
 
-## Périmètre validé
+## Réalisé
 
-La plateforme supervisera progressivement :
+- supervision de `srv-web`, `srv-monitoring` et `pc-emmanuel` ;
+- métriques CPU, RAM, disque, réseau, uptime et batterie ;
+- historiques de 1 heure à 7 jours et volumes persistants ;
+- interface responsive et Emma_IA multi-équipement ;
+- alertes Prometheus et Telegram ;
+- sauvegardes Linux et réplication vérifiée vers le PC.
 
-- `srv-web` (Linux, application, Nginx, Cloudflare Tunnel, Docker et cAdvisor) ;
-- `srv-monitoring` (Linux, Prometheus, Grafana, Alertmanager et stockages persistants) ;
-- `pc-emmanuel` (Windows, ressources système, réseau et batterie) ;
-- les futurs serveurs ou VPS ajoutés à la configuration.
+## Prochaines évolutions possibles
 
-## Organisation de l’interface
+1. Exposer les métriques de sauvegarde de `srv-monitoring` comme celles de `srv-web`.
+2. Alerter sur la croissance anormale des volumes persistants.
+3. Automatiser un test périodique de restauration.
+4. Actualiser les captures GitHub.
+5. Ajouter les futurs serveurs avec le même modèle d’équipement.
 
-La page Monitoring proposera un sélecteur commun :
+## Règle de qualité
 
-`Vue globale | srv-web | srv-monitoring | PC Emmanuel`
-
-La vue globale comparera la santé et les principaux indicateurs des équipements.
-Chaque vue détaillée réutilisera le même gabarit, avec des panneaux adaptés au type
-de machine et aux services réellement présents.
-
-## Ordre de réalisation
-
-1. Synchroniser le dépôt avec la version réellement déployée sur `srv-web`.
-2. Ajouter une configuration centrale des équipements.
-3. Créer les API de métriques actuelles, historiques et de disponibilité.
-4. Construire l’interface Monitoring validée, sur ordinateur et téléphone.
-5. Adapter l’accueil, l’infrastructure, l’audit et la documentation.
-6. Étendre Emma_IA aux questions et comparaisons multi-équipement.
-7. Étendre les alertes Prometheus et Telegram.
-8. Tester, documenter et déployer avec une procédure de retour arrière.
-
-## Règle de sécurité
-
-Aucune donnée fictive ne doit être affichée comme une mesure réelle. Une donnée
-absente doit rester `inconnue`, sans être transformée en panne ou en valeur nulle.
+Aucune donnée fictive ne doit être affichée comme réelle. Une valeur absente reste `inconnue` et ne devient ni zéro ni panne sans preuve.

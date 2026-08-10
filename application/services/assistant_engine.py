@@ -4,11 +4,15 @@ from typing import Any
 import re
 import unicodedata
 
+from flask import current_app
+
 from services.assistant_router import (
     health_analysis_answer,
+    metrics_answer,
     route_assistant_question,
     services_answer,
 )
+from services.assistant_equipment import equipment_question_answer
 from services.intent_router import detect_intent
 from services.knowledge_engine import search
 
@@ -29,9 +33,15 @@ LIVE_INTENTS = {
     "infrastructure",
     "metrics",
     "services",
+    "equipment",
 }
 
 SUGGESTIONS = {
+    "equipment": [
+        "Compare les trois équipements.",
+        "Quel équipement demande le plus d’attention ?",
+        "Quel est l’état de la batterie du PC ?",
+    ],
     "containers": [
         "Quels conteneurs sont actuellement actifs ?",
         "Analyse la santé des conteneurs.",
@@ -135,7 +145,7 @@ def _direct_answer(
         marker in normalized
         for marker in ("analyse", "actuel", "utilisation", "etat")
     ):
-        return health_analysis_answer(question), "metrics", 0.98
+        return metrics_answer(), "metrics", 0.98
 
     if "securite" in normalized and any(
         marker in normalized
@@ -165,6 +175,32 @@ def _direct_answer(
         ])
         return answer, "infrastructure", 0.9
 
+    if "amelioration" in normalized and any(
+        marker in normalized
+        for marker in ("prioritaire", "priorite", "reste", "prochaine")
+    ):
+        answer = "\n".join([
+            "🚀 Améliorations prioritaires",
+            "",
+            "1. Finaliser Emma_IA en mode multi-équipement",
+            "Valider ses diagnostics pour srv-web, srv-monitoring et le PC Emmanuel.",
+            "",
+            "2. Adapter les alertes Telegram",
+            "Identifier clairement l’équipement, la métrique et le seuil concernés.",
+            "",
+            "3. Actualiser la documentation technique",
+            "Décrire les nouveaux collecteurs, KPI, volumes et procédures de diagnostic.",
+            "",
+            "4. Tester une restauration complète",
+            "Restaurer une archive sur une machine isolée et vérifier les services.",
+            "",
+            "5. Préparer la future migration",
+            "Conserver les équipements configurables et mesurer les ressources nécessaires.",
+            "",
+            "Priorité immédiate : terminer Emma_IA, puis les alertes et la documentation.",
+        ])
+        return answer, "documentation", 0.94
+
     if asks_live_state and any(
         service in normalized
         for service in (
@@ -188,6 +224,7 @@ def _direct_answer(
         )
     ):
         live_status = services_answer()
+        grafana_url = current_app.config["GRAFANA_URL"].rstrip("/")
         answer = "\n".join([
             "🛠️ Diagnostic ciblé de Grafana",
             "",
@@ -207,7 +244,7 @@ def _direct_answer(
             "• df -h /",
             "",
             "Sur srv-web, si l'URL publique seule est en panne :",
-            "• curl -sS http://192.168.50.20:3000/api/health",
+            f"• curl -sS {grafana_url}/api/health",
             "• systemctl is-active cloudflared",
         ])
         return answer, "services", 0.97
@@ -278,6 +315,23 @@ def _documentation_answer(
     return "\n".join(parts)
 
 
+def _direct_sources(intent: str, answer: str) -> list[str]:
+    """Décrit précisément les données utilisées par une réponse directe."""
+
+    if "Évaluation de sécurité actuelle" in answer:
+        return [
+            "Contrôles de services en temps réel",
+            "Constats validés lors de l’audit technique",
+        ]
+    if intent == "services":
+        return ["Prometheus et contrôles HTTP en temps réel"]
+    if intent in {"metrics", "infrastructure"}:
+        return ["Prometheus — métriques en temps réel"]
+    if "Améliorations prioritaires" in answer:
+        return ["Feuille de route du projet"]
+    return ["Documentation locale du projet"]
+
+
 def build_assistant_response(
     question: str,
     context: dict[str, Any] | None = None,
@@ -292,6 +346,18 @@ def build_assistant_response(
             "sources": [],
             "suggestions": SUGGESTIONS["documentation"],
             "used_live_data": False,
+            "follow_up": False,
+        }
+
+    equipment_answer = equipment_question_answer(original_question)
+    if equipment_answer:
+        return {
+            "answer": equipment_answer,
+            "intent": "equipment",
+            "confidence": 0.98,
+            "sources": ["Prometheus — métriques multi-équipement en temps réel"],
+            "suggestions": SUGGESTIONS["equipment"],
+            "used_live_data": True,
             "follow_up": False,
         }
 
@@ -313,14 +379,12 @@ def build_assistant_response(
             "answer": direct_answer,
             "intent": intent,
             "confidence": direct_confidence,
-            "sources": ["Données temps réel de la plateforme"]
-            if intent == "services"
-            else ["Architecture documentée du projet"],
+            "sources": _direct_sources(intent, direct_answer),
             "suggestions": SUGGESTIONS.get(
                 intent,
                 SUGGESTIONS["documentation"],
             ),
-            "used_live_data": intent == "services",
+            "used_live_data": intent in LIVE_INTENTS,
             "follow_up": is_follow_up,
         }
 

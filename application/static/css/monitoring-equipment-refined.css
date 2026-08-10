@@ -50,3 +50,32 @@ body.mobile-menu-open{overflow:hidden}
 .technical-details dd{max-width:62%;overflow-wrap:anywhere}
 .scrape-footer{align-items:flex-start;flex-direction:column;gap:7px}
 }
+
+/* Monitoring harmonisé avec les pages autonomes du portail. */
+.monitoring-page.workspace{
+    width:min(1380px,100%);
+    max-width:1380px;
+    margin:0 auto;
+    padding:24px;
+}
+.monitoring-page .portal-header{margin-bottom:20px}
+.monitoring-context{
+    padding:14px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+}
+.monitoring-context .breadcrumb{font-size:12px}
+.monitoring-context .title-line h1{font-size:22px}
+.monitoring-page .toolbar{margin-top:14px}
+
+@media(max-width:720px){
+    .monitoring-page.workspace{padding:16px 12px}
+    .monitoring-page .portal-header{align-items:flex-start}
+    .monitoring-page .portal-title-icon{width:44px;height:44px;border-radius:13px}
+    .monitoring-page .portal-title h1{font-size:1.2rem}
+    .monitoring-page .portal-back{min-height:38px}
+    .monitoring-context{padding:12px}
+    .monitoring-context>div:first-child{padding-right:0}
+}

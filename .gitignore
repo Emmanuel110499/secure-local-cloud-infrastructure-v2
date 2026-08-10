@@ -18,6 +18,7 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+tmp/
 .venv/
 venv/
 
@@ -45,6 +46,7 @@ application/*summary*.json
 *.zip
 *.tar
 *.tar.gz
+output/pdf/qa-equipment/
 
 # IDE et systeme
 .idea/
@@ -57,5 +59,6 @@ docs/screenshots/*
 !docs/screenshots/.gitkeep
 !docs/screenshots/accueil.png
 !docs/screenshots/monitoring.png
+!docs/screenshots/monitoring-mobile.png
 !docs/screenshots/conteneurs-docker.png
 !docs/screenshots/architecture.png

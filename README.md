@@ -17,19 +17,46 @@ Portail local de supervision et d'administration d'une infrastructure auto-heber
 
 ```mermaid
 flowchart LR
-    U[Utilisateur] -->|HTTPS| N[Nginx]
-    N --> F[Portail Flask / Gunicorn]
-    F --> D[Docker Engine]
-    F --> P[Prometheus]
-    F --> G[Grafana]
-    F --> A[Alertmanager]
-    P --> E[Node Exporter]
-    P --> C[cAdvisor]
+    Internet((Internet)) --> CF[Cloudflare Zero Trust]
+    CF -->|Tunnel HTTPS| N[Nginx sur srv-web]
+    N --> F[Flask et Gunicorn]
+
+    subgraph PC[PC Emmanuel - Windows]
+        WE[Windows Exporter]
+        BAT[Collecteur batterie]
+        VM[VMware Workstation]
+    end
+
+    subgraph WEB[srv-web - Ubuntu]
+        N
+        F
+        DE1[Docker Engine]
+        NE1[Node Exporter]
+        CA[cAdvisor]
+    end
+
+    subgraph MON[srv-monitoring - Ubuntu]
+        P[Prometheus]
+        G[Grafana]
+        A[Alertmanager]
+        NE2[Node Exporter]
+        V[Volumes persistants]
+    end
+
+    BAT --> WE
+    P -->|scrape| WE
+    P -->|scrape| NE1
+    P -->|scrape| CA
+    P -->|scrape| NE2
+    F -->|API Prometheus| P
+    G --> P
+    P --> A
+    P --> V
 ```
 
-Les composants peuvent etre repartis sur deux machines : un serveur web pour Nginx et Flask, et un serveur de monitoring pour Prometheus, Grafana et Alertmanager. Les adresses presentes dans les fichiers Compose sont des exemples issus du reseau local d'origine.
+L'installation réelle comprend trois équipements : le PC Windows d'administration, `srv-web` pour le portail et la collecte locale, et `srv-monitoring` pour la centralisation, l'historique, la visualisation et les alertes.
 
-Une [architecture cible a grande echelle](docs/ARCHITECTURE.md#architecture-cible-a-grande-echelle) documente l'evolution possible vers plusieurs sites, des Prometheus regionaux, un stockage distribue, un cluster Alertmanager et une authentification centralisee.
+L'[architecture technique détaillée](docs/ARCHITECTURE.md) documente les équipements, les réseaux, les flux HTTPS, les collecteurs, les volumes et les limites de sécurité.
 
 ## Arborescence utile
 
@@ -96,6 +123,12 @@ La vue de monitoring présente les mesures en temps réel et leur historique : C
 
 ![Monitoring CPU, mémoire et disque](docs/screenshots/monitoring.png)
 
+### Version mobile
+
+La navigation responsive masque la barre latérale derrière un bouton de menu et empile les indicateurs pour conserver une lecture claire sur téléphone.
+
+![Monitoring multi-équipement sur téléphone](docs/screenshots/monitoring-mobile.png)
+
 ### Conteneurs Docker
 
 Cette vue centralise l'état, la consommation et les actions d'exploitation des conteneurs exécutés sur `srv-web`.
@@ -117,8 +150,17 @@ Avant chaque publication, consultez [SECURITY.md](SECURITY.md), verifiez l'histo
 ## Documentation
 
 - [Installation](docs/INSTALLATION.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Securite et secrets](SECURITY.md)
+- [Architecture physique, réseau et applicative](docs/ARCHITECTURE.md)
+- [Guide du code et des fichiers](docs/GUIDE-DU-CODE.md)
+- [Alertes Prometheus, Alertmanager et Telegram](docs/ALERTES-TELEGRAM.md)
+- [Sauvegardes, réplication et restauration](docs/SAUVEGARDES-RESTAURATION.md)
+- [Sécurité et secrets](SECURITY.md)
+
+### Dossiers PDF
+
+- [Audit avant/après corrections](output/pdf/audit-avant-apres-secure-local-cloud.pdf)
+- [Guide utilisateur](output/pdf/guide-utilisateur-secure-local-cloud.pdf)
+- [Manuel administrateur et dossier technique](output/pdf/manuel-administrateur-secure-local-cloud.pdf)
 
 ## Etat du projet
 

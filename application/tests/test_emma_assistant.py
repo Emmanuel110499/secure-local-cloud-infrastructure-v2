@@ -17,6 +17,73 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class EmmaIntentTests(unittest.TestCase):
+    class FakeEquipmentPrometheus:
+        def get_equipment_metrics(self, equipment_id):
+            equipment = {
+                "srv-web": ("srv-web", "Serveur applicatif", "linux", 10, 30, 50),
+                "srv-monitoring": ("srv-monitoring", "Serveur d’observabilité", "linux", 5, 25, 65),
+                "pc-emmanuel": ("PC Emmanuel", "Poste d’administration", "windows", 20, 90, 70),
+            }[equipment_id]
+            metrics = {
+                "cpu": equipment[3], "memory": equipment[4], "disk": equipment[5],
+                "network_receive_kbps": 12, "uptime": "2 j",
+            }
+            if equipment_id == "pc-emmanuel":
+                metrics["battery"] = {
+                    "charge_percent": 96,
+                    "on_ac_power": True,
+                    "collector_age_seconds": 15,
+                }
+            if equipment_id == "srv-monitoring":
+                metrics["volumes"] = [
+                    {"name": "prometheus-data", "used_bytes": 1024**3},
+                    {"name": "grafana-data", "used_bytes": 512 * 1024**2},
+                ]
+            return {
+                "equipment": {
+                    "id": equipment_id, "name": equipment[0],
+                    "role": equipment[1], "os": equipment[2],
+                },
+                "state": "up", "metrics": metrics,
+            }
+
+        def get_all_equipment_metrics(self):
+            return [
+                self.get_equipment_metrics(equipment_id)
+                for equipment_id in ("srv-web", "srv-monitoring", "pc-emmanuel")
+            ]
+
+    def render_equipment(self, question):
+        app = Flask(__name__)
+        app.extensions["prometheus_service"] = self.FakeEquipmentPrometheus()
+        with app.app_context():
+            return build_assistant_response(question)
+
+    def test_equipment_state_uses_targeted_live_data(self):
+        response = self.render_equipment("Quel est l’état actuel de srv-monitoring ?")
+        self.assertEqual(response["intent"], "equipment")
+        self.assertTrue(response["used_live_data"])
+        self.assertIn("srv-monitoring", response["answer"])
+        self.assertIn("65 %", response["answer"])
+
+    def test_equipment_comparison_identifies_main_pressure(self):
+        response = self.render_equipment("Compare les trois équipements")
+        self.assertIn("PC Emmanuel", response["answer"])
+        self.assertIn("RAM à 90 %", response["answer"])
+        self.assertIn("Alerte critique", response["answer"])
+        self.assertIn("état opérationnel", response["answer"])
+
+    def test_pc_battery_is_explained(self):
+        response = self.render_equipment("Quel est l’état de la batterie de mon PC ?")
+        self.assertIn("96 %", response["answer"])
+        self.assertIn("secteur", response["answer"])
+
+    def test_monitoring_volumes_are_explained(self):
+        response = self.render_equipment("Explique les volumes persistants")
+        self.assertIn("prometheus-data", response["answer"])
+        self.assertIn("grafana-data", response["answer"])
+        self.assertIn("après le redémarrage", response["answer"])
+
     def test_empty_question_is_rejected_cleanly(self):
         response = build_assistant_response("   ")
 

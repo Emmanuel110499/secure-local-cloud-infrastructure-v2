@@ -20,12 +20,11 @@ class VisualAssetsProTests(unittest.TestCase):
         self.assertTrue(image.exists())
         self.assertGreater(image.stat().st_size, 100_000)
 
-    def test_replacement_is_loaded_on_relevant_pages(self):
-        for name in ("index_v2.html", "documentation.html", "login.html", "base.html"):
-            with self.subTest(template=name):
-                text = (ROOT / "templates" / name).read_text(encoding="utf-8")
-                self.assertIn("css/visual-assets-pro.css", text)
-                self.assertIn("js/visual-assets-pro.js", text)
+    def test_optional_replacement_assets_remain_self_contained(self):
+        stylesheet = ROOT / "static/css/visual-assets-pro.css"
+        script = ROOT / "static/js/visual-assets-pro.js"
+        self.assertTrue(stylesheet.exists())
+        self.assertTrue(script.exists())
 
     def test_replacement_uses_real_brand_files(self):
         script = (ROOT / "static/js/visual-assets-pro.js").read_text(encoding="utf-8")
