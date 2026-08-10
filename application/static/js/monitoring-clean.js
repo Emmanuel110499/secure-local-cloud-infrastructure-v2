@@ -200,23 +200,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         Chargement…
                     </span>
 
-                    <button
-                        id="cm-export"
-                        type="button"
-                        class="cm-export"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
+                    <div class="cm-print-choices" aria-label="Exportation et impression">
+                        <a
+                            href="/export/pdf"
+                            class="cm-print-choice cm-pdf-download"
+                            title="Télécharger le rapport PDF"
                         >
-                            <path d="M6 2h8l4 4v16H6z"></path>
-                            <path d="M14 2v5h5"></path>
-                            <path d="M9 13h6"></path>
-                            <path d="M9 17h6"></path>
-                        </svg>
-
-                        <span>Exporter</span>
-                    </button>
+                            Télécharger PDF
+                        </a>
+                        <button type="button" class="cm-print-choice" data-print-orientation="portrait">
+                            Imprimer vertical
+                        </button>
+                        <button type="button" class="cm-print-choice" data-print-orientation="landscape">
+                            Imprimer horizontal
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -423,6 +421,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     Dernière actualisation : --
                 </span>
             </div>
+
+            <section class="cm-insights" aria-label="Synthèse du monitoring">
+                <article class="cm-insight">
+                    <small>État global</small>
+                    <strong id="cm-global-state">Analyse en cours…</strong>
+                </article>
+                <article class="cm-insight">
+                    <small>Qualité des données</small>
+                    <strong id="cm-data-quality">Chargement…</strong>
+                </article>
+                <article class="cm-insight">
+                    <small>Ressource la plus sollicitée</small>
+                    <strong id="cm-highest-resource">Calcul en cours…</strong>
+                </article>
+                <article class="cm-insight">
+                    <small>Seuils surveillés</small>
+                    <strong>CPU 70 % · RAM 75 % · Disque 80 %</strong>
+                </article>
+            </section>
         `;
 
         const container = findPageContainer();
@@ -726,6 +743,107 @@ document.addEventListener("DOMContentLoaded", () => {
         ).textContent = percent(statistics.max);
     }
 
+    async function fetchJson(url, timeout = 8000) {
+        const controller = new AbortController();
+        const timer = window.setTimeout(
+            () => controller.abort(),
+            timeout
+        );
+
+        try {
+            const response = await fetch(url, {
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                    Accept: "application/json",
+                },
+                signal: controller.signal,
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            return await response.json();
+        } finally {
+            window.clearTimeout(timer);
+        }
+    }
+
+    async function loadCurrentMetrics(status, historyError) {
+        try {
+            const payload = await fetchJson(
+                `/api/metrics?t=${Date.now()}`,
+                8000
+            );
+            const metrics = payload.metrics || {};
+            const current = {
+                cpu: number(metrics.cpu),
+                memory: number(metrics.memory),
+                disk: number(metrics.disk),
+            };
+
+            if (
+                metrics.cpu == null
+                || metrics.memory == null
+                || metrics.disk == null
+            ) {
+                throw new Error("Métriques temps réel incomplètes");
+            }
+
+            const labels = ["Maintenant", "Maintenant"];
+
+            Object.entries(current).forEach(([metric, value]) => {
+                const colors = {
+                    cpu: ["#3567e8", "rgba(53,103,232,.10)", 70],
+                    memory: ["#10a87f", "rgba(16,168,127,.10)", 75],
+                    disk: ["#e9810b", "rgba(233,129,11,.11)", 80],
+                }[metric];
+                const statistics = {
+                    min: value,
+                    avg: value,
+                    max: value,
+                    latest: value,
+                };
+
+                updateMetric(metric, statistics);
+                renderChart({
+                    key: metric,
+                    canvasId: `cm-${metric}-chart`,
+                    labels,
+                    values: [value, value],
+                    line: colors[0],
+                    fill: colors[1],
+                    threshold: colors[2],
+                });
+            });
+
+            document.getElementById("cm-count").textContent = "Temps réel";
+            document.getElementById("cm-period-label").textContent =
+                "Valeurs actuelles de Prometheus";
+            document.getElementById("cm-global-state").textContent =
+                "Mesures actuelles disponibles";
+            document.getElementById("cm-data-quality").textContent =
+                "Mode temps réel actif";
+            document.getElementById("cm-highest-resource").textContent =
+                Object.entries(current)
+                    .sort((left, right) => right[1] - left[1])
+                    .map(([name, value]) =>
+                        `${name.toUpperCase()} · ${percent(value)}`
+                    )[0];
+
+            status.textContent =
+                "Valeurs réelles · historique temporairement indisponible";
+            document.getElementById("cm-updated-at").textContent =
+                "Dernière actualisation : "
+                + new Date().toLocaleTimeString("fr-FR");
+        } catch (fallbackError) {
+            console.error("Métriques temps réel indisponibles :", fallbackError);
+            status.textContent =
+                `Données indisponibles : ${historyError.message}`;
+        }
+    }
+
     async function loadHistory(hours = state.hours) {
         state.hours = hours;
 
@@ -736,24 +854,10 @@ document.addEventListener("DOMContentLoaded", () => {
             "Chargement des données…";
 
         try {
-            const response = await fetch(
+            const payload = await fetchJson(
                 `/api/metrics/history?hours=${hours}&t=${Date.now()}`,
-                {
-                    credentials: "same-origin",
-                    cache: "no-store",
-                    headers: {
-                        Accept: "application/json",
-                    },
-                }
+                8000
             );
-
-            if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}`
-                );
-            }
-
-            const payload = await response.json();
 
             const allRecords =
                 Array.isArray(payload.history)
@@ -836,6 +940,28 @@ document.addEventListener("DOMContentLoaded", () => {
             updateMetric("memory", memoryStats);
             updateMetric("disk", diskStats);
 
+            const currentValues = {
+                CPU: cpuStats.latest,
+                RAM: memoryStats.latest,
+                Disque: diskStats.latest,
+            };
+            const highest = Object.entries(currentValues)
+                .sort((left, right) => right[1] - left[1])[0];
+            const warningCount = [
+                cpuStats.latest >= 70,
+                memoryStats.latest >= 75,
+                diskStats.latest >= 80,
+            ].filter(Boolean).length;
+
+            document.getElementById("cm-global-state").textContent =
+                warningCount
+                    ? `${warningCount} seuil(s) à surveiller`
+                    : "Tous les indicateurs sont normaux";
+            document.getElementById("cm-data-quality").textContent =
+                `${allRecords.length} mesures disponibles`;
+            document.getElementById("cm-highest-resource").textContent =
+                `${highest[0]} · ${percent(highest[1])}`;
+
             document.getElementById(
                 "cm-count"
             ).textContent = allRecords.length;
@@ -875,8 +1001,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
-            status.textContent =
-                `Erreur : ${error.message}`;
+            await loadCurrentMetrics(status, error);
         }
     }
 

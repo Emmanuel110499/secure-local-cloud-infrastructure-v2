@@ -423,8 +423,8 @@
         .topology-servers {
             display: grid;
             grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-            gap: 50px;
+                repeat(3, minmax(0, 1fr));
+            gap: 24px;
         }
 
         .server-node {
@@ -444,6 +444,13 @@
                     #faf7ff
                 );
             border-color: #e8d9ff;
+        }
+
+        .server-pc-icon,
+        .server-icon.pc {
+            color: #2563eb;
+            background: linear-gradient(145deg, #eaf2ff, #f8fbff);
+            border-color: #d4e2ff;
         }
 
         .topology-ip {
@@ -602,7 +609,7 @@
         .servers-grid {
             display: grid;
             grid-template-columns:
-                repeat(2, minmax(0, 1fr));
+                repeat(3, minmax(0, 1fr));
             gap: 15px;
             margin-bottom: 16px;
         }
@@ -958,6 +965,7 @@
     ) }}"
 >
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/product-system.css', v='product-v2-1') }}">
 </head>
 
 <body class="portal-v4 portal-body">
@@ -1008,22 +1016,22 @@
             </div>
 
             <div class="health-metric">
-                <span>CPU srv-web</span>
+                <span>CPU consolidé</span>
                 <strong id="metric-cpu">--</strong>
             </div>
 
             <div class="health-metric">
-                <span>RAM srv-web</span>
+                <span>RAM consolidée</span>
                 <strong id="metric-memory">--</strong>
             </div>
 
             <div class="health-metric">
-                <span>Disque srv-web</span>
+                <span>Disque le plus utilisé</span>
                 <strong id="metric-disk">--</strong>
             </div>
 
             <div class="health-metric optional">
-                <span>Uptime</span>
+                <span>Équipements</span>
                 <strong id="metric-uptime">--</strong>
             </div>
         </section>
@@ -1101,33 +1109,6 @@
             </div>
 
             <div class="topology-map">
-                <article class="topology-node admin-node">
-                    <div class="topology-node-icon">
-                        <svg viewBox="0 0 24 24">
-                            <rect
-                                x="3"
-                                y="4"
-                                width="18"
-                                height="12"
-                                rx="2"
-                            />
-                            <path d="M8 20h8M12 16v4"/>
-                            <path d="M6 8h12"/>
-                        </svg>
-                    </div>
-
-                    <strong>Poste d’administration</strong>
-
-                    <span>
-                        Windows · VMware · SSH · Navigateur
-                    </span>
-                </article>
-
-                <div class="topology-link vertical-link">
-                    <span></span>
-                    <small>Administration</small>
-                </div>
-
                 <article class="topology-network">
                     <div class="topology-network-icon">
                         <svg viewBox="0 0 24 24">
@@ -1162,6 +1143,28 @@
                 </div>
 
                 <div class="topology-servers">
+                    <article class="topology-node server-node">
+                        <div class="topology-node-icon server-pc-icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="12" rx="2"/>
+                                <path d="M8 20h8M12 16v4"/>
+                            </svg>
+                        </div>
+
+                        <strong>PC Emmanuel</strong>
+
+                        <span class="topology-ip">192.168.154.1</span>
+
+                        <div class="topology-services">
+                            <span>Poste d’administration</span>
+                            <span>Windows 11</span>
+                            <span>Windows Exporter</span>
+                            <span>Collecteur batterie</span>
+                            <span>VMware</span>
+                            <span>SSH</span>
+                        </div>
+                    </article>
+
                     <article class="topology-node server-node">
                         <div class="topology-node-icon server-web-icon">
                             <svg viewBox="0 0 24 24">
@@ -1225,6 +1228,7 @@
                             <span>Prometheus</span>
                             <span>Grafana</span>
                             <span>Alertmanager</span>
+                            <span>Node Exporter</span>
                             <span>Historique</span>
                         </div>
                     </article>
@@ -1236,7 +1240,7 @@
                     <div class="flow-label">
                         Métriques système et Docker
                         <small>
-                            Node Exporter / cAdvisor → Prometheus
+                            Windows Exporter / Node Exporter / cAdvisor → Prometheus
                         </small>
                     </div>
                 </div>
@@ -1244,6 +1248,45 @@
         </section>
 
         <section class="servers-grid">
+            <article class="server-card">
+                <header class="server-header">
+                    <div class="server-identity">
+                        <span class="server-icon pc">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="12" rx="2"/>
+                                <path d="M8 20h8M12 16v4"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong class="server-name">PC Emmanuel</strong>
+                            <span class="server-description">Poste d’administration et hôte VMware.</span>
+                        </div>
+                    </div>
+                    <span id="pc-emmanuel-state" class="server-state">Opérationnel</span>
+                </header>
+
+                <div class="server-network">
+                    <span class="network-badge">192.168.154.1</span>
+                    <span class="network-badge">Windows 11</span>
+                    <span class="network-badge">VMware</span>
+                </div>
+
+                <div class="services-list">
+                    <div class="service-item">
+                        <div class="service-identity"><span class="service-symbol">W</span><span class="service-name">Windows Exporter</span></div>
+                        <span id="service-windows-exporter" class="service-status">UP</span>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-identity"><span class="service-symbol">▰</span><span class="service-name">Collecteur batterie</span></div>
+                        <span id="service-battery-collector" class="service-status">UP</span>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-identity"><span class="service-symbol">VM</span><span class="service-name">VMware Workstation</span></div>
+                        <span class="service-status">Hôte</span>
+                    </div>
+                </div>
+            </article>
+
             <article class="server-card">
                 <header class="server-header">
                     <div class="server-identity">
@@ -1372,6 +1415,45 @@
 
                         <span class="service-status">
                             Actif
+                        </span>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-identity">
+                            <span class="service-symbol">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 4h14v16H5Z"/>
+                                    <path d="M8 8h8M8 12h8M8 16h5"/>
+                                </svg>
+                            </span>
+
+                            <span class="service-name">
+                                Nginx
+                            </span>
+                        </div>
+
+                        <span class="service-status">
+                            Actif
+                        </span>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-identity">
+                            <span class="service-symbol">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M6 12a6 6 0 0 1 10.7-3.7"/>
+                                    <path d="M18 12a6 6 0 0 1-10.7 3.7"/>
+                                    <path d="M16 5v4h-4M8 19v-4h4"/>
+                                </svg>
+                            </span>
+
+                            <span class="service-name">
+                                Cloudflare Tunnel
+                            </span>
+                        </div>
+
+                        <span class="service-status">
+                            Configuré
                         </span>
                     </div>
                 </div>
@@ -1503,6 +1585,43 @@
                             Actif
                         </span>
                     </div>
+
+                    <div class="service-item">
+                        <div class="service-identity">
+                            <span class="service-symbol">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/>
+                                </svg>
+                            </span>
+
+                            <span class="service-name">
+                                Node Exporter
+                            </span>
+                        </div>
+
+                        <span class="service-status">
+                            UP
+                        </span>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-identity">
+                            <span class="service-symbol">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="4" y="6" width="16" height="12" rx="2"/>
+                                    <path d="M8 10h8M8 14h5"/>
+                                </svg>
+                            </span>
+
+                            <span class="service-name">
+                                Docker Engine
+                            </span>
+                        </div>
+
+                        <span class="service-status">
+                            Actif
+                        </span>
+                    </div>
                 </div>
             </article>
         </section>
@@ -1521,11 +1640,11 @@
                     <span class="flow-number">1</span>
 
                     <div>
-                        <strong>Collecte système</strong>
+                        <strong>Collecte Linux</strong>
 
                         <span>
-                            Node Exporter expose les ressources
-                            système de srv-web sur le port 9100.
+                            Node Exporter expose les ressources de
+                            srv-web et srv-monitoring sur le port 9100.
                         </span>
                     </div>
                 </article>
@@ -1534,11 +1653,11 @@
                     <span class="flow-number">2</span>
 
                     <div>
-                        <strong>Collecte Docker</strong>
+                        <strong>Collecte Windows et Docker</strong>
 
                         <span>
-                            cAdvisor expose l’activité des
-                            conteneurs sur le port 8080.
+                            Windows Exporter publie le PC sur 9182 ;
+                            cAdvisor publie les conteneurs sur 8080.
                         </span>
                     </div>
                 </article>
@@ -1613,7 +1732,7 @@
             <h2>Architecture opérationnelle en temps réel</h2>
 
             <p>
-                Représentation des accès externes, du serveur applicatif,
+                Représentation du PC Windows, des deux serveurs,
                 de Docker et de la chaîne de supervision.
             </p>
         </div>
@@ -1626,41 +1745,41 @@
     <div class="real-architecture">
         <article class="real-node">
             <div class="real-node-head">
-                <span class="brand-logo large cloudflare">
-                    <img
-                        src="{{ url_for('static', filename='brand/cloudflare.svg') }}"
-                        alt="Cloudflare"
-                    >
+                <span class="brand-logo large pc-source">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="12" rx="2"/>
+                        <path d="M8 20h8M12 16v4"/>
+                    </svg>
                 </span>
 
                 <div>
-                    <h3>Accès administrateur</h3>
+                    <h3>PC Emmanuel</h3>
 
                     <span class="real-node-subtitle">
-                        Cloudflare Zero Trust
+                        Windows 11 · VMware · 192.168.154.1
                     </span>
                 </div>
             </div>
 
             <div class="real-node-details">
                 <div class="real-node-detail">
-                    <span>Entrée</span>
-                    <strong>HTTPS public</strong>
+                    <span>Collecteur</span>
+                    <strong>Windows Exporter :9182</strong>
                 </div>
 
                 <div class="real-node-detail">
-                    <span>Protection</span>
-                    <strong>Identité + tunnel</strong>
+                    <span>Télémétrie</span>
+                    <strong>Système + batterie</strong>
                 </div>
             </div>
 
             <div class="real-services">
                 <span class="real-service-chip">
-                    TLS actif
+                    Batterie
                 </span>
 
                 <span class="real-service-chip">
-                    Zero Trust
+                    Poste administrateur
                 </span>
             </div>
         </article>
@@ -1672,7 +1791,7 @@
             </div>
 
             <span class="real-connector-label">
-                Requêtes HTTPS
+                Métriques Windows
             </span>
         </div>
 
@@ -1840,13 +1959,13 @@
 
             <div class="real-flow-steps">
                 <div class="real-flow-step">
-                    <strong>1. Accès</strong>
-                    L’administrateur passe par Cloudflare.
+                    <strong>1. Poste Windows</strong>
+                    Windows Exporter publie les KPI et la batterie.
                 </div>
 
                 <div class="real-flow-step">
                     <strong>2. Application</strong>
-                    Nginx transmet les requêtes à Flask.
+                    Cloudflare et Nginx transmettent les requêtes à Flask.
                 </div>
 
                 <div class="real-flow-step">
@@ -2010,8 +2129,24 @@
                         );
                     }
 
-                    const payload =
-                        await response.json();
+                    const payload = await response.json();
+                    const equipmentResponse = await fetch(
+                        `/api/equipment?t=${Date.now()}`,
+                        {cache: "no-store", headers: {Accept: "application/json"}}
+                    );
+                    const equipmentPayload = equipmentResponse.ok
+                        ? await equipmentResponse.json()
+                        : {equipment: []};
+                    const equipment = Array.isArray(equipmentPayload.equipment)
+                        ? equipmentPayload.equipment
+                        : [];
+                    const liveEquipment = equipment.filter(item => item.state === "up");
+                    const numericValues = key => liveEquipment
+                        .map(item => Number((item.metrics || {})[key]))
+                        .filter(Number.isFinite);
+                    const average = values => values.length
+                        ? values.reduce((total, value) => total + value, 0) / values.length
+                        : null;
 
                     const metrics =
                         payload.metrics || {};
@@ -2021,22 +2156,22 @@
 
                     setText(
                         "metric-cpu",
-                        formatPercent(metrics.cpu)
+                        formatPercent(average(numericValues("cpu")))
                     );
 
                     setText(
                         "metric-memory",
-                        formatPercent(metrics.memory)
+                        formatPercent(average(numericValues("memory")))
                     );
 
                     setText(
                         "metric-disk",
-                        formatPercent(metrics.disk)
+                        formatPercent(Math.max(...numericValues("disk")))
                     );
 
                     setText(
                         "metric-uptime",
-                        metrics.uptime || "--"
+                        `${liveEquipment.length}/${equipment.length} opérationnels`
                     );
 
                     updateHealth(payload.health);
@@ -2090,6 +2225,17 @@
                         "srv-monitoring-state",
                         monitoringHealthy
                     );
+
+                    const pc = equipment.find(item =>
+                        item.equipment && item.equipment.id === "pc-emmanuel"
+                    );
+                    const pcHealthy = Boolean(pc && pc.state === "up");
+                    const battery = pc && pc.metrics ? pc.metrics.battery || {} : {};
+                    const batteryFresh = Number.isFinite(Number(battery.collector_age_seconds))
+                        && Number(battery.collector_age_seconds) < 180;
+                    updateServerState("pc-emmanuel-state", pcHealthy);
+                    updateService("windows-exporter", pcHealthy);
+                    updateService("battery-collector", batteryFresh);
 
                     setText(
                         "infrastructure-updated-at",

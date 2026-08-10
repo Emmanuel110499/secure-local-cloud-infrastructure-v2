@@ -9,6 +9,8 @@ from typing import Any
 import requests
 from flask import current_app, jsonify
 
+from decorators import login_required
+
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / "data" / "daily_alerts.db"
@@ -276,6 +278,7 @@ def register_daily_alerts(app) -> None:
     initialize_database()
 
     @app.get("/api/daily-alerts")
+    @login_required
     def daily_alerts():
         try:
             active_alerts = fetch_active_alerts()

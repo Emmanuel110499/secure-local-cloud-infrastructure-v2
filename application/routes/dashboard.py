@@ -41,6 +41,10 @@ def get_complete_services_status() -> dict:
             current_app.config["GRAFANA_URL"]
             + "/api/health"
         ),
+        "alertmanager": security.check_http_service(
+            current_app.config["ALERTMANAGER_URL"]
+            + "/-/healthy"
+        ),
     })
 
     return services
@@ -172,6 +176,90 @@ def api_metrics_history():
     })
 
 
+@dashboard_bp.route("/api/equipment")
+@login_required
+def api_equipment():
+    """Catalogue et état actuel de tous les équipements."""
+
+    prometheus = current_app.extensions["prometheus_service"]
+    equipment = prometheus.get_all_equipment_metrics()
+
+    return jsonify({
+        "equipment": equipment,
+        "count": len(equipment),
+        "updated_at": datetime.now().isoformat(),
+    })
+
+
+@dashboard_bp.route("/api/equipment/<equipment_id>/metrics")
+@login_required
+def api_equipment_metrics(equipment_id: str):
+    """KPI actuels d'un équipement configuré."""
+
+    prometheus = current_app.extensions["prometheus_service"]
+    result = prometheus.get_equipment_metrics(equipment_id)
+
+    if result is None:
+        return jsonify({
+            "error": "Équipement inconnu.",
+            "equipment_id": equipment_id,
+        }), 404
+
+    platform_services = get_complete_services_status()
+    service_names = {
+        "srv-web": ("flask", "node_exporter", "cadvisor"),
+        "srv-monitoring": ("prometheus", "grafana", "alertmanager"),
+        "pc-emmanuel": ("windows_exporter", "battery_collector"),
+    }.get(equipment_id, ())
+
+    if equipment_id == "pc-emmanuel":
+        battery = result.get("metrics", {}).get("battery") or {}
+        contextual_services = {
+            "windows_exporter": result.get("state") == "up",
+            "battery_collector": (
+                battery.get("collector_age_seconds") is not None
+                and battery.get("collector_age_seconds") < 180
+            ),
+        }
+    else:
+        contextual_services = {
+            name: platform_services.get(name)
+            for name in service_names
+        }
+
+    return jsonify({
+        **result,
+        "services": contextual_services,
+        "updated_at": datetime.now().isoformat(),
+    })
+
+
+@dashboard_bp.route("/api/equipment/<equipment_id>/history")
+@login_required
+def api_equipment_history(equipment_id: str):
+    """Historique Prometheus d'un équipement sur 1 à 168 heures."""
+
+    try:
+        hours = int(request.args.get("hours", 24))
+    except (TypeError, ValueError):
+        hours = 24
+
+    prometheus = current_app.extensions["prometheus_service"]
+    result = (
+        prometheus.get_global_history(hours)
+        if equipment_id == "global"
+        else prometheus.get_equipment_history(equipment_id, hours)
+    )
+
+    if result is None:
+        return jsonify({"error": "Équipement inconnu."}), 404
+
+    return jsonify({
+        **result,
+        "updated_at": datetime.now().isoformat(),
+    })
+
+
 @dashboard_bp.route("/api/health-score")
 @login_required
 def api_health_score():
@@ -198,5 +286,3 @@ def api_health_score():
             containers=containers,
         )
     )
-
-

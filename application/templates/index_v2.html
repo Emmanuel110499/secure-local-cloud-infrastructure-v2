@@ -40,7 +40,7 @@
     href="{{ url_for(
         'static',
         filename='css/emma-floating-chat.css',
-        v='emma-floating-chat-v2'
+        v='interface-mobile-v1.4.1'
     ) }}"
 >
 
@@ -78,7 +78,7 @@ v='modern-pc-20260803-233423'
     href="{{ url_for(
         'static',
         filename='css/sidebar-premium.css',
-        v='compact-health-20260804-201558'
+        v='interface-visual-v1.2.1'
     ) }}"
 >
 
@@ -98,7 +98,7 @@ v='modern-pc-20260803-233423'
     href="{{ url_for(
         'static',
         filename='css/monitoring-report-print.css',
-        v='monitoring-print-20260804-134659'
+        v='interface-visual-v1.2.1'
     ) }}"
 >
 
@@ -108,10 +108,11 @@ v='modern-pc-20260803-233423'
     href="{{ url_for(
         'static',
         filename='css/platform-search.css',
-        v='platform-search-20260804-144713'
+        v='interface-mobile-v1.4'
     ) }}"
 >
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/product-system.css', v='product-v2-1') }}">
 </head>
 
 <body class="portal-v4">
@@ -173,14 +174,6 @@ v='modern-pc-20260803-233423'
     Accueil
 </span>
 </a>
-            <a href="#dashboard" class="nav-item">
-<span class="sidebar-colored-icon" aria-hidden="true">
-    📊
-</span>
-<span class="sidebar-nav-label">
-    Tableau de bord
-</span>
-</a>
             <a href="/monitoring" class="nav-item">
 <span class="sidebar-colored-icon" aria-hidden="true">
     📈
@@ -206,15 +199,6 @@ v='modern-pc-20260803-233423'
 </span>
 </a>
             
-            <a href="/documentation" class="nav-item">
-<span class="sidebar-colored-icon" aria-hidden="true">
-    📚
-</span>
-<span class="sidebar-nav-label">
-    Documentation
-</span>
-</a>
-
             <div class="nav-heading">Outils avancés</div>
 
             <a
@@ -257,6 +241,24 @@ class="nav-item">
     Audit
 </span>
 </a>
+            <a href="/documentation" class="nav-item">
+<span class="sidebar-colored-icon" aria-hidden="true">
+    📚
+</span>
+<span class="sidebar-nav-label">
+    Documentation
+</span>
+</a>
+
+            <section class="sidebar-premium-card" aria-label="État local de la plateforme">
+                <div class="sidebar-premium-status">
+                    <span class="sidebar-premium-pulse" aria-hidden="true"></span>
+                    Protection active
+                </div>
+                <strong id="sidebar-local-time">--:--</strong>
+                <span id="sidebar-local-date">Heure locale</span>
+                <small>Surveillance continue</small>
+            </section>
         </nav>
 </aside>
 
@@ -356,17 +358,6 @@ class="nav-item">
                         </div>
                     </div>
 
-                    <a href="/account">
-                        
-<span class="account-symbol menu-symbol" aria-hidden="true">
-    <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1A8 8 0 0 0 15 6l-.3-2.5h-4L10.4 6a8 8 0 0 0-1.7 1.1l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1A8 8 0 0 0 10.4 18l.3 2.5h4L15 18a8 8 0 0 0 1.6-1.1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1Z"/>
-    </svg>
-</span>
-                        Gérer mon compte
-                    </a>
-
                     <a href="/account#username">
                         
 <span class="account-symbol menu-symbol" aria-hidden="true">
@@ -410,18 +401,16 @@ class="nav-item">
 <section class="hero">
             <div class="hero-content">
                 <span class="hero-badge">
-                    Infrastructure Cloud & Connexion sécurisée
+                    Console d’exploitation
                 </span>
 
                 <h1>
-                    Bienvenue sur Secure Local Cloud Infrastructure
+                    Secure Local Cloud
                 </h1>
 
                 <p>
-                    Une plateforme de supervision et d’observabilité
-                    permettant de suivre l’état des services, des
-                    ressources système et des conteneurs Docker depuis
-                    une interface centralisée et sécurisée.
+                    État des services, capacité système, sécurité et
+                    opérations réunis dans une même console.
                 </p>
 
                 <div class="world-presence-card">
@@ -446,15 +435,15 @@ class="nav-item">
         <div class="world-presence-heading">
             <div>
                 <span class="world-presence-eyebrow">
-                    Global Infrastructure
+                    Périmètre réseau
                 </span>
 
-                <h2>Présence réseau détectée</h2>
+                <h2>État du périmètre</h2>
             </div>
 
             <span class="world-online-badge">
                 <span class="world-online-dot"></span>
-                Online
+                Opérationnel
             </span>
         </div>
 
@@ -1356,24 +1345,6 @@ type="button">
         src="{{ url_for('static', filename='js/portal-v4.js', v='portal-v4-7') }}"
         defer
     ></script>
-<a
-    class="pdf-export-button mobile-export-above-emma"
-    href="{{ url_for('reports.export_pdf') }}"
-    title="Télécharger le rapport PDF"
->
-    <span class="pdf-export-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-            <path d="M6 2h9l5 5v15H6z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M9 13h6"/>
-            <path d="M9 17h6"/>
-        </svg>
-    </span>
-
-    <span class="pdf-export-text">
-        Exporter le rapport PDF
-    </span>
-</a>
 <script
     src="{{ url_for(
         'static',
@@ -1394,6 +1365,13 @@ type="button">
         filename='js/sidebar-active-navigation.js', v='sidebar-active-20260803-204450'
     ) }}"
 ></script>
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/sidebar-premium-clock.js',
+        v='interface-visual-v1.2.1'
+    ) }}"
+></script>
 <!-- EMMA_FLOATING_CHAT_START -->
 
 <button
@@ -1411,9 +1389,6 @@ type="button">
         🤖
     </span>
 
-    <span class="emma-chat-launcher-label">
-        Demandez à Emma_IA
-    </span>
 </button>
 
 <section
@@ -1551,7 +1526,7 @@ type="button">
     src="{{ url_for(
         'static',
         filename='js/emma-floating-chat.js',
-        v='emma-floating-chat-v2'
+        v='emma-floating-chat-v3.8'
     ) }}"
 ></script>
 
@@ -1608,9 +1583,10 @@ type="button">
     src="{{ url_for(
         'static',
         filename='js/platform-search.js',
-        v='platform-search-20260804-144713'
+        v='interface-mobile-v1.4'
     ) }}"
 ></script>
 
+<script src="{{ url_for('static', filename='js/product-icons.js', v='product-v2-1') }}"></script>
 </body>
 </html>

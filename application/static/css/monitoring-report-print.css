@@ -40,12 +40,39 @@
     .floating-actions,
     .report-pdf-button,
     .export-report-button,
+    .cm-print-choices,
+    .cm-toolbar,
+    [role="tooltip"],
+    .tooltip,
     #report-pdf-button,
     #export-report-pdf,
     button:has(
         svg
     ) {
         display: none !important;
+    }
+
+    .cm-insights {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 4mm !important;
+        margin-top: 5mm !important;
+    }
+
+    .cm-insight {
+        break-inside: avoid !important;
+        padding: 4mm !important;
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+    }
+
+    html[data-print-orientation="portrait"] .cm-chart-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-print-orientation="landscape"] .cm-chart-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
 
     main,

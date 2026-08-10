@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from flask import jsonify, request
@@ -9,6 +9,8 @@ from flask import jsonify, request
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / "data" / "visitor_analytics.db"
+RETENTION_DAYS = 90
+MAX_VISITS = 10_000
 
 
 def get_connection() -> sqlite3.Connection:
@@ -159,6 +161,38 @@ def get_statistics(
     }
 
 
+def prune_visits(
+    connection: sqlite3.Connection,
+) -> None:
+    """Limite la conservation et la taille de la base visiteurs."""
+
+    oldest_date = (
+        datetime.now(timezone.utc).date()
+        - timedelta(days=RETENTION_DAYS)
+    ).isoformat()
+
+    connection.execute(
+        """
+        DELETE FROM visitor_visits
+        WHERE visit_date < ?
+        """,
+        (oldest_date,),
+    )
+
+    connection.execute(
+        """
+        DELETE FROM visitor_visits
+        WHERE id NOT IN (
+            SELECT id
+            FROM visitor_visits
+            ORDER BY id DESC
+            LIMIT ?
+        )
+        """,
+        (MAX_VISITS,),
+    )
+
+
 def register_visitor_analytics(app) -> None:
     initialize_database()
 
@@ -271,6 +305,7 @@ def register_visitor_analytics(app) -> None:
                             ),
                         )
 
+                    prune_visits(connection)
                     connection.commit()
 
             return jsonify(

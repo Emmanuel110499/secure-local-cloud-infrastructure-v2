@@ -1413,3 +1413,73 @@ line-height:1.2;
         display: none !important;
     }
 }
+/* Carte d'état premium : remplace le lien Documentation retiré. */
+.sidebar-premium-card {
+    position: relative;
+    margin: 18px 3px 8px;
+    padding: 16px;
+    overflow: hidden;
+    color: #ffffff;
+    background:
+        radial-gradient(circle at 100% 0, rgba(83, 221, 187, 0.24), transparent 42%),
+        linear-gradient(145deg, rgba(45, 80, 153, 0.54), rgba(12, 32, 67, 0.88));
+    border: 1px solid rgba(132, 166, 229, 0.28);
+    border-radius: 18px;
+    box-shadow: 0 16px 34px rgba(0, 8, 28, 0.2);
+}
+
+.sidebar-premium-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #bff8e8;
+    font-size: 0.65rem;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.sidebar-premium-pulse {
+    width: 8px;
+    height: 8px;
+    background: #35dfb2;
+    border-radius: 50%;
+    box-shadow: 0 0 0 5px rgba(53, 223, 178, 0.12);
+    animation: sidebarPremiumCardPulse 2s ease-in-out infinite;
+}
+
+.sidebar-premium-card strong,
+.sidebar-premium-card > span,
+.sidebar-premium-card small {
+    display: block;
+}
+
+.sidebar-premium-card strong {
+    margin-top: 14px;
+    font-size: 1.55rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+}
+
+.sidebar-premium-card > span {
+    margin-top: 4px;
+    color: #dbe7ff;
+    font-size: 0.72rem;
+    font-weight: 750;
+    text-transform: capitalize;
+}
+
+.sidebar-premium-card small {
+    margin-top: 12px;
+    padding-top: 10px;
+    color: #94a9cd;
+    border-top: 1px solid rgba(148, 169, 205, 0.18);
+    font-size: 0.59rem;
+}
+
+@keyframes sidebarPremiumCardPulse {
+    50% {
+        opacity: 0.55;
+        transform: scale(0.82);
+    }
+}

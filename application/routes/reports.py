@@ -1,6 +1,7 @@
 from datetime import datetime
 from io import BytesIO
 import socket
+from xml.sax.saxutils import escape
 
 from flask import (
     Blueprint,
@@ -589,9 +590,11 @@ def export_pdf():
                     container.get("name")
                 ),
                 Paragraph(
-                    str(
-                        safe_value(
-                            container.get("image")
+                    escape(
+                        str(
+                            safe_value(
+                                container.get("image")
+                            )
                         )
                     ),
                     small_style,
@@ -916,7 +919,10 @@ def export_pdf():
     ):
         story.append(
             Paragraph(
-                f"<b>{number}.</b> {recommendation}",
+                (
+                    f"<b>{number}.</b> "
+                    f"{escape(str(recommendation))}"
+                ),
                 normal_style,
             )
         )
