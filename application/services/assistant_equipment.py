@@ -8,8 +8,12 @@ from flask import current_app
 
 
 EQUIPMENT_ALIASES = {
-    "srv-web": ("srv web", "serveur web", "serveur applicatif"),
-    "srv-monitoring": (
+    "vps-production": (
+        "vps production", "vps", "serveur de production",
+        "serveur web", "serveur applicatif", "srv web",
+    ),
+    "lab-vmware": (
+        "laboratoire vmware", "lab vmware", "anciennes vm",
         "srv monitoring",
         "serveur monitoring",
         "serveur de monitoring",
@@ -67,6 +71,7 @@ def _equipment_answer(equipment_id: str) -> str | None:
     state = {
         "up": "opérationnel",
         "down": "indisponible",
+        "disconnected": "non connecté (extension optionnelle)",
         "unknown": "état inconnu",
     }.get(result.get("state"), "état inconnu")
 
@@ -119,6 +124,7 @@ def _comparison_answer() -> str:
         state = {
             "up": "opérationnel",
             "down": "indisponible",
+            "disconnected": "non connecté (extension optionnelle)",
             "unknown": "état inconnu",
         }.get(result.get("state"), "état inconnu")
         lines.append(
@@ -183,12 +189,12 @@ def _volumes_answer() -> str:
     service = _service()
     if service is None:
         return "Les données Prometheus sont actuellement indisponibles."
-    result = service.get_equipment_metrics("srv-monitoring")
+    result = service.get_equipment_metrics("vps-production")
     volumes = (result or {}).get("metrics", {}).get("volumes") or []
     if not volumes:
         return "Aucune métrique de volume persistant n’est disponible."
 
-    lines = ["Volumes persistants de srv-monitoring", ""]
+    lines = ["Volumes persistants du VPS Production", ""]
     for volume in volumes:
         size_gib = float(volume.get("used_bytes", 0)) / 1024**3
         lines.append(f"• {volume.get('name', 'volume')} : {size_gib:.2f} Gio utilisés")

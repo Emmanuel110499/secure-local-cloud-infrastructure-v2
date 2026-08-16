@@ -1,0 +1,122 @@
+name: secure-local-cloud
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  web:
+    build:
+      context: ../application
+    container_name: secure-web-app-vps
+    hostname: srv-web
+    restart: unless-stopped
+    logging: *default-logging
+    env_file:
+      - ./secrets/application.env
+    environment:
+      NODE_EXPORTER_URL: http://node-exporter:9100
+      CADVISOR_URL: http://cadvisor:8080/containers/
+      CERTIFICATE_PATH: /security/nginx.crt
+    ports:
+      - "127.0.0.1:5001:5000"
+    volumes:
+      - ../application/data:/app/data
+      - ../application/log_exports:/app/log_exports
+      - ./config/internal-status.crt:/security/nginx.crt:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - prometheus
+      - cadvisor
+    networks:
+      - secure-cloud
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.9.1
+    container_name: node-exporter
+    hostname: vps-production
+    restart: unless-stopped
+    logging: *default-logging
+    command:
+      - --path.rootfs=/host
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - secure-cloud
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor@sha256:3de2bd5203120b866d74a9b283b2ffb8ec382fbf9dc321814700c6ea6f44ec57
+    container_name: cadvisor
+    restart: unless-stopped
+    logging: *default-logging
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - secure-cloud
+
+  prometheus:
+    image: prom/prometheus@sha256:508729e0e2d18e11fd742a5a5ca70e557b940a93948c3c95fd0123a6fd538b69
+    container_name: prometheus
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - alertmanager
+      - node-exporter
+      - cadvisor
+    networks:
+      - secure-cloud
+
+  alertmanager:
+    image: prom/alertmanager@sha256:9e082985f56f4c8c9f724e18f2288c6708f472e56a5286b8863d080434ea065d
+    container_name: alertmanager
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "127.0.0.1:9093:9093"
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    volumes:
+      - ./config/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    networks:
+      - secure-cloud
+
+  grafana:
+    image: grafana/grafana@sha256:1c1bd67c54c5fcf6e759897852b5a584191bd6796e8d328a5ace457799801261
+    container_name: grafana
+    restart: unless-stopped
+    logging: *default-logging
+    env_file:
+      - ./secrets/grafana.env
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - secure-cloud
+
+networks:
+  secure-cloud:
+    name: secure-cloud
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  alertmanager-data:

@@ -69,6 +69,23 @@ body.mobile-menu-open{overflow:hidden}
 .monitoring-context .breadcrumb{font-size:12px}
 .monitoring-context .title-line h1{font-size:22px}
 .monitoring-page .toolbar{margin-top:14px}
+.monitoring-page,.monitoring-page>*{min-width:0}
+.monitoring-page .equipment-tabs{max-width:100%;flex-wrap:wrap;justify-content:flex-end}
+.online-badge.is-disconnected{color:#7b5a12;background:#fff8e7;border-color:#f0d38a}
+.disconnected-state[hidden]{display:none}
+.kpi-grid[hidden],.content-grid[hidden],.bottom-grid[hidden],.scrape-footer[hidden]{display:none!important}
+.disconnected-state{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(240px,.55fr);gap:24px;align-items:center;min-height:310px;margin-top:16px;padding:38px;overflow:hidden;background:linear-gradient(135deg,#fff 0%,#f7faff 62%,#eef4ff 100%);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.disconnected-state-icon{display:grid;place-items:center;width:76px;height:76px;color:#9a6b08;background:#fff5d9;border:1px solid #f0d38a;border-radius:22px;font-size:42px;font-weight:700}
+.disconnected-state-label{color:#1769e8;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.disconnected-state h2{margin:8px 0 10px;font-size:26px}
+.disconnected-state-copy>p{max-width:700px;margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+.disconnected-state-facts{display:flex;flex-wrap:wrap;gap:9px 18px;margin-top:22px}
+.disconnected-state-facts span{color:#536580;font-size:12px;font-weight:700}
+.disconnected-state-facts i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--green)}
+.disconnected-state-action{padding:20px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.disconnected-state-action strong{font-size:14px}
+.disconnected-state-action p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
+body.equipment-disconnected .toolbar{margin-bottom:0}
 
 @media(max-width:720px){
     .monitoring-page.workspace{padding:16px 12px}
@@ -78,4 +95,9 @@ body.mobile-menu-open{overflow:hidden}
     .monitoring-page .portal-back{min-height:38px}
     .monitoring-context{padding:12px}
     .monitoring-context>div:first-child{padding-right:0}
+    .disconnected-state{grid-template-columns:1fr;min-height:0;padding:24px 18px;gap:18px}
+    .disconnected-state-icon{width:60px;height:60px;border-radius:17px;font-size:34px}
+    .disconnected-state h2{font-size:21px}
 }
+
+@media(max-width:1100px) and (min-width:721px){.disconnected-state{grid-template-columns:auto minmax(0,1fr)}.disconnected-state-action{grid-column:1/-1}}

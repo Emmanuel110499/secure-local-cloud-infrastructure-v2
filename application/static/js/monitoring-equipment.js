@@ -49,6 +49,38 @@
     function setText(id, text) { const node = $(id); if (node) node.textContent = text; }
     function average(values) { return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null; }
 
+    function renderConnectionState(item) {
+        const disconnected = item.state === "disconnected";
+        const disconnectedPanel = $("disconnected-state");
+        const sections = [
+            $("kpi-grid"),
+            document.querySelector(".content-grid"),
+            document.querySelector(".bottom-grid"),
+            document.querySelector(".scrape-footer"),
+        ];
+
+        if (disconnectedPanel) disconnectedPanel.hidden = !disconnected;
+        sections.forEach(section => {
+            if (section) section.hidden = disconnected;
+        });
+        document.body.classList.toggle("equipment-disconnected", disconnected);
+        if (!disconnected) return;
+
+        const isPc = item.equipment.id === "pc-emmanuel";
+        setText("disconnected-title", isPc
+            ? "PC Emmanuel est actuellement hors ligne"
+            : "Laboratoire VMware en attente d’activation");
+        setText("disconnected-description", isPc
+            ? "Le poste d’administration n’envoie momentanément plus ses métriques. Le VPS et le portail public continuent de fonctionner normalement."
+            : "Ce laboratoire est une extension facultative. Les anciennes VM ne sont pas nécessaires au fonctionnement de la plateforme hébergée sur le VPS.");
+        setText("disconnected-action-title", isPc
+            ? "Pour reprendre la supervision"
+            : "Activation ultérieure");
+        setText("disconnected-action-text", isPc
+            ? "Démarrer le PC, Windows Exporter et la future liaison sécurisée vers le VPS."
+            : "Démarrer les VM uniquement pour les exercices de laboratoire, puis établir leur liaison sécurisée avec Prometheus.");
+    }
+
     function metricSummary(series) {
         const values = series.map(number).filter(Number.isFinite);
         return values.length ? { min: Math.min(...values), avg: average(values), max: Math.max(...values) } : null;
@@ -71,6 +103,7 @@
     function updateDetails(item, updatedAt) {
         const equipment = item.equipment;
         const metrics = item.metrics || {};
+        renderConnectionState(item);
         setText("equipment-title", equipment.name);
         setText("breadcrumb-equipment", equipment.name);
         setText("equipment-role", equipment.role);
@@ -86,26 +119,32 @@
         setText("detail-title", equipment.name);
         setText("detail-subtitle", equipment.role);
         setText("detail-os", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Linux + Windows" : "Linux");
-        setText("detail-state", item.state === "up" ? "Opérationnel" : item.state === "down" ? "Indisponible" : "Inconnu");
+        const stateLabel = item.state === "up" ? "Opérationnel"
+            : item.state === "down" ? "Indisponible"
+                : item.state === "disconnected" ? "Non connecté" : "Inconnu";
+        setText("detail-state", stateLabel);
         setText(
             "detail-source",
             equipment.id === "global"
                 ? "Prometheus — vue consolidée"
                 : equipment.id === "pc-emmanuel"
                     ? "Windows Exporter → Prometheus"
-                    : "Node Exporter → Prometheus"
+                    : equipment.id === "lab-vmware"
+                        ? "Connexion à configurer"
+                        : "Node Exporter → Prometheus"
         );
         const normalizedUpdatedAt = /(?:Z|[+-]\d{2}:?\d{2})$/.test(updatedAt)
             ? updatedAt
             : `${updatedAt}Z`;
         setText("detail-updated", new Date(normalizedUpdatedAt).toLocaleTimeString("fr-FR"));
         setText("os-badge", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Multi-équipement" : "Linux");
-        setText("online-badge", item.state === "up" ? "● En ligne" : "● État partiel");
+        setText("online-badge", item.state === "up" ? "● En ligne" : item.state === "disconnected" ? "○ Non connecté" : "● État partiel");
+        $("online-badge")?.classList.toggle("is-disconnected", item.state === "disconnected");
         setText("system-name", equipment.name);
         setText("system-role", equipment.role);
         setText("system-os", equipment.os === "windows" ? "Windows" : equipment.os === "multi" ? "Linux + Windows" : "Linux");
         setText("system-exporter", equipment.id === "pc-emmanuel" ? "Windows Exporter" : equipment.os === "multi" ? "Prometheus" : "Node Exporter");
-        renderStorage(equipment, metrics);
+        renderStorage(equipment, metrics, item.state);
         const battery = metrics.battery;
         $("battery-kpi").hidden = !battery;
         if (battery) {
@@ -114,13 +153,17 @@
         }
     }
 
-    function renderStorage(equipment, metrics) {
+    function renderStorage(equipment, metrics, equipmentState) {
         const bytes = amount => Number.isFinite(Number(amount))
             ? `${(Number(amount) / 1073741824).toFixed(2)} Gio` : "—";
         const total = Number(metrics.disk_total_bytes);
         const available = Number(metrics.disk_available_bytes);
         const used = Number.isFinite(total) && Number.isFinite(available)
             ? total - available : null;
+        if (equipmentState === "disconnected") {
+            $("storage-rows").innerHTML = '<div class="storage-row"><b>Équipement non connecté</b><code>—</code><span>—</span><span>—</span><span>Connexion future</span></div>';
+            return;
+        }
         const rows = [{
             name: equipment.os === "windows" ? "Disque système" : equipment.os === "multi" ? "Stockage consolidé" : "Système racine",
             mountpoint: equipment.os === "windows" ? "C:" : equipment.os === "multi" ? "3 équipements" : "/",
@@ -151,7 +194,7 @@
         $("service-list").innerHTML = items.map(item => `
             <div class="equipment-row ${item.state}">
                 <i></i><div><b>${item.equipment.name}</b><small>${item.equipment.role}</small></div>
-                <span>${item.state === "up" ? "OPÉRATIONNEL" : item.state.toUpperCase()}</span>
+                <span>${item.state === "up" ? "OPÉRATIONNEL" : item.state === "disconnected" ? "NON CONNECTÉ" : item.state.toUpperCase()}</span>
             </div>`).join("");
     }
 
@@ -173,14 +216,17 @@
         const payload = await json("/api/equipment");
         state.inventory = payload.equipment || [];
         renderInventory(state.inventory);
-        const up = state.inventory.filter(item => item.state === "up").length;
-        const metrics = key => average(state.inventory.map(item => Number(item.metrics?.[key])).filter(Number.isFinite));
-        const totalDisk = state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.disk_total_bytes) || 0), 0);
-        const availableDisk = state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.disk_available_bytes) || 0), 0);
-        const representative = { equipment: { id: "global", name: "Vue globale", role: `${up}/${state.inventory.length} équipements opérationnels`, os: "multi" }, state: up === state.inventory.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: totalDisk > 0 ? (1 - availableDisk / totalDisk) * 100 : metrics("disk"), disk_total_bytes: totalDisk || null, disk_available_bytes: totalDisk ? availableDisk : null, network_receive_kbps: state.inventory.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "Consolidé", load_1m: metrics("load_1m") } };
+        const monitored = state.inventory.filter(item => item.equipment?.monitored !== false);
+        const optional = state.inventory.length - monitored.length;
+        const up = monitored.filter(item => item.state === "up").length;
+        const metrics = key => average(monitored.map(item => Number(item.metrics?.[key])).filter(Number.isFinite));
+        const totalDisk = monitored.reduce((sum, item) => sum + (Number(item.metrics?.disk_total_bytes) || 0), 0);
+        const availableDisk = monitored.reduce((sum, item) => sum + (Number(item.metrics?.disk_available_bytes) || 0), 0);
+        const role = `${up}/${monitored.length} actif${monitored.length > 1 ? "s" : ""} · ${optional} extension${optional > 1 ? "s" : ""} en attente`;
+        const representative = { equipment: { id: "global", name: "Vue globale", role, os: "multi" }, state: monitored.length > 0 && up === monitored.length ? "up" : "unknown", metrics: { cpu: metrics("cpu"), memory: metrics("memory"), disk: totalDisk > 0 ? (1 - availableDisk / totalDisk) * 100 : metrics("disk"), disk_total_bytes: totalDisk || null, disk_available_bytes: totalDisk ? availableDisk : null, network_receive_kbps: monitored.reduce((sum, item) => sum + (Number(item.metrics?.network_receive_kbps) || 0), 0), uptime: "VPS actif", load_1m: metrics("load_1m") } };
         updateDetails(representative, payload.updated_at);
         setText("detail-title", "Équipements supervisés");
-        setText("detail-subtitle", `${up}/${state.inventory.length} disponibles`);
+        setText("detail-subtitle", role);
         $("battery-kpi").hidden = true;
         const history = await json(`/api/equipment/global/history?hours=${state.hours}`);
         ["cpu", "memory", "disk"].forEach(name => updateChart(name, history.series?.[name] || []));
@@ -194,6 +240,7 @@
             json(`/api/equipment/${id}/history?hours=${state.hours}`)
         ]);
         updateDetails(current, current.updated_at);
+        if (current.state === "disconnected") return;
         renderServices(current.services);
         ["cpu", "memory", "disk"].forEach(name => updateChart(name, history.series?.[name] || []));
         const count = Math.max(...["cpu", "memory", "disk"].map(name => history.series?.[name]?.length || 0));

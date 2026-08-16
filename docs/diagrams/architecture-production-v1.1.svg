@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+  <title id="title">Architecture Secure Local Cloud v1.1</title>
+  <desc id="desc">Le portail public passe par Cloudflare vers le VPS OVHcloud. Le VPS collecte les métriques du PC et des deux machines virtuelles via Tailscale.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7f9fd"/><stop offset="1" stop-color="#eaf1ff"/></linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1769e8"/><stop offset="1" stop-color="#7047eb"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#10213d" flood-opacity=".12"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#3068db"/></marker>
+    <style>
+      .title{font:700 34px Arial,sans-serif;fill:#10213d}.sub{font:18px Arial,sans-serif;fill:#60708c}.h{font:700 22px Arial,sans-serif;fill:#10213d}.t{font:16px Arial,sans-serif;fill:#50617d}.tag{font:700 14px Arial,sans-serif;fill:#1769e8}.line{stroke:#3068db;stroke-width:4;fill:none;marker-end:url(#arrow)}.dash{stroke:#7d5ce7;stroke-width:3;stroke-dasharray:9 8;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1440" height="900" rx="28" fill="url(#bg)"/>
+  <text x="70" y="72" class="title">Secure Local Cloud - architecture de production v1.1</text>
+  <text x="70" y="108" class="sub">Un socle VPS disponible 24/7, complété par trois équipements privés reliés avec Tailscale</text>
+
+  <g filter="url(#shadow)"><rect x="70" y="175" width="255" height="160" rx="24" fill="#fff" stroke="#cbd9f3"/><text x="100" y="220" class="h">Internet</text><text x="100" y="255" class="t">app.emmanuelinfra.fr</text><text x="100" y="286" class="t">Navigateur administrateur</text><text x="100" y="315" class="tag">HTTPS public</text></g>
+  <g filter="url(#shadow)"><rect x="400" y="175" width="270" height="160" rx="24" fill="#fff" stroke="#cbd9f3"/><text x="430" y="220" class="h">Cloudflare</text><text x="430" y="255" class="t">DNS, TLS et Access</text><text x="430" y="286" class="t">Tunnel sortant sécurisé</text><text x="430" y="315" class="tag">Aucun port applicatif exposé</text></g>
+  <path d="M325 255H395" class="line"/>
+  <path d="M670 255H755" class="line"/>
+
+  <g filter="url(#shadow)"><rect x="760" y="145" width="610" height="280" rx="28" fill="#10213d"/><rect x="785" y="170" width="185" height="55" rx="18" fill="url(#blue)"/><text x="810" y="206" style="font:700 22px Arial,sans-serif;fill:white">VPS Production</text><text x="790" y="262" style="font:16px Arial,sans-serif;fill:#c8d6f1">OVHcloud - Ubuntu 24.04 - disponible 24/7</text>
+    <g><rect x="790" y="292" width="165" height="48" rx="14" fill="#1d3152"/><text x="815" y="322" style="font:700 15px Arial,sans-serif;fill:#fff">Nginx + Flask</text></g>
+    <g><rect x="970" y="292" width="175" height="48" rx="14" fill="#1d3152"/><text x="992" y="322" style="font:700 15px Arial,sans-serif;fill:#fff">Prometheus</text></g>
+    <g><rect x="1160" y="292" width="175" height="48" rx="14" fill="#1d3152"/><text x="1188" y="322" style="font:700 15px Arial,sans-serif;fill:#fff">Grafana</text></g>
+    <g><rect x="790" y="354" width="165" height="48" rx="14" fill="#1d3152"/><text x="816" y="384" style="font:700 15px Arial,sans-serif;fill:#fff">Alertmanager</text></g>
+    <g><rect x="970" y="354" width="175" height="48" rx="14" fill="#1d3152"/><text x="995" y="384" style="font:700 15px Arial,sans-serif;fill:#fff">Node Exporter</text></g>
+    <g><rect x="1160" y="354" width="175" height="48" rx="14" fill="#1d3152"/><text x="1197" y="384" style="font:700 15px Arial,sans-serif;fill:#fff">cAdvisor</text></g>
+  </g>
+
+  <rect x="70" y="490" width="1300" height="58" rx="20" fill="#e8e3ff" stroke="#a994f5"/><text x="558" y="526" class="h">Réseau privé Tailscale</text>
+  <path d="M1065 425V485" class="dash"/>
+
+  <g filter="url(#shadow)"><rect x="70" y="615" width="365" height="200" rx="25" fill="#fff" stroke="#cbd9f3"/><text x="100" y="662" class="h">PC Emmanuel</text><text x="100" y="696" class="t">Windows 11 - poste d'administration</text><text x="100" y="730" class="t">Windows Exporter + batterie</text><text x="100" y="764" class="t">VMware Workstation</text><text x="100" y="797" class="tag">Supervisé lorsqu'il est allumé</text></g>
+  <g filter="url(#shadow)"><rect x="537" y="615" width="365" height="200" rx="25" fill="#fff" stroke="#cbd9f3"/><text x="567" y="662" class="h">VM srv-web</text><text x="567" y="696" class="t">Laboratoire applicatif Ubuntu</text><text x="567" y="730" class="t">Node Exporter</text><text x="567" y="764" class="t">Sauvegarde hebdomadaire</text><text x="567" y="797" class="tag">Extension de laboratoire</text></g>
+  <g filter="url(#shadow)"><rect x="1005" y="615" width="365" height="200" rx="25" fill="#fff" stroke="#cbd9f3"/><text x="1035" y="662" class="h">VM srv-monitoring</text><text x="1035" y="696" class="t">Laboratoire d'observabilité Ubuntu</text><text x="1035" y="730" class="t">Node Exporter</text><text x="1035" y="764" class="t">Sauvegarde hebdomadaire</text><text x="1035" y="797" class="tag">Extension de laboratoire</text></g>
+  <path d="M252 615V553" class="dash"/><path d="M720 615V553" class="dash"/><path d="M1187 615V553" class="dash"/>
+  <text x="70" y="866" class="sub">Les extensions peuvent être arrêtées sans interrompre le portail public ni le monitoring du VPS.</text>
+</svg>

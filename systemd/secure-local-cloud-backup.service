@@ -1,0 +1,13 @@
+[Unit]
+Description=Sauvegarde complète de Secure Local Cloud
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/backup-secure-local-cloud-vps.sh
+User=root
+Group=root
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

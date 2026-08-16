@@ -62,3 +62,9 @@ docs/screenshots/*
 !docs/screenshots/monitoring-mobile.png
 !docs/screenshots/conteneurs-docker.png
 !docs/screenshots/architecture.png
+# Private operational guide (local-only, contains infrastructure details)
+/output/pdf/guide-prive-*
+/tools/build_private_ops_guide.py
+
+# Temporary local validation environment
+/application/.venv-sync/

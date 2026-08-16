@@ -15,46 +15,19 @@ Portail local de supervision et d'administration d'une infrastructure auto-heber
 
 ## Architecture
 
+![Architecture de production Secure Local Cloud v1.1](docs/diagrams/architecture-production-v1.1.svg)
+
+Depuis la version `v1.1.0`, le VPS OVHcloud constitue le socle permanent : portail Flask, Prometheus, Grafana, Alertmanager, Nginx, Cloudflare Tunnel et sauvegardes. Le PC Windows et les deux VM VMware sont des extensions privées reliées par Tailscale. Elles peuvent être arrêtées sans interrompre le portail public.
+
 ```mermaid
 flowchart LR
-    Internet((Internet)) --> CF[Cloudflare Zero Trust]
-    CF -->|Tunnel HTTPS| N[Nginx sur srv-web]
-    N --> F[Flask et Gunicorn]
-
-    subgraph PC[PC Emmanuel - Windows]
-        WE[Windows Exporter]
-        BAT[Collecteur batterie]
-        VM[VMware Workstation]
-    end
-
-    subgraph WEB[srv-web - Ubuntu]
-        N
-        F
-        DE1[Docker Engine]
-        NE1[Node Exporter]
-        CA[cAdvisor]
-    end
-
-    subgraph MON[srv-monitoring - Ubuntu]
-        P[Prometheus]
-        G[Grafana]
-        A[Alertmanager]
-        NE2[Node Exporter]
-        V[Volumes persistants]
-    end
-
-    BAT --> WE
-    P -->|scrape| WE
-    P -->|scrape| NE1
-    P -->|scrape| CA
-    P -->|scrape| NE2
-    F -->|API Prometheus| P
-    G --> P
-    P --> A
-    P --> V
+    Internet --> Cloudflare --> VPS[VPS Production]
+    VPS -->|Tailscale| PC[PC Emmanuel]
+    VPS -->|Tailscale| WEB[VM srv-web]
+    VPS -->|Tailscale| MON[VM srv-monitoring]
 ```
 
-L'installation réelle comprend trois équipements : le PC Windows d'administration, `srv-web` pour le portail et la collecte locale, et `srv-monitoring` pour la centralisation, l'historique, la visualisation et les alertes.
+L'installation réelle comprend quatre équipements supervisés : le VPS Production, le PC Windows d'administration, la VM `srv-web` et la VM `srv-monitoring`.
 
 L'[architecture technique détaillée](docs/ARCHITECTURE.md) documente les équipements, les réseaux, les flux HTTPS, les collecteurs, les volumes et les limites de sécurité.
 
@@ -154,6 +127,7 @@ Avant chaque publication, consultez [SECURITY.md](SECURITY.md), verifiez l'histo
 - [Guide du code et des fichiers](docs/GUIDE-DU-CODE.md)
 - [Alertes Prometheus, Alertmanager et Telegram](docs/ALERTES-TELEGRAM.md)
 - [Sauvegardes, réplication et restauration](docs/SAUVEGARDES-RESTAURATION.md)
+- [Notes de version 1.1.0 et captures de production](docs/RELEASE-v1.1.0.md)
 - [Sécurité et secrets](SECURITY.md)
 
 ### Dossiers PDF
