@@ -1,139 +1,115 @@
 # Architecture technique réelle
 
-Ce document décrit l’installation multi-équipement actuellement exploitée. Les adresses sont celles du laboratoire ; elles doivent être adaptées lors d’une migration.
+Ce document décrit l'architecture de production introduite avec la version `v1.1.0`. Elle prolonge le laboratoire VMware de la version `v1.0.0` sans le supprimer : le laboratoire devient une extension facultative d'un socle VPS autonome.
 
-## État validé au 10 août 2026
+![Architecture de production Secure Local Cloud](diagrams/architecture-production-v1.1.svg)
 
-| Équipement | Fonction | Composants réellement présents |
+## État validé au 17 août 2026
+
+| Équipement | Fonction | Disponibilité attendue |
 |---|---|---|
-| PC Emmanuel | Administration, hébergement VMware et supervision Windows | Windows 11, VMware Workstation, Windows Exporter, collecteur batterie, SSH et réplication des sauvegardes |
-| `srv-web` | Serveur applicatif et collecte locale | Cloudflare Tunnel, Nginx, Flask/Gunicorn, Docker Engine, Node Exporter et cAdvisor |
-| `srv-monitoring` | Collecte, stockage, visualisation et alertes | Prometheus, Grafana, Alertmanager, Node Exporter, Docker Engine et volumes persistants |
+| VPS Production | Portail, collecte, historique, visualisation, alertes et sauvegarde | 24 h/24 |
+| PC Emmanuel | Poste d'administration, Windows Exporter, batterie et hôte VMware | Lorsque le PC est allumé |
+| VM `srv-web` | Laboratoire applicatif et Node Exporter | À la demande |
+| VM `srv-monitoring` | Laboratoire d'observabilité et Node Exporter | À la demande |
 
-Les vues publiques `/monitoring` et `/infrastructure` utilisent cette topologie. Les mesures affichées proviennent de Prometheus et les états absents ne sont pas remplacés artificiellement par zéro.
+Le portail public ne dépend plus du PC ni des VM. Lorsqu'une extension est arrêtée, seules ses propres métriques deviennent indisponibles.
 
-## Vue physique et réseau
+## Évolution depuis la version 1.0
 
-```mermaid
-flowchart TB
-    Internet((Internet))
-    CF["Cloudflare Edge<br/>DNS, HTTPS public, Zero Trust"]
-    PC["PC Emmanuel — Windows<br/>192.168.154.1<br/>Navigateur, SSH, Windows Exporter :9182<br/>collecteur batterie et réplication"]
+![Passage du laboratoire local au VPS](diagrams/evolution-v1.0-v1.1.svg)
 
-    subgraph WEB["srv-web — Ubuntu — 192.168.50.10 / 192.168.154.10"]
-        Tunnel["cloudflared<br/>tunnel sortant"]
-        Nginx["Nginx<br/>HTTPS local et reverse proxy"]
-        Flask["Flask + Gunicorn<br/>port conteneur 5000<br/>port hôte 127.0.0.1:5001"]
-        Docker["Docker Engine"]
-        NEWeb["Node Exporter :9100"]
-        CAdvisor["cAdvisor :8080"]
-        AppData["Données applicatives<br/>authentification, historique, audit"]
-    end
+La première version séparait le portail et la supervision dans deux VM VMware. Cette organisation reste utile pour les exercices, mais elle dépendait du PC physique et du réseau domestique. La version 1.1 place les services permanents sur OVHcloud et relie les équipements privés avec Tailscale.
 
-    subgraph MON["srv-monitoring — Ubuntu — 192.168.50.20 / 192.168.154.20"]
-        Prom["Prometheus :9090<br/>collecte et historique"]
-        Graf["Grafana :3000<br/>visualisation"]
-        AM["Alertmanager :9093<br/>routage des alertes"]
-        NEMon["Node Exporter :9100<br/>métriques hôte et volumes"]
-        Volumes["Volumes Docker persistants<br/>prometheus-data<br/>grafana-data<br/>alertmanager-data"]
-    end
+## Composition du VPS Production
 
-    TG["Telegram<br/>notifications firing et resolved"]
-    Backup["PC Windows<br/>SecureLocalCloud-Backups<br/>archives vérifiées SHA-256"]
-
-    Internet -->|HTTPS 443| CF
-    CF -->|Tunnel chiffré sortant| Tunnel
-    Tunnel --> Nginx
-    PC -->|HTTPS / interface| Nginx
-    Nginx -->|HTTP local| Flask
-    Flask -->|API Prometheus| Prom
-    Flask --> Docker
-    Flask --> AppData
-    Prom -->|scrape 15 s| NEWeb
-    Prom -->|scrape 15 s| CAdvisor
-    Prom -->|scrape 15 s| NEMon
-    Prom -->|scrape 15 s| PC
-    Prom -->|alertes| AM
-    AM -->|API Telegram| TG
-    Prom --> Volumes
-    Graf --> Prom
-    WEB -. archives .-> Backup
-    MON -. archives .-> Backup
-```
-
-## Rôle de chaque zone
-
-| Zone | Rôle | Éléments importants |
+| Composant | Fonction | Exposition |
 |---|---|---|
-| Accès public | Publier sans port entrant sur la box | Cloudflare DNS, HTTPS et Tunnel |
-| `srv-web` | Servir la plateforme | Nginx, Flask, Gunicorn, Docker, cAdvisor, Node Exporter |
-| `srv-monitoring` | Observer et alerter | Prometheus, Grafana, Alertmanager, Node Exporter |
-| PC Emmanuel | Administrer et être supervisé | navigateur, SSH, Windows Exporter, batterie, réplication |
-| Telegram | Prévenir l’administrateur | alertes critiques, avertissements et résolutions |
+| Nginx | Reverse proxy local | Ports publics 80/443 selon la configuration |
+| Flask et Gunicorn | Portail, authentification, API et vues | `127.0.0.1:5001` |
+| Prometheus | Collecte et stockage temporel | `127.0.0.1:9090`, protégé par Cloudflare Access |
+| Grafana | Visualisation avancée | `127.0.0.1:3000`, protégé par Cloudflare Access |
+| Alertmanager | Routage des alertes | `127.0.0.1:9093` |
+| Node Exporter | Métriques du VPS | Réseau Docker privé |
+| cAdvisor | Métriques des conteneurs | Réseau Docker privé |
+| cloudflared | Tunnel sortant vers Cloudflare | Aucun port entrant requis pour le tunnel |
+| Tailscale | Réseau privé entre les équipements | Interface privée `tailscale0` |
 
-## Chemin d’une requête utilisateur
+## Flux public
 
 ```mermaid
 sequenceDiagram
     actor U as Utilisateur
     participant C as Cloudflare
-    participant T as cloudflared
+    participant T as cloudflared sur VPS
     participant N as Nginx
     participant F as Flask/Gunicorn
-    participant P as Prometheus
-
     U->>C: HTTPS app.emmanuelinfra.fr
     C->>T: tunnel chiffré
-    T->>N: requête vers l’origine
-    N->>F: proxy HTTP local
-    F->>P: requête PromQL si données temps réel
-    P-->>F: métriques des équipements
-    F-->>N: page HTML ou réponse JSON
-    N-->>U: réponse HTTPS
+    T->>N: requête locale
+    N->>F: proxy vers 127.0.0.1:5001
+    F-->>U: portail authentifié
 ```
 
-Le certificat public est géré côté Cloudflare. Nginx protège et distribue le trafic sur `srv-web`. Gunicorn exécute l’application Flask ; il ne doit pas être exposé directement à Internet.
+Grafana et Prometheus utilisent le même tunnel mais sont précédés par Cloudflare Access. Ils ne doivent pas être exposés directement sur Internet.
 
-## Chaîne de supervision
+## Flux de supervision privé
 
 ```mermaid
 flowchart LR
-    NW["Node Exporter srv-web"] --> P[Prometheus]
-    CA[cAdvisor] --> P
-    NM["Node Exporter srv-monitoring"] --> P
-    WE["Windows Exporter"] --> P
-    BAT["Collecteur batterie"] --> WE
-    VM["Collecteur volumes Docker"] --> NM
-    P --> UI["Portail Flask"]
-    P --> G[Grafana]
-    P --> R["Règles d’alerte"]
-    R --> A[Alertmanager]
-    A --> T[Telegram]
+    VPS[Prometheus sur VPS]
+    PC[PC Emmanuel - Windows Exporter 9182]
+    WEB[VM srv-web - Node Exporter 9100]
+    MON[VM srv-monitoring - Node Exporter 9100]
+    VPS -->|Tailscale| PC
+    VPS -->|Tailscale| WEB
+    VPS -->|Tailscale| MON
 ```
 
-Prometheus interroge périodiquement les exporters. Une valeur absente reste inconnue : elle ne doit jamais être transformée artificiellement en zéro. Le portail interroge Prometheus pour afficher les valeurs actuelles et les historiques.
+Les pare-feu des équipements autorisent les ports des exporters uniquement depuis l'adresse Tailscale du VPS. Les adresses Tailscale réelles et les secrets restent hors du dépôt public ; les exemples utilisent des valeurs à remplacer.
 
-## Données persistantes
+## Cibles Prometheus
 
-| Donnée | Emplacement logique | Emplacement sur l’hôte |
+| Job | Équipement | Rôle | Alerte d'indisponibilité |
+|---|---|---|---|
+| `vps-production` | VPS Production | Production | Oui |
+| `cadvisor` | VPS Production | Conteneurs | Oui |
+| `pc-windows` | PC Emmanuel | Administration | Non, extension facultative |
+| `lab-srv-web` | VM `srv-web` | Laboratoire applicatif | Non |
+| `lab-srv-monitoring` | VM `srv-monitoring` | Laboratoire d'observabilité | Non |
+
+Une cible absente ne doit jamais être représentée par une mesure égale à zéro. L'interface distingue les états `UP`, `DOWN`, non connecté et en attente d'historique.
+
+## Persistance et sauvegardes
+
+Les volumes Docker de Prometheus, Grafana et Alertmanager conservent les données lors de la recréation des conteneurs. Ils sont inclus dans la sauvegarde du VPS, mais un volume n'est pas à lui seul une sauvegarde.
+
+| Machine | Fréquence | Rétention |
 |---|---|---|
-| Séries Prometheus | `prometheus-data` | `/var/lib/docker/volumes/monitoring_prometheus-data/_data` |
-| Tableaux Grafana | `grafana-data` | `/var/lib/docker/volumes/monitoring_grafana-data/_data` |
-| État Alertmanager | `alertmanager-data` | `/var/lib/docker/volumes/monitoring_alertmanager-data/_data` |
-| Données Flask | `application/data/` | volume ou dossier de `srv-web` |
-| Configuration sensible | `application/.env` | uniquement sur `srv-web`, permission `600` |
+| VPS Production | Quotidienne | 3 générations |
+| VM `srv-web` | Hebdomadaire | 2 générations |
+| VM `srv-monitoring` | Hebdomadaire | 2 générations |
 
-Un volume Docker conserve ses données après la recréation d’un conteneur, mais ce n’est pas une sauvegarde. Les volumes doivent être inclus dans les archives de restauration.
+Toutes les archives sont contrôlées avec SHA-256. Les sauvegardes de production restent privées et ne sont jamais publiées dans Git.
 
 ## Frontières de sécurité
 
-- seul le point d’entrée HTTPS est public ;
-- Prometheus, Grafana, Alertmanager, exporters et socket Docker restent privés ;
-- le PC Windows autorise le port `9182` uniquement depuis `srv-monitoring` ;
-- le PC peut être en veille sans générer une alerte d’indisponibilité générale ;
-- les secrets, bases, archives et clés sont exclus de Git ;
-- Emma_IA est en lecture seule et ne lance aucune commande système.
+- les secrets sont injectés par des fichiers exclus de Git ;
+- le socket Docker et les interfaces internes ne sont jamais publiés directement ;
+- SSH utilise une clé et l'authentification par mot de passe est désactivée sur le VPS ;
+- UFW limite les ports entrants ;
+- Cloudflare Access protège les consoles sensibles ;
+- Tailscale transporte les flux de collecte privés ;
+- les équipements de laboratoire peuvent être arrêtés sans fausse alerte critique.
 
-## Extension future
+## Ajouter un équipement
 
-Pour ajouter un nouvel équipement : installer un exporter, filtrer son port, déclarer la cible dans `monitoring/prometheus.yml`, ajouter ses labels (`equipment`, `role`, `os`), adapter les requêtes et règles, puis créer sa vue en réutilisant le gabarit multi-équipement.
+1. Installer l'exporter adapté à l'équipement.
+2. Relier l'équipement au même réseau Tailscale.
+3. Limiter le pare-feu à l'adresse Tailscale du VPS.
+4. Ajouter une cible et des labels explicites dans Prometheus.
+5. Valider la configuration avec `promtool`.
+6. Ajouter l'équipement au modèle de configuration Flask et aux tests.
+7. Vérifier les KPI, les courbes, l'état hors ligne et l'absence de fausse alerte.
+
+Pour le détail des changements publiés, consulter les [notes de version 1.1.0](RELEASE-v1.1.0.md).

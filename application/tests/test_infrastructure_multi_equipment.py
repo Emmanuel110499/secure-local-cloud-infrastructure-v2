@@ -13,7 +13,7 @@ class InfrastructureMultiEquipmentTests(unittest.TestCase):
         )
 
     def test_architecture_lists_all_three_equipment(self):
-        for label in ("PC Emmanuel", "srv-web", "srv-monitoring"):
+        for label in ("PC Emmanuel", "VPS Production", "Laboratoire VMware"):
             with self.subTest(label=label):
                 self.assertIn(label, self.template)
 
@@ -48,6 +48,7 @@ class InfrastructureMultiEquipmentTests(unittest.TestCase):
         self.assertIn("RAM consolidée", self.template)
         self.assertIn("Disque le plus utilisé", self.template)
         self.assertNotIn("CPU srv-web", self.template)
+        self.assertIn("203.0.113.10", self.template)
 
 
 if __name__ == "__main__":

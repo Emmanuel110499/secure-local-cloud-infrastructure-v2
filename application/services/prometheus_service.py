@@ -23,15 +23,16 @@ class PrometheusService:
         self.node_exporter_instance = node_exporter_instance
         self.cadvisor_instance = cadvisor_instance
         self.equipments = equipments or {
-            "srv-web": {
-                "id": "srv-web",
-                "name": "srv-web",
-                "role": "Serveur applicatif",
+            "vps-production": {
+                "id": "vps-production",
+                "name": "VPS Production",
+                "role": "Hébergement et observabilité",
                 "os": "linux",
                 "job": node_exporter_job,
                 "instance": node_exporter_instance,
                 "docker_job": cadvisor_job,
                 "docker_instance": cadvisor_instance,
+                "monitored": True,
             }
         }
 
@@ -64,6 +65,7 @@ class PrometheusService:
                 "name": item["name"],
                 "role": item["role"],
                 "os": item["os"],
+                "monitored": item.get("monitored", True),
             }
             for item in self.equipments.values()
         ]
@@ -74,6 +76,19 @@ class PrometheusService:
         equipment = self.equipments.get(equipment_id)
         if equipment is None:
             return None
+
+        if not equipment.get("monitored", True):
+            return {
+                "equipment": {
+                    "id": equipment["id"],
+                    "name": equipment["name"],
+                    "role": equipment["role"],
+                    "os": equipment["os"],
+                    "monitored": False,
+                },
+                "state": "disconnected",
+                "metrics": {},
+            }
 
         labels = self._labels(equipment)
         availability = self.query_scalar(f'up{{{labels}}}')
@@ -94,6 +109,7 @@ class PrometheusService:
                 "name": equipment["name"],
                 "role": equipment["role"],
                 "os": equipment["os"],
+                "monitored": equipment.get("monitored", True),
             },
             "state": state,
             "metrics": metrics,
@@ -116,6 +132,19 @@ class PrometheusService:
         equipment = self.equipments.get(equipment_id)
         if equipment is None:
             return None
+
+        if not equipment.get("monitored", True):
+            return {
+                "equipment": {
+                    "id": equipment["id"],
+                    "name": equipment["name"],
+                    "role": equipment["role"],
+                    "os": equipment["os"],
+                    "monitored": False,
+                },
+                "hours": max(1, min(int(hours), 168)),
+                "series": {"cpu": [], "memory": [], "disk": []},
+            }
 
         hours = max(1, min(int(hours), 168))
         labels = self._labels(equipment)
@@ -290,7 +319,7 @@ class PrometheusService:
             result["containers"] = (
                 int(containers) if containers is not None else None
             )
-        if equipment["id"] == "srv-monitoring":
+        if equipment["id"] in ("vps-production", "srv-monitoring"):
             result["volumes"] = self._get_monitoring_volumes()
         return result
 
@@ -299,7 +328,7 @@ class PrometheusService:
 
         rows = []
         for item in self.query_vector(
-            'secure_docker_volume_size_bytes{equipment="srv-monitoring"}'
+            'secure_docker_volume_size_bytes{equipment=~"vps-production|srv-monitoring"}'
         ):
             try:
                 labels = item.get("metric", {})

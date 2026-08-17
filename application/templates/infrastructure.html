@@ -1187,10 +1187,10 @@
                             </svg>
                         </div>
 
-                        <strong>srv-web</strong>
+                        <strong>VPS Production</strong>
 
                         <span class="topology-ip">
-                            192.168.50.10
+                            203.0.113.10
                         </span>
 
                         <div class="topology-services">
@@ -1218,18 +1218,16 @@
                             </svg>
                         </div>
 
-                        <strong>srv-monitoring</strong>
+                        <strong>Laboratoire VMware</strong>
 
                         <span class="topology-ip">
-                            192.168.50.20
+                            Connexion future
                         </span>
 
                         <div class="topology-services">
-                            <span>Prometheus</span>
-                            <span>Grafana</span>
-                            <span>Alertmanager</span>
-                            <span>Node Exporter</span>
-                            <span>Historique</span>
+                            <span>Ancienne VM srv-web</span>
+                            <span>Ancienne VM srv-monitoring</span>
+                            <span>Optionnel</span>
                         </div>
                     </article>
                 </div>
@@ -1240,7 +1238,7 @@
                     <div class="flow-label">
                         Métriques système et Docker
                         <small>
-                            Windows Exporter / Node Exporter / cAdvisor → Prometheus
+                            Node Exporter / cAdvisor → Prometheus sur le VPS
                         </small>
                     </div>
                 </div>
@@ -1262,7 +1260,7 @@
                             <span class="server-description">Poste d’administration et hôte VMware.</span>
                         </div>
                     </div>
-                    <span id="pc-emmanuel-state" class="server-state">Opérationnel</span>
+                    <span id="pc-emmanuel-state" class="server-state">Non connecté</span>
                 </header>
 
                 <div class="server-network">
@@ -1300,17 +1298,17 @@
 
                         <div>
                             <strong class="server-name">
-                                srv-web
+                                VPS Production
                             </strong>
 
                             <span class="server-description">
-                                Serveur applicatif et collecte locale.
+                                Hébergement public, application et observabilité.
                             </span>
                         </div>
                     </div>
 
                     <span
-                        id="srv-web-state"
+                        id="vps-production-state"
                         class="server-state"
                     >
                         Opérationnel
@@ -1319,7 +1317,7 @@
 
                 <div class="server-network">
                     <span class="network-badge">
-                        192.168.50.10
+                        203.0.113.10
                     </span>
 
                     <span class="network-badge">
@@ -1473,17 +1471,17 @@
 
                         <div>
                             <strong class="server-name">
-                                srv-monitoring
+                                Services d’observabilité du VPS
                             </strong>
 
                             <span class="server-description">
-                                Collecte, stockage et visualisation.
+                                Collecte, stockage, visualisation et alertes.
                             </span>
                         </div>
                     </div>
 
                     <span
-                        id="srv-monitoring-state"
+                        id="vps-observability-state"
                         class="server-state"
                     >
                         Opérationnel
@@ -1492,7 +1490,7 @@
 
                 <div class="server-network">
                     <span class="network-badge">
-                        192.168.50.20
+                        Réseau Docker privé
                     </span>
 
                     <span class="network-badge">
@@ -2065,6 +2063,13 @@
                 );
             }
 
+            function updateOptionalState(id, connected) {
+                const element = document.getElementById(id);
+                if (!element) return;
+                element.textContent = connected ? "Opérationnel" : "Non connecté";
+                element.classList.toggle("down", false);
+            }
+
             function updateHealth(health) {
                 if (!health) {
                     return;
@@ -2217,12 +2222,12 @@
                     ].every(Boolean);
 
                     updateServerState(
-                        "srv-web-state",
-                        webHealthy
+                        "vps-production-state",
+                        webHealthy && monitoringHealthy
                     );
 
                     updateServerState(
-                        "srv-monitoring-state",
+                        "vps-observability-state",
                         monitoringHealthy
                     );
 
@@ -2233,7 +2238,7 @@
                     const battery = pc && pc.metrics ? pc.metrics.battery || {} : {};
                     const batteryFresh = Number.isFinite(Number(battery.collector_age_seconds))
                         && Number(battery.collector_age_seconds) < 180;
-                    updateServerState("pc-emmanuel-state", pcHealthy);
+                    updateOptionalState("pc-emmanuel-state", pcHealthy);
                     updateService("windows-exporter", pcHealthy);
                     updateService("battery-collector", batteryFresh);
 

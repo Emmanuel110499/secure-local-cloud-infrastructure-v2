@@ -20,8 +20,8 @@ class EmmaIntentTests(unittest.TestCase):
     class FakeEquipmentPrometheus:
         def get_equipment_metrics(self, equipment_id):
             equipment = {
-                "srv-web": ("srv-web", "Serveur applicatif", "linux", 10, 30, 50),
-                "srv-monitoring": ("srv-monitoring", "Serveur d’observabilité", "linux", 5, 25, 65),
+                "vps-production": ("VPS Production", "Production unifiée", "linux", 5, 25, 65),
+                "lab-vmware": ("Laboratoire VMware", "Extension de laboratoire", "linux", None, None, None),
                 "pc-emmanuel": ("PC Emmanuel", "Poste d’administration", "windows", 20, 90, 70),
             }[equipment_id]
             metrics = {
@@ -34,7 +34,7 @@ class EmmaIntentTests(unittest.TestCase):
                     "on_ac_power": True,
                     "collector_age_seconds": 15,
                 }
-            if equipment_id == "srv-monitoring":
+            if equipment_id == "vps-production":
                 metrics["volumes"] = [
                     {"name": "prometheus-data", "used_bytes": 1024**3},
                     {"name": "grafana-data", "used_bytes": 512 * 1024**2},
@@ -44,13 +44,14 @@ class EmmaIntentTests(unittest.TestCase):
                     "id": equipment_id, "name": equipment[0],
                     "role": equipment[1], "os": equipment[2],
                 },
-                "state": "up", "metrics": metrics,
+                "state": "disconnected" if equipment_id == "lab-vmware" else "up",
+                "metrics": metrics,
             }
 
         def get_all_equipment_metrics(self):
             return [
                 self.get_equipment_metrics(equipment_id)
-                for equipment_id in ("srv-web", "srv-monitoring", "pc-emmanuel")
+                for equipment_id in ("vps-production", "pc-emmanuel", "lab-vmware")
             ]
 
     def render_equipment(self, question):
@@ -60,10 +61,10 @@ class EmmaIntentTests(unittest.TestCase):
             return build_assistant_response(question)
 
     def test_equipment_state_uses_targeted_live_data(self):
-        response = self.render_equipment("Quel est l’état actuel de srv-monitoring ?")
+        response = self.render_equipment("Quel est l’état actuel du VPS Production ?")
         self.assertEqual(response["intent"], "equipment")
         self.assertTrue(response["used_live_data"])
-        self.assertIn("srv-monitoring", response["answer"])
+        self.assertIn("VPS Production", response["answer"])
         self.assertIn("65 %", response["answer"])
 
     def test_equipment_comparison_identifies_main_pressure(self):

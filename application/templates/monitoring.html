@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Monitoring multi-équipement — Secure Local Cloud</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal-pages.css', v='monitoring-harmony-v1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal-pages.css', v='disconnected-ui-v1-2') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment.css', v='multi-v1') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment-refined.css', v='monitoring-harmony-v1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring-equipment-refined.css', v='disconnected-ui-v1-2') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 </head>
 <body class="portal-v4 portal-body">
@@ -30,9 +30,10 @@
         <div><p class="breadcrumb">Monitoring / <span id="breadcrumb-equipment">Vue globale</span></p><div class="title-line"><span class="equipment-icon">▤</span><h1 id="equipment-title">Vue globale</h1><span class="os-badge" id="os-badge">Multi-équipement</span><span class="online-badge" id="online-badge">● En ligne</span></div><p id="equipment-role">État consolidé de l’infrastructure</p></div>
         <div class="equipment-tabs" id="equipment-tabs">
             <button class="active" data-equipment="global">Vue globale</button>
-            <button data-equipment="srv-web">srv-web</button>
-            <button data-equipment="srv-monitoring">srv-monitoring</button>
+            <button data-equipment="vps-production">VPS Production</button>
             <button data-equipment="pc-emmanuel">PC Emmanuel</button>
+            <button data-equipment="lab-srv-web">VM srv-web</button>
+            <button data-equipment="lab-srv-monitoring">VM srv-monitoring</button>
         </div>
     </section>
 
@@ -41,6 +42,24 @@
             <button data-hours="1">1 heure</button><button data-hours="6">6 heures</button><button class="active" data-hours="24">24 heures</button><button data-hours="168">7 jours</button>
         </div>
         <div class="live-state"><i></i><span id="refresh-state">Actualisation…</span></div>
+    </section>
+
+    <section class="disconnected-state" id="disconnected-state" hidden>
+        <div class="disconnected-state-icon" aria-hidden="true">○</div>
+        <div class="disconnected-state-copy">
+            <span class="disconnected-state-label">Extension distante</span>
+            <h2 id="disconnected-title">Équipement non connecté</h2>
+            <p id="disconnected-description">Aucune donnée n’est attendue tant que cet équipement n’est pas relié au VPS.</p>
+            <div class="disconnected-state-facts">
+                <span><i></i>Le portail VPS reste opérationnel</span>
+                <span><i></i>Aucune fausse alerte n’est générée</span>
+                <span><i></i>Les mesures reprendront après reconnexion</span>
+            </div>
+        </div>
+        <div class="disconnected-state-action">
+            <strong id="disconnected-action-title">Connexion à venir</strong>
+            <p id="disconnected-action-text">La liaison sécurisée sera configurée dans une prochaine étape.</p>
+        </div>
     </section>
 
     <section class="kpi-grid" id="kpi-grid">
@@ -95,6 +114,6 @@
     </section>
     <footer class="scrape-footer"><span><i></i> Dernière collecte réussie</span><span id="footer-source">Source : Prometheus</span></footer>
 </main>
-<script src="{{ url_for('static', filename='js/monitoring-equipment.js', v='multi-v3.2') }}"></script>
+<script src="{{ url_for('static', filename='js/monitoring-equipment.js', v='disconnected-ui-v1-2') }}"></script>
 </body>
 </html>

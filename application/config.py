@@ -57,8 +57,8 @@ class Config:
     )
 
     NODE_EXPORTER_JOB = os.getenv(
-        "NODE_EXPORTER_JOB",
-        "srv-web",
+        "VPS_NODE_EXPORTER_JOB",
+        "vps-production",
     )
 
     CADVISOR_JOB = os.getenv(
@@ -67,8 +67,8 @@ class Config:
     )
 
     NODE_EXPORTER_INSTANCE = os.getenv(
-        "NODE_EXPORTER_INSTANCE",
-        f"{WEB_PRIVATE_IP}:9100",
+        "VPS_NODE_EXPORTER_INSTANCE",
+        "node-exporter:9100",
     )
 
     CADVISOR_INSTANCE = os.getenv(
@@ -101,24 +101,55 @@ class Config:
         "pc-emmanuel",
     )
 
+    LAB_SRV_WEB_JOB = os.getenv(
+        "LAB_SRV_WEB_JOB",
+        "lab-srv-web",
+    )
+
+    LAB_SRV_WEB_INSTANCE = os.getenv(
+        "LAB_SRV_WEB_INSTANCE",
+        "100.64.0.12:9100",
+    )
+
+    LAB_SRV_MONITORING_JOB = os.getenv(
+        "LAB_SRV_MONITORING_JOB",
+        "lab-srv-monitoring",
+    )
+
+    LAB_SRV_MONITORING_INSTANCE = os.getenv(
+        "LAB_SRV_MONITORING_INSTANCE",
+        "100.64.0.13:9100",
+    )
+
     EQUIPMENTS = {
-        "srv-web": {
-            "id": "srv-web",
-            "name": "srv-web",
-            "role": "Serveur applicatif",
+        "vps-production": {
+            "id": "vps-production",
+            "name": "VPS Production",
+            "role": "Hébergement et observabilité",
             "os": "linux",
             "job": NODE_EXPORTER_JOB,
             "instance": NODE_EXPORTER_INSTANCE,
             "docker_job": CADVISOR_JOB,
             "docker_instance": CADVISOR_INSTANCE,
+            "monitored": True,
         },
-        "srv-monitoring": {
-            "id": "srv-monitoring",
-            "name": "srv-monitoring",
-            "role": "Serveur d’observabilité",
+        "lab-srv-web": {
+            "id": "lab-srv-web",
+            "name": "VM srv-web",
+            "role": "Serveur applicatif du laboratoire VMware",
             "os": "linux",
-            "job": MONITORING_NODE_JOB,
-            "instance": MONITORING_NODE_INSTANCE,
+            "job": LAB_SRV_WEB_JOB,
+            "instance": LAB_SRV_WEB_INSTANCE,
+            "monitored": True,
+        },
+        "lab-srv-monitoring": {
+            "id": "lab-srv-monitoring",
+            "name": "VM srv-monitoring",
+            "role": "Serveur d’observabilité du laboratoire VMware",
+            "os": "linux",
+            "job": LAB_SRV_MONITORING_JOB,
+            "instance": LAB_SRV_MONITORING_INSTANCE,
+            "monitored": True,
         },
         "pc-emmanuel": {
             "id": "pc-emmanuel",
@@ -128,6 +159,7 @@ class Config:
             "job": WINDOWS_EXPORTER_JOB,
             "instance": WINDOWS_EXPORTER_INSTANCE,
             "equipment_label": WINDOWS_EQUIPMENT,
+            "monitored": True,
         },
     }
 

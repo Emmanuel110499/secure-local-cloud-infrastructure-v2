@@ -58,6 +58,26 @@ def make_service():
 
 
 class MultiEquipmentTests(unittest.TestCase):
+    def test_optional_equipment_is_disconnected_without_prometheus_query(self):
+        equipment = dict(EQUIPMENTS)
+        equipment["pc-emmanuel"] = {
+            **equipment["pc-emmanuel"],
+            "monitored": False,
+        }
+        service = PrometheusService(
+            "http://prometheus.test:9090",
+            node_exporter_job="vps-production",
+            cadvisor_job="cadvisor",
+            node_exporter_instance="node-exporter:9100",
+            cadvisor_instance="cadvisor:8080",
+            equipments=equipment,
+        )
+        with patch.object(service, "query_scalar") as query:
+            result = service.get_equipment_metrics("pc-emmanuel")
+        self.assertEqual(result["state"], "disconnected")
+        self.assertEqual(result["metrics"], {})
+        query.assert_not_called()
+
     def test_catalog_does_not_expose_instances(self):
         catalog = make_service().get_equipment_catalog()
 
@@ -107,7 +127,7 @@ class MultiEquipmentTests(unittest.TestCase):
 
 
 class MultiEquipmentResponsiveTests(unittest.TestCase):
-    def test_mobile_navigation_and_single_column_layout_exist(self):
+    def test_autonomous_mobile_single_column_layout_exists(self):
         root = Path(__file__).resolve().parents[1]
         template = (root / "templates" / "monitoring.html").read_text(
             encoding="utf-8"
@@ -115,13 +135,9 @@ class MultiEquipmentResponsiveTests(unittest.TestCase):
         css = (
             root / "static" / "css" / "monitoring-equipment-refined.css"
         ).read_text(encoding="utf-8")
-        javascript = (
-            root / "static" / "js" / "monitoring-equipment.js"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn('id="mobile-menu-toggle"', template)
-        self.assertIn('id="mobile-sidebar-overlay"', template)
-        self.assertIn("configureMobileMenu", javascript)
+        self.assertIn('class="portal-page workspace monitoring-page"', template)
+        self.assertIn('class="portal-back"', template)
+        self.assertNotIn('class="shell-sidebar"', template)
         self.assertIn("grid-template-columns:1fr", css)
         self.assertIn("grid-template-columns:repeat(2,minmax(0,1fr))", css)
         self.assertIn("overflow-x:hidden", css)

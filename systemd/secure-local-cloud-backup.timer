@@ -1,0 +1,11 @@
+[Unit]
+Description=Planification quotidienne de la sauvegarde Secure Local Cloud
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+Persistent=true
+RandomizedDelaySec=10m
+Unit=secure-local-cloud-backup.service
+
+[Install]
+WantedBy=timers.target

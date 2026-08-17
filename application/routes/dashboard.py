@@ -207,12 +207,25 @@ def api_equipment_metrics(equipment_id: str):
 
     platform_services = get_complete_services_status()
     service_names = {
-        "srv-web": ("flask", "node_exporter", "cadvisor"),
-        "srv-monitoring": ("prometheus", "grafana", "alertmanager"),
+        "vps-production": (
+            "flask", "node_exporter", "cadvisor",
+            "prometheus", "grafana", "alertmanager",
+        ),
+        "lab-srv-web": ("node_exporter",),
+        "lab-srv-monitoring": ("node_exporter",),
         "pc-emmanuel": ("windows_exporter", "battery_collector"),
     }.get(equipment_id, ())
 
-    if equipment_id == "pc-emmanuel":
+    if result.get("state") == "disconnected":
+        contextual_services = {}
+    elif equipment_id in {
+        "lab-srv-web",
+        "lab-srv-monitoring",
+    }:
+        contextual_services = {
+            "node_exporter": result.get("state") == "up",
+        }
+    elif equipment_id == "pc-emmanuel":
         battery = result.get("metrics", {}).get("battery") or {}
         contextual_services = {
             "windows_exporter": result.get("state") == "up",
