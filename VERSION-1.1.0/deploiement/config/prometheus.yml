@@ -1,0 +1,60 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+  - job_name: vps-production
+    static_configs:
+      - targets:
+          - node-exporter:9100
+        labels:
+          equipment: vps-production
+          role: production
+          os: linux
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+          - cadvisor:8080
+        labels:
+          equipment: vps-production
+          role: containers
+
+  - job_name: pc-windows
+    static_configs:
+      - targets:
+          - 100.64.0.11:9182
+        labels:
+          equipment: pc-emmanuel
+          role: administration
+          os: windows
+          alert_on_down: "false"
+
+  - job_name: lab-srv-web
+    static_configs:
+      - targets:
+          - 100.64.0.12:9100
+        labels:
+          equipment: lab-srv-web
+          role: laboratory-application
+          os: linux
+          alert_on_down: "false"
+
+  - job_name: lab-srv-monitoring
+    static_configs:
+      - targets:
+          - 100.64.0.13:9100
+        labels:
+          equipment: lab-srv-monitoring
+          role: laboratory-monitoring
+          os: linux
+          alert_on_down: "false"

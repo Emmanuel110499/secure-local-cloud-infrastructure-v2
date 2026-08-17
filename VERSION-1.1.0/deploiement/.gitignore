@@ -1,0 +1,7 @@
+secrets/*.env
+secrets/*.key
+secrets/*.crt
+config/*.key
+config/internal-status.crt
+config/*.before-*
+!secrets/*.example

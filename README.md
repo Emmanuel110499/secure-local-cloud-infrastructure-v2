@@ -4,6 +4,12 @@ Portail local de supervision et d'administration d'une infrastructure auto-heber
 
 > Ce depot fournit une base de deploiement. Les adresses IP, noms d'hote, chemins de volumes et certificats doivent etre adaptes a votre environnement. Aucun secret reel ne doit etre versionne.
 
+## Accès rapide à la version 1.1.0
+
+Toute la publication v1.1.0 est regroupée dans un dossier unique : **[ouvrir VERSION-1.1.0](VERSION-1.1.0/README.md)**.
+
+Ce dossier contient les explications, les schémas, les captures réelles et les modèles de déploiement dans un ordre de lecture simple.
+
 ## Fonctionnalites
 
 - tableau de bord web et vues de supervision ;
