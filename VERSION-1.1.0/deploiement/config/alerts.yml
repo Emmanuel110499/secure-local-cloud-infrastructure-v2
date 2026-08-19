@@ -1,0 +1,41 @@
+groups:
+  - name: infrastructure-production
+    rules:
+      - alert: ProductionTargetDown
+        expr: up{role=~"production|containers"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "Service de production indisponible"
+          description: "{{ $labels.equipment }} / {{ $labels.job }} est inaccessible"
+      - alert: HighCPU
+        expr: 100 - (avg by(instance)(rate(node_cpu_seconds_total{mode="idle",role="production"}[5m])) * 100) > 80
+        for: 2m
+        labels: {severity: warning, environment: production}
+        annotations: {summary: "CPU du VPS élevé"}
+      - alert: HighMemory
+        expr: (1-node_memory_MemAvailable_bytes{role="production"}/node_memory_MemTotal_bytes{role="production"})*100 > 85
+        for: 2m
+        labels: {severity: warning, environment: production}
+        annotations: {summary: "Mémoire du VPS élevée"}
+      - alert: ProductionHighDisk
+        expr: 100*(1-node_filesystem_avail_bytes{role="production",mountpoint="/",fstype!~"tmpfs|overlay"}/node_filesystem_size_bytes{role="production",mountpoint="/",fstype!~"tmpfs|overlay"}) > 90
+        for: 5m
+        labels: {severity: critical, environment: production}
+        annotations: {summary: "Disque du VPS presque plein"}
+  - name: laboratory-dependencies
+    rules:
+      - alert: LaboratoryTargetDown
+        expr: (up{role=~"laboratory-.*"} == 0) and on() (max(up{job="pc-windows"}) == 1)
+        for: 2m
+        labels: {severity: warning, environment: laboratory}
+        annotations:
+          summary: "VM du laboratoire indisponible"
+          description: "{{ $labels.equipment }} est inaccessible alors que le PC hôte est connecté"
+      - alert: LaboratoryHighDisk
+        expr: 100*(1-node_filesystem_avail_bytes{role=~"laboratory-.*",mountpoint="/",fstype!~"tmpfs|overlay"}/node_filesystem_size_bytes{role=~"laboratory-.*",mountpoint="/",fstype!~"tmpfs|overlay"}) > 90
+        for: 10m
+        labels: {severity: warning, environment: laboratory}
+        annotations: {summary: "Disque d’une VM du laboratoire presque plein"}
