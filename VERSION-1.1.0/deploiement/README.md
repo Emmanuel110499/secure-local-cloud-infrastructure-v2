@@ -30,3 +30,7 @@ Les services d'administration écoutent uniquement sur `127.0.0.1`. L'accès pub
 ## Sécurité
 
 Ne jamais ajouter dans Git : fichiers `.env`, clés privées, jeton Cloudflare, état Tailscale, données applicatives ou volumes Docker.
+
+## Politique d’alertes livrée
+
+Le fichier `config/alerts.yml` reflète la politique finale : production critique, laboratoire en avertissement seulement lorsque le PC hôte est joignable. Les adresses et secrets réels ne sont pas inclus.

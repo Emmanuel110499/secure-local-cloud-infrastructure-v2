@@ -4,7 +4,7 @@ Ce document décrit l'architecture de production introduite avec la version `v1.
 
 ![Architecture de production Secure Local Cloud](../schemas/architecture-production.svg)
 
-## État validé au 17 août 2026
+## État validé au 19 août 2026
 
 | Équipement | Fonction | Disponibilité attendue |
 |---|---|---|
@@ -74,8 +74,8 @@ Les pare-feu des équipements autorisent les ports des exporters uniquement depu
 |---|---|---|---|
 | `vps-production` | VPS Production | Production | Oui |
 | `cadvisor` | VPS Production | Conteneurs | Oui |
-| `pc-windows` | PC Emmanuel | Administration | Non, extension facultative |
-| `lab-srv-web` | VM `srv-web` | Laboratoire applicatif | Non |
+| `pc-windows` | PC Emmanuel | Administration et hôte VMware | Non, extension facultative |
+| `lab-srv-web` | VM `srv-web` | Laboratoire applicatif | Avertissement seulement si le PC hôte est connecté |
 | `lab-srv-monitoring` | VM `srv-monitoring` | Laboratoire d'observabilité | Non |
 
 Une cible absente ne doit jamais être représentée par une mesure égale à zéro. L'interface distingue les états `UP`, `DOWN`, non connecté et en attente d'historique.
@@ -100,7 +100,9 @@ Toutes les archives sont contrôlées avec SHA-256. Les sauvegardes de productio
 - UFW limite les ports entrants ;
 - Cloudflare Access protège les consoles sensibles ;
 - Tailscale transporte les flux de collecte privés ;
-- les équipements de laboratoire peuvent être arrêtés sans fausse alerte critique.
+- les équipements de laboratoire peuvent être arrêtés sans fausse alerte critique ;
+- une tâche Windows restaure automatiquement les services réseau VMware après le démarrage du PC ;
+- Telegram reçoit les alertes critiques de production et les avertissements conditionnels du laboratoire.
 
 ## Ajouter un équipement
 
@@ -112,4 +114,4 @@ Toutes les archives sont contrôlées avec SHA-256. Les sauvegardes de productio
 6. Ajouter l'équipement au modèle de configuration Flask et aux tests.
 7. Vérifier les KPI, les courbes, l'état hors ligne et l'absence de fausse alerte.
 
-Pour le détail des changements publiés, consulter les [notes de version 1.1.0](RELEASE-v1.1.0.md).
+Pour le détail des changements publiés, consulter les [notes de version 1.1.0](NOTES-DE-VERSION.md).

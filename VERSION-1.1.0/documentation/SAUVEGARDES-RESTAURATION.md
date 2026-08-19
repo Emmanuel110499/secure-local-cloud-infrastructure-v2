@@ -65,3 +65,7 @@ Get-ChildItem "$env:USERPROFILE\SecureLocalCloud-Backups" -Recurse -File
 8. Planifier ensuite la restauration de production avec un retour arrière.
 
 Une sauvegarde n’est considérée fiable qu’après un test de restauration réussi.
+
+## État vérifié au 19 août 2026
+
+Les minuteries systemd sont actives. Les archives conservées ont été contrôlées avec SHA-256. La rétention est limitée afin de protéger l’espace disque : trois générations sur le VPS et deux sur chaque VM. Une restauration complète reste à tester périodiquement.

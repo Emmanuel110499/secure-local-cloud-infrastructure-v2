@@ -73,3 +73,12 @@ Consultez également [l'architecture détaillée](ARCHITECTURE.md), [le guide d'
 - la santé globale de l'application a été validée après stabilisation ;
 - les archives de sauvegarde ont passé le contrôle SHA-256 ;
 - les configurations Prometheus et les règles d'alerte ont été validées avec `promtool`.
+
+## Finalisation du 19 août 2026
+
+- liaison Tailscale validée entre le VPS, le PC et les deux VM ;
+- remontée réelle des métriques Windows et Linux ;
+- Telegram validé de bout en bout ;
+- distinction entre alertes critiques de production et avertissements conditionnels du laboratoire ;
+- récupération automatique du réseau VMware au démarrage de Windows ;
+- documentation consolidée dans un dossier unique avec PDF et présentation.
